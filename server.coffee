@@ -15,9 +15,9 @@ app = express()
 app.use express.favicon()
 app.use express.logger('dev')
 app.use express.bodyParser()
+app.use '/static', express.static(path.join(__dirname, 'static'))
 app.use app.router
 app.use express.errorHandler()
-app.use express.static(path.join(__dirname, 'public'))
 
 
 # load the packaged drivers, we're assuming there may be user provided
@@ -30,7 +30,7 @@ processClientRequest = (client) ->
   connectionConfig = core.selectConnection(client)
   query.execute driver, connectionConfig, renderedTemplate, client.sendRow, client.startRowset
 
-app.get '/response-stream', (req, res) ->
+app.get '/sse', (req, res) ->
   new sse.Client req, res
 
 app.get /\/(.+)$/, (req, res) ->
@@ -42,6 +42,7 @@ app.get /\/(.+)$/, (req, res) ->
 
   res.writeHead(200, {'Content-Type': 'text/html'})
   res.write("\n")
+  res.write "Message Sent"
   res.end()
 
 

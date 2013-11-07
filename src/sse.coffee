@@ -26,7 +26,11 @@ class Client
 
   sendEvent: (name, data) ->
     @res.write "event: #{name}\n"
-    @res.write "data: #{data}\n\n"
+    if data
+      @res.write "data: #{data}\n"
+    else
+      @res.write "data:\n"
+    @res.write "\n"
 
   attach: () =>
     @req.socket.setTimeout(Infinity)
@@ -38,8 +42,8 @@ class Client
     @res.write('\n')
 
     registerPing = (client) ->
-      sendPing = () -> client.sendData("data: ping\n\n")
-      setInterval sendPing, 30000
+      sendPing = () -> client.sendEvent("ping")
+      setInterval sendPing, 5000
   
     # this is how we'll hook the close of the request so that we can do
     # any cleanup of our
