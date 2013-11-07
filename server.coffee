@@ -5,7 +5,7 @@ path    = require 'path'
 fs      = require 'fs'
 hogan   = require 'hogan.js'
 log     = require 'simplog'
-Client  = require('./src/client.coffee').Client
+sse     = require './src/sse.coffee'
 core    = require './src/core.coffee'
 config  = require './src/config.coffee'
 query   = require './src/query.coffee'
@@ -30,43 +30,11 @@ processClientRequest = (client) ->
   connectionConfig = core.selectConnection(client)
   query.execute driver, connectionConfig, renderedTemplate, client.sendRow, client.startRowset
 
-connectedClients = {}
-
 app.get '/response-stream', (req, res) ->
-  req.socket.setTimeout(Infinity)
-  log.debug("update-stream requested")
-
-  res.writeHead 200, {
-    'Content-Type': 'text/event-stream',
-    'Cache-Control': 'no-cache',
-    'Connection': 'keep-alive'
-  }
-  res.write('\n')
-
-  client = new Client req, res
-  connectedClients[client.id] = client
-  
-  registerClose = (clientId) ->
-    req.on "close", () ->
-      log.debug "close event raised for #{clientId}"
-      delete connectedClients[clientId]
-      num = 0
-      _.each connectedClients, () -> num++
-      log.debug "Num connectedClients connected: #{num}"
-    
-
-  registerPing = (client) ->
-    sendPing = () -> client.res.write("data: ping\n\n")
-    setInterval sendPing, 30000
-
-  registerPing client
-  registerClose client.id
-
-  client.sendEvent("id_assign", client.id)
-  log.debug "added client: #{client.id}"
+  new sse.Client req, res
 
 app.get /\/(.+)$/, (req, res) ->
-  client = connectedClients[req.param('client_id')]
+  client = sse.getConnectedClientById(req.param('client_id'))
   template_path = req.params[0]
   if client != undefined
     log.debug "raising event for client"
@@ -79,4 +47,4 @@ app.get /\/(.+)$/, (req, res) ->
 
 PORT = process.env.PORT || 8080
 app.listen PORT
-console.log("Express server listening on port %d in %s mode", PORT, app.settings.env);
+console.log("Express server listening on port %d in %s mode", PORT, app.settings.env)
