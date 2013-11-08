@@ -2,8 +2,6 @@
 express = require 'express'
 _       = require 'underscore'
 path    = require 'path'
-fs      = require 'fs'
-hogan   = require 'hogan.js'
 log     = require 'simplog'
 sse     = require './src/sse.coffee'
 core    = require './src/core.coffee'
@@ -19,26 +17,44 @@ app.use '/static', express.static(path.join(__dirname, 'static'))
 app.use app.router
 app.use express.errorHandler()
 
+core.init()
 
-# load the packaged drivers, we're assuming there may be user provided
-# drivers
-drivers = core.loadDrivers(path.join(__dirname, 'src', 'drivers'))
+processQueryRequest = (queryRequest, onComplete) ->
+  client.sendEvent "queryBegin", {template: templatePath}
+  oncComplete = () -> client.sendEvent "queryComplete"
+  onRendered = (renderedTemplate) ->
+    driver = core.selectDriver queryRequest.templatePath, drivers
+    # for reference
+    queryRequest.renderedTemplate = renderedTemplate
+    query.execute driver,
+      queryRequest.connectionConfig,
+      renderedTemplate,
+      queryRequest.client.sendRow,
+      queryRequest.client.startRowset,
+      onComplete
+  templates.renderTemplate queryRequest.templatePath,
+        context,
+        onRendered
 
-processClientRequest = (client) ->
-  renderedTemplate = templates.renderTemplate(client.templatePath, client.context)
-  driver = core.selectDriver(client.templatePath, drivers)
-  connectionConfig = core.selectConnection(client)
-  query.execute driver, connectionConfig, renderedTemplate, client.sendRow, client.startRowset
 
 app.get '/sse', (req, res) ->
   new sse.Client req, res
 
 app.get /\/(.+)$/, (req, res) ->
   client = sse.getConnectedClientById(req.param('client_id'))
-  template_path = req.params[0]
-  if client != undefined
-    log.debug "raising event for client"
-    client.sendEvent template_path, "data mang!"
+  if client
+    # we allow people to provide any path relative to the templates directory
+    # so we'll remove the initial / and keep the rest of the path while conveniently
+    # dropping any parent indicators (..)
+    templatePath = req.params[0].replace(/\.\./g, '')
+    templateContext = _.extend {}, req.body, req.query, req.headers
+    qr = new QueryRequest templatePath, client, templateContext
+    # here we select the appropriate connection based on the inbound request
+    qr.connectionConfig = core.selectConnection client
+    processQueryRequest client,
+        context,
+        templatePath,
+        () -> client.sendEvent "queryComplete"
 
   res.writeHead(200, {'Content-Type': 'text/html'})
   res.write("\n")
@@ -46,6 +62,6 @@ app.get /\/(.+)$/, (req, res) ->
   res.end()
 
 
-PORT = process.env.PORT || 8080
-app.listen PORT
-console.log("Express server listening on port %d in %s mode", PORT, app.settings.env)
+log.info "server starting with configuration"
+log.info "%j", config
+app.listen config.port

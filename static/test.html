@@ -3,16 +3,30 @@
   <title>Yo</title>
   <link rel='stylesheet' href='/stylesheets/style.css'></link>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
   <script type="text/javascript" src="/static/client.js"></script>
   <script type="text/javascript">
-    client = new Client();
-    function fire(){
-      client.request('/pants');
+    function QueryController($scope){
+      $scope.client = new Client();
+      $scope.fire = function () { $scope.client.request('/pants'); }
+      $scope.client.addEventListener('queryBegin', function(e){
+        $scope.lastTemplate = e.template;
+        $scope.queryActive = true;
+        $scope.$apply();
+      });
+      $scope.client.addEventListener('queryEnd', function(e){
+        $scope.queryActive = false;
+        $scope.$apply();
+      });
+
     }
   </script>
 </head>
-<body>
-  <button onclick="fire();">Fire!</button>
+<body ng-app>
+  <div ng-controller="QueryController">
+  <button ng-click="fire()">Fire!</button>
+  <div id="lastTemplate">{{lastTemplate}}</div>
+  </div>
 </body>
 </html>
 

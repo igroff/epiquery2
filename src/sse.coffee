@@ -11,10 +11,6 @@ CONNECTED_CLIENTS={}
 
 class Client
   constructor: (@req, @res) ->
-    # we allow people to provide any path relative to the templates directory
-    # so we'll remove the initial / and keep the rest of the path while conveniently
-    # dropping any parent indicators (..)
-    @templatePath = @req.path.replace(/\.\./g, '')
     @id = "#{CLIENT_COUNTER++}#{process.pid}"
     @attach()
 
@@ -26,9 +22,12 @@ class Client
 
   sendEvent: (name, data) ->
     @res.write "event: #{name}\n"
-    if data
-      @res.write "data: #{data}\n"
+    if data and (typeof(data) is "string")
+        @res.write "data: #{data}\n"
+    else if data
+      @res.write "data: #{JSON.stringify data}\n"
     else
+      # no data
       @res.write "data:\n"
     @res.write "\n"
 
@@ -43,7 +42,7 @@ class Client
 
     registerPing = (client) ->
       sendPing = () -> client.sendEvent("ping")
-      setInterval sendPing, 5000
+      setInterval sendPing, 30000
   
     # this is how we'll hook the close of the request so that we can do
     # any cleanup of our

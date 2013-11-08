@@ -14,12 +14,12 @@ for a date issue). Driver name: mssql
 
 ## Configuration 
 
-Config, JSON object accessible via environment variable EPIQUERY_CONFIG as either the object itself (JSON) or
-a file containing JSON.
+Config, JSON object accessible via environment variable `EPIQUERY_CONFIG` as
+either the object itself (JSON) or a file containing JSON.
 
 #### Configuration Structure
-Provides the configuration information for an epiquery instance, a skeleton with all options is listed
-below:
+Provides the configuration information for an epiquery instance, a skeleton
+with all options is listed below:
 
     {
       "connections":[],
@@ -57,9 +57,9 @@ configuration data that is specific to the driver.
  
 ## Interface
 
-  The systems to which epiquery provides access are generally streaming data sources.
-The only supported interface is websockets as it allows for simple event based interface more
-compatable with streaming data
+  The systems to which epiquery provides access are generally streaming data
+sources.  The only supported interface is websockets as it allows for simple
+event based interface more compatable with streaming data
 
 ##### Compatability
     As a convenience there is a veneer that maps the underlying socket protocol into a REST like interface. The REST interface is backwards compatible with an older epiquery interface offering less functionality and being quite a bit less sophisticated than the socket interface.  
@@ -115,3 +115,25 @@ active.
 
 execute_query(text, row_callback, recordset_callback)
 
+### Design thoughts
+
+#### Request Tracking
+
+In order for support of various useful functionality the system will have the
+concept of a QueryRequest.  The QueryRequest will track all the state info
+about a request to execute a query, this will facilitate all sorts of things
+around tracking a single request to execute a query as it is handled by the
+system.  Specifically this is to help debugging as the concept of epiquery is
+very concise and simple, it should support a robust handling of that functionality
+
+
+#### Data Source 'Drivers'
+
+Epiquery simply provides a consistent interface to query data from various
+disparate datasources (often Relational, and almost always best treated as 
+streaming data sources).  To support this and allow for ease of extending
+the system to support other datasources epiquery will support individual
+Drivers handling the interface to the various supported data sources.  Epiquery
+will explicitly support a set of built in drivers and handling of 'after market'
+or user created drivers as well to facilitate extension to support additonal
+datasources.
