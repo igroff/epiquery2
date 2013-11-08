@@ -1,6 +1,10 @@
 hogan     = require 'hogan.js'
 dot       = require 'dot'
 async     = require 'async'
+log       = require 'simplog'
+fs        = require 'fs'
+path      = require 'path'
+
 # regex to replace MS special charactes, these are characters that are known to
 # cause issues in storage and retrieval so we're going to switch 'em wherever
 # we find 'em
@@ -53,19 +57,20 @@ getRendererForTemplate = (templatePath) ->
     return renderers[""]
 
 templateLoader = (templatePath, context, cb) ->
-  loadTemplate = (templatePath, cb) ->
-    callbackWithData = (error, rawTemplate) ->
-      cb error, templatePath, rawTemplate, context
-    fs.readFile templatePath, {encoding: 'utf8'}, callbackWithData
+  log.info "loading template %s", templatePath
+  callbackWithData = (error, rawTemplate) ->
+    cb error, templatePath, rawTemplate, context
+  fs.readFile templatePath, {encoding: 'utf8'}, callbackWithData
 
 renderTemplate = (templatePath, templateContent, context, cb) ->
-  renderer = getRendererForTemplate template_name
-  rendered = renderer template.toString(), template_context
-  cb null, {rawTemplate: template, renderedTemplate: renderedTemplate}
+  log.info "renderingTemplate #{templatePath}"
+  renderer = getRendererForTemplate templatePath
+  rendered = renderer templateContent.toString(), context
+  cb null, {rawTemplate: templateContent, renderedTemplate: rendered}
 
 module.exports.renderTemplate = (templatePath, context, cb) ->
- stepsToRender = [
-    (cb) -> cb templatePath, context,
+  stepsToRender = [
+    (bootstrapCallback) -> bootstrapCallback(null, templatePath, context),
     templateLoader,
     renderTemplate
   ]
