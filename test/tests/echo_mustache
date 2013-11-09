@@ -1,0 +1,2 @@
+#! /usr/bin/env bash
+./test/bin/templateRunner.coffee --templatePath /Users/iangroff/Development/epiquery/templates/test/echo.mustache --context '{"pants":"blue jeans","message":"Clint Rulez!!!"}'
