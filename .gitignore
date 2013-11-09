@@ -1,3 +1,4 @@
 *.swp
 *.bs
 node_modules/
+test/templates/

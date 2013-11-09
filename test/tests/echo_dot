@@ -1,2 +1,2 @@
 #! /usr/bin/env bash
-./test/bin/templateRunner.coffee --templatePath /Users/iangroff/Development/epiquery/templates/test/echo.dot --context '{"pants":"blue jeans","message":"Clint Rulez!!!"}' 2>/dev/null
+./test/bin/templateRunner.coffee --templatePath ./test/templates/test/echo.dot --context '{"pants":"blue jeans","message":"Clint Rulez!!!"}' 2>/dev/null
