@@ -1,11 +1,17 @@
 ## Definitions
 
-* Query - Used to refer to the rendered result of processing a template in response to a query message. 
-  Specifically we use this to refer to the resulting string as it is sent to the target server.  A Query
-  as we've defined here may well contain multiple queries against the target data source resulting in 
-  multiple result sets.
-* Active Query - A Query is considered to be active while it is being processed by epiquery.  This 
-  time is specifically that which is bounded by Query Begin and Query Complete messages.
+* Query - Used to refer to the rendered result of processing a template in
+response to a query message.  Specifically we use this to refer to the
+resulting string as it is sent to the target server.  A Query as we've defined
+here may well contain multiple queries against the target data source
+resulting in multiple result sets.
+* Active Query - A Query is considered to be active while it is being
+processed by epiquery.  This time is specifically that which is bounded by
+Query Begin and Query Complete messages.
+* QueryRequest - An inbound request for epiquery to render and execute a 
+template against a specific connection.
+* Data Source - A server from which epiquery is capable of retrieving data for
+a query.
 
 ## Supported data sources
 * Microsoft SQL Server - as supported by the tedious npm package (although it has been patched
@@ -22,9 +28,9 @@ Provides the configuration information for an epiquery instance, a skeleton
 with all options is listed below:
 
     {
-      "connections":[],
+      "connections":{}
       "templateDir":"",
-      "listeningPort":8080
+      "port":8080
     }
 
 ##### Connection Config
@@ -38,19 +44,18 @@ connections list in the epiquery configuration object.  The config property of t
 configuration data that is specific to the driver.
 
     {
-      "name":"",
       "driver":"",
       "config":{}
     }
 
 #### Sample Configuration
     {
-      "connections":[
-        {"name":"sql__old","driver":"mssql","config": {"user":"", "password":"", "host":"", "port":""}},
-        {"name":"sql_conn","driver":"mssql","config": {"user":"", "password":"", "host":"", "port":""}},
-        {"name":"sql_con2","driver":"mssql","config": {"user":"", "password":"", "host":"", "port":""}},
-        {"name":"mysql","driver":"mysql","config": {"user":"", "password":"", "host":"", "port":""}}
-      ],
+      "connections":{
+        "sql__old":{"driver":"mssql","config": {"user":"", "password":"", "host":"", "port":""}},
+        "sql_conn":{"driver":"mssql","config": {"user":"", "password":"", "host":"", "port":""}},
+        "sql_con2":{"driver":"mssql","config": {"user":"", "password":"", "host":"", "port":""}},
+        "mysql":   {"driver":"mysql","config": {"user":"", "password":"", "host":"", "port":""}}
+      },
       "templateDir":"",
       "httpPort":8080
     }
@@ -113,7 +118,7 @@ active.
 
 ### Query Driver Interface
 
-execute_query(text, row_callback, recordset_callback)
+executeQuery(text, rowCallback, recordsetCallback)
 
 ### Design thoughts
 
@@ -137,3 +142,10 @@ Drivers handling the interface to the various supported data sources.  Epiquery
 will explicitly support a set of built in drivers and handling of 'after market'
 or user created drivers as well to facilitate extension to support additonal
 datasources.
+
+#### Connections
+
+Epiquery supports configuration of multiple, named, connections to be used
+when executing a QueryRequets.  In addition it allows for specification of
+all required connection information within the request, allowing for connection
+to arbitrary supported data sources.

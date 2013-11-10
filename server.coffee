@@ -21,19 +21,17 @@ core.init()
 
 processQueryRequest = (queryRequest, onComplete) ->
   client.sendEvent "queryBegin", {template: templatePath}
-  oncComplete = () -> client.sendEvent "queryComplete"
   onRendered = (renderedTemplate) ->
-    driver = core.selectDriver queryRequest.templatePath, drivers
-    # for reference
+    driver = core.selectDriver queryRequest.connectionConfig
     queryRequest.renderedTemplate = renderedTemplate
     query.execute driver,
       queryRequest.connectionConfig,
       renderedTemplate,
       queryRequest.client.sendRow,
       queryRequest.client.startRowset,
-      onComplete
+      () -> client.sendEvent "queryComplete"
   templates.renderTemplate queryRequest.templatePath,
-        context,
+        queryRequest.templateContext,
         onRendered
 
 
@@ -50,7 +48,7 @@ app.get /\/(.+)$/, (req, res) ->
     templateContext = _.extend {}, req.body, req.query, req.headers
     qr = new QueryRequest templatePath, client, templateContext
     # here we select the appropriate connection based on the inbound request
-    qr.connectionConfig = core.selectConnection client
+    qr.connectionConfig = core.selectConnection req
     processQueryRequest client,
         context,
         templatePath,
