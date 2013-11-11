@@ -21,6 +21,11 @@ core.init()
 
 processQueryRequest = (queryRequest, onComplete) ->
   queryRequest.beginQuery()
+  queryCompleteCallback = (err) ->
+    if err
+      log.error err
+      queryRequest.sendError(err)
+    queryRequest.endQuery()
   onRendered = (err, rawTemplate, renderedTemplate) ->
     log.debug "onRendered(#{_.toArray arguments})"
     driver = core.selectDriver queryRequest.connectionConfig
@@ -28,15 +33,16 @@ processQueryRequest = (queryRequest, onComplete) ->
     query.execute driver,
       queryRequest.connectionConfig,
       renderedTemplate,
-      queryRequest.client.sendRow,
-      queryRequest.client.startRowset,
-      queryRequest.endQuery
+      queryRequest.sendRow,
+      queryRequest.startRowset,
+      queryCompleteCallback
   templates.renderTemplate queryRequest.templatePath,
         queryRequest.templateContext,
         onRendered
 
-
 app.get '/sse', (req, res) ->
+  # providing the client_id is specifically for testing, if you're doing it
+  # for any other reason you're doing it in an un-intended manner
   client_id = req.param('client_id')
   new sse.Client req, res, client_id
 

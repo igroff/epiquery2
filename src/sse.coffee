@@ -39,10 +39,6 @@ class Client
     }
     @res.write('\n')
 
-    registerPing = (client) ->
-      sendPing = () -> client.sendEvent("ping")
-      setInterval sendPing, 30000
-  
     # this is how we'll hook the close of the request so that we can do
     # any cleanup of our
     registerClose = (clientId, req) ->
@@ -55,14 +51,12 @@ class Client
 
     CONNECTED_CLIENTS[@id] = this
     registerClose @id, @req
-    registerPing this
 
     @sendEvent("id_assign", @id)
     log.debug "attached client: #{@id}"
 
-    close: () =>
-      @req.end()
-    
+  close: () =>
+    @res.end()
 
 
 module.exports.Client = Client

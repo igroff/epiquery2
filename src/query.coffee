@@ -29,6 +29,13 @@ class QueryRequest
       columns: row
     @client.sendEvent 'row', event
 
+  sendError: (msg) =>
+    event =
+      queryId: @id
+      message: "error"
+      data: msg
+    @client.sendEvent 'error', event
+
   beginRowset: (rowSet) =>
     event =
       queryId: @id
@@ -49,7 +56,7 @@ class QueryRequest
 
  
 module.exports.execute = (driver, config, query, rowCallback, rowsetCallback, cb) ->
-  log.debug "using #{driver.name} to execute query #{query}, with connection #{config}"
+  log.debug "using #{driver.name} to execute query #{query}, with connection %j", config
   driver.execute(config, query, rowCallback, rowsetCallback, cb)
 
 module.exports.QueryRequest = QueryRequest

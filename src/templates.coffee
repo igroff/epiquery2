@@ -65,7 +65,6 @@ templateLoader = (templatePath, context, cb) ->
 
 renderTemplate = (templatePath, templateContent, context, cb) ->
   log.debug "renderingTemplate #{templatePath}"
-  log.debug "content:\n%s", templateContent
   renderer = getRendererForTemplate templatePath
   rendered = renderer templateContent.toString(), context
   log.debug "renderd template content:\n%s", rendered
