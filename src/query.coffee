@@ -1,6 +1,8 @@
+log     = require 'simplog'
+
 QUERY_REQUEST_COUNTER = 0
 class QueryRequest
-  constructor: (@template, @client, @context=null) ->
+  constructor: (@client, @context=null) ->
     # the id that will be used to relate events to a particular query
     # execution.  This is core to the streaming async nature of the entire
     # system.  The client will be able to issue a number of queries without
@@ -46,4 +48,8 @@ class QueryRequest
     @client.sendEvent 'queryEnd', {queryId: @id}
     
  
-module.exports.execute = (driver, config, query, rowCallback, rowsetCallback) ->
+module.exports.execute = (driver, config, query, rowCallback, rowsetCallback, cb) ->
+  log.debug "using #{driver.name} to execute query #{query}, with connection #{config}"
+  driver.execute(config, query, rowCallback, rowsetCallback, cb)
+
+module.exports.QueryRequest = QueryRequest

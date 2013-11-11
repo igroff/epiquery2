@@ -143,6 +143,12 @@ will explicitly support a set of built in drivers and handling of 'after market'
 or user created drivers as well to facilitate extension to support additonal
 datasources.
 
+##### Provided Drivers
+* mssql 
+* mysql
+* file
+* msmdx
+
 #### Connections
 
 Epiquery supports configuration of multiple, named, connections to be used

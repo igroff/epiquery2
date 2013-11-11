@@ -20,8 +20,10 @@ app.use express.errorHandler()
 core.init()
 
 processQueryRequest = (queryRequest, onComplete) ->
-  client.sendEvent "queryBegin", {template: templatePath}
-  onRendered = (renderedTemplate) ->
+  queryRequest.client.sendEvent "queryBegin",
+      {template: queryRequest.templatePath}
+  onRendered = (err, rawTemplate, renderedTemplate) ->
+    log.debug "onRendered(#{_.toArray arguments})"
     driver = core.selectDriver queryRequest.connectionConfig
     queryRequest.renderedTemplate = renderedTemplate
     query.execute driver,
@@ -29,7 +31,7 @@ processQueryRequest = (queryRequest, onComplete) ->
       renderedTemplate,
       queryRequest.client.sendRow,
       queryRequest.client.startRowset,
-      () -> client.sendEvent "queryComplete"
+      () -> queryRequest.client.sendEvent "queryComplete"
   templates.renderTemplate queryRequest.templatePath,
         queryRequest.templateContext,
         onRendered
@@ -44,14 +46,14 @@ app.get /\/(.+)$/, (req, res) ->
     # we allow people to provide any path relative to the templates directory
     # so we'll remove the initial / and keep the rest of the path while conveniently
     # dropping any parent indicators (..)
-    templatePath = req.params[0].replace(/\.\./g, '')
     templateContext = _.extend {}, req.body, req.query, req.headers
-    qr = new QueryRequest templatePath, client, templateContext
+    qr = new query.QueryRequest(client, templateContext)
     # here we select the appropriate connection based on the inbound request
-    qr.connectionConfig = core.selectConnection req
-    processQueryRequest client,
-        context,
-        templatePath,
+    core.selectConnection req, qr
+    log.debug "using connection configuration: %j", qr.connectionConfig
+    processQueryRequest qr,
+        templateContext,
+        qr.templatePath,
         () -> client.sendEvent "queryComplete"
 
   res.writeHead(200, {'Content-Type': 'text/html'})

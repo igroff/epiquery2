@@ -4,6 +4,7 @@ async     = require 'async'
 log       = require 'simplog'
 fs        = require 'fs'
 path      = require 'path'
+_         = require 'underscore'
 
 # regex to replace MS special charactes, these are characters that are known to
 # cause issues in storage and retrieval so we're going to switch 'em wherever
@@ -63,10 +64,12 @@ templateLoader = (templatePath, context, cb) ->
   fs.readFile templatePath, {encoding: 'utf8'}, callbackWithData
 
 renderTemplate = (templatePath, templateContent, context, cb) ->
-  log.info "renderingTemplate #{templatePath}"
+  log.debug "renderingTemplate #{templatePath}"
+  log.debug "content:\n%s", templateContent
   renderer = getRendererForTemplate templatePath
   rendered = renderer templateContent.toString(), context
-  cb null, {rawTemplate: templateContent, renderedTemplate: rendered}
+  log.debug "renderd template content:\n%s", rendered
+  cb null, [templateContent, rendered]
 
 module.exports.renderTemplate = (templatePath, context, cb) ->
   stepsToRender = [
@@ -74,4 +77,10 @@ module.exports.renderTemplate = (templatePath, context, cb) ->
     templateLoader,
     renderTemplate
   ]
-  async.waterfall stepsToRender, cb
+  async.waterfall stepsToRender,
+    (err, results) ->
+      if err
+        cb(err)
+      else
+        results.unshift(err)
+        cb.apply cb, results
