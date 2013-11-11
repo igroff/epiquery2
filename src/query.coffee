@@ -46,7 +46,7 @@ class QueryRequest
 
   endQuery: () =>
     @client.sendEvent 'queryEnd', {queryId: @id}
-    
+
  
 module.exports.execute = (driver, config, query, rowCallback, rowsetCallback, cb) ->
   log.debug "using #{driver.name} to execute query #{query}, with connection #{config}"

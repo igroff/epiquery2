@@ -20,8 +20,7 @@ app.use express.errorHandler()
 core.init()
 
 processQueryRequest = (queryRequest, onComplete) ->
-  queryRequest.client.sendEvent "queryBegin",
-      {template: queryRequest.templatePath}
+  queryRequest.beginQuery()
   onRendered = (err, rawTemplate, renderedTemplate) ->
     log.debug "onRendered(#{_.toArray arguments})"
     driver = core.selectDriver queryRequest.connectionConfig
@@ -31,14 +30,25 @@ processQueryRequest = (queryRequest, onComplete) ->
       renderedTemplate,
       queryRequest.client.sendRow,
       queryRequest.client.startRowset,
-      () -> queryRequest.client.sendEvent "queryComplete"
+      queryRequest.endQuery
   templates.renderTemplate queryRequest.templatePath,
         queryRequest.templateContext,
         onRendered
 
 
 app.get '/sse', (req, res) ->
-  new sse.Client req, res
+  client_id = req.param('client_id')
+  new sse.Client req, res, client_id
+
+app.get "/terminate/:client_id", (req, res) ->
+  log.info "terminate requested for #{req.params.client_id}"
+  client = sse.getConnectedClientById(req.params.client_id)
+  if client
+    log.debug "terminating client #{req.params.client_id}"
+    client.close()
+  res.writeHead(200, {'Content-Type': 'text/html'})
+  res.write "\n"
+  res.end()
 
 app.get /\/(.+)$/, (req, res) ->
   client = sse.getConnectedClientById(req.param('client_id'))
@@ -60,6 +70,8 @@ app.get /\/(.+)$/, (req, res) ->
   res.write("\n")
   res.write "Message Sent"
   res.end()
+
+  
 
 
 log.info "server starting with configuration"

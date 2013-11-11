@@ -10,17 +10,16 @@ CLIENT_COUNTER=0
 CONNECTED_CLIENTS={}
 
 class Client
-  constructor: (@req, @res) ->
-    @id = "#{CLIENT_COUNTER++}#{process.pid}"
+  # id is an optional parameter, it's only here to facilitate testing
+  constructor: (@req, @res, @id=null) ->
+    if not @id
+      @id = "#{CLIENT_COUNTER++}#{process.pid}"
     @attach()
 
-  sendRow: (row) ->
-  startRowset: (metadata=null) ->
-
-  sendData: (data) ->
+  sendData: (data) =>
     @res.write "data: #{data}\n\n"
 
-  sendEvent: (name, data) ->
+  sendEvent: (name, data) =>
     @res.write "event: #{name}\n"
     if data and (typeof(data) is "string")
         @res.write "data: #{data}\n"
@@ -60,6 +59,10 @@ class Client
 
     @sendEvent("id_assign", @id)
     log.debug "attached client: #{@id}"
+
+    close: () =>
+      @req.end()
+    
 
 
 module.exports.Client = Client
