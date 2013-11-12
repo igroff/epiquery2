@@ -34,7 +34,7 @@ processQueryRequest = (queryRequest, onComplete) ->
       queryRequest.connectionConfig,
       renderedTemplate,
       queryRequest.sendRow,
-      queryRequest.startRowset,
+      queryRequest.beginRowset,
       queryCompleteCallback
   templates.renderTemplate queryRequest.templatePath,
         queryRequest.templateContext,

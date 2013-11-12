@@ -22,7 +22,7 @@ class Client
   sendEvent: (name, data) =>
     @res.write "event: #{name}\n"
     if data and (typeof(data) is "string")
-        @res.write "data: #{data}\n"
+      @res.write "data: #{data}\n"
     else if data
       @res.write "data: #{JSON.stringify data}\n"
     else

@@ -55,8 +55,16 @@ class QueryRequest
     @client.sendEvent 'queryEnd', {queryId: @id}
 
  
-module.exports.execute = (driver, config, query, rowCallback, rowsetCallback, cb) ->
-  log.debug "using #{driver.name} to execute query #{query}, with connection %j", config
-  driver.execute(config, query, rowCallback, rowsetCallback, cb)
+execute = (driver, config, query, rowCallback, rowsetCallback, cb) ->
+  log.debug(
+    "using #{driver.name} to execute query #{query}, with connection %j",
+    config
+  )
+  driverInstance = new driver.class(query, config)
+  driverInstance.on 'row', rowCallback
+  driverInstance.on 'beginRowset', rowsetCallback
+  driverInstance.on 'endQuery', cb
+  driverInstance.on 'error', cb
 
 module.exports.QueryRequest = QueryRequest
+module.exports.execute = execute

@@ -11,19 +11,19 @@ loadDrivers = (driverPath) ->
     # ignore hidden files
     continue if file[0] is '.'
     driverModule = require path.join(driverPath, file)
-    if driverModule.execute
+    if driverModule.DriverClass
       driverName = file.replace(/\.coffee$/,'').replace(/\.js/,'')
       log.info "loading driver from #{file}"
-      DRIVERS[driverName] = {execute: driverModule.execute, driver: driverModule, name: driverName}
+      DRIVERS[driverName] =
+        class: driverModule.DriverClass
+        module: driverModule
+        name: driverName
       log.info "driver '#{driverName}' loaded"
     else
       log.error "Unable to find execute in module #{file}"
 
 selectDriver = (connectionConfig) ->
-  selected = DRIVERS[connectionConfig.driver]
-  if not selected
-    throw "unable to find driver by name '#{connectionConfig.driver}'"
-  selected
+  DRIVERS[connectionConfig.driver]
 
 init = () ->
   # load out-of-the-box drivers
@@ -33,7 +33,7 @@ init = () ->
   
 # we select the connection based on the data in the inbound http request
 # this allows us to do things like have an explicit override of the connection
-# passed in via HTTP Header 
+# passed in via HTTP Header
 selectConnection = (httpRequest, queryRequest) ->
   # remove any leading '/' and any dubious parent references '..'
   templatePath = httpRequest.path.replace(/\.\./g, '').replace(/^\//, '')
@@ -48,8 +48,7 @@ selectConnection = (httpRequest, queryRequest) ->
     pathParts = templatePath.split('/')
     connectionName = pathParts.shift()
     conn = config.connections[connectionName]
-    if not conn
-      throw "unable to find connection by name '#{connectionName}'"
+    conn || log.error "unable to find connection by name '#{connectionName}'"
     templatePath = path.join.apply(path.join, pathParts)
   queryRequest.templatePath = path.join(config.templateDirectory, templatePath)
   queryRequest.connectionConfig = conn

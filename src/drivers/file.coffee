@@ -1,12 +1,14 @@
-fs          = require 'fs'
 LineReader  = require 'line-by-line'
-log         = require 'simplog'
+events      = require 'events'
 
-queryHandler = (config, filePath, rowCallback, rowSetCallback, cb) ->
-  log.debug "file driver handling request for #{filePath}"
-  lr = new LineReader(filePath.replace(/\n/,''))
-  lr.on 'line', (line) -> rowCallback( {line: line} )
-  lr.on 'end', () -> cb()
-  lr.on 'error', (err) -> cb(err)
-  
-module.exports.execute = queryHandler
+class FileDriver extends events.EventEmitter
+  constructor: (@filePath) ->
+    @lineReader = new LineReader(filePath.replace(/\n/,''))
+    @lineReader.on 'line', (line) =>
+      this.emit 'row', line
+    @lineReader.on 'error', (err) =>
+      this.emit 'error', err
+    @lineReader.on 'end', () =>
+      this.emit 'endQuery'
+    
+module.exports.DriverClass = FileDriver
