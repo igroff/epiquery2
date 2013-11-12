@@ -1,4 +1,4 @@
-.PHONY: watch test pass
+.PHONY: watch test pass lint
 
 watch:
 	DEBUG=true nodemon --ext .coffee server.coffee
@@ -7,7 +7,7 @@ test/templates:
 	cd test/ && git clone https://github.com/intimonkey/epiquery-templates.git \
 		templates/
 
-test: test/templates
+test: lint test/templates
 	./test/run.sh
 
 pass/%:

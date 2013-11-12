@@ -2,7 +2,7 @@ log     = require 'simplog'
 
 QUERY_REQUEST_COUNTER = 0
 class QueryRequest
-  constructor: (@client, @context=null) ->
+  constructor: (@client, @context, @closeConnectionOnEndQuery) ->
     # the id that will be used to relate events to a particular query
     # execution.  This is core to the streaming async nature of the entire
     # system.  The client will be able to issue a number of queries without
@@ -52,7 +52,7 @@ class QueryRequest
     @client.sendEvent 'queryBegin', {queryId: @id}
 
   endQuery: () =>
-    @client.sendEvent 'queryEnd', {queryId: @id}
+    @client.sendEvent 'queryEnd', {queryId: @id}, @closeConnectionOnEndQuery
 
  
 execute = (driver, config, query, rowCallback, rowsetCallback, cb) ->

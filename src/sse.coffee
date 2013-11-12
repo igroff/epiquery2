@@ -19,7 +19,7 @@ class Client
   sendData: (data) =>
     @res.write "data: #{data}\n\n"
 
-  sendEvent: (name, data) =>
+  sendEvent: (name, data, closeAfterSend=false) =>
     @res.write "event: #{name}\n"
     if data and (typeof(data) is "string")
       @res.write "data: #{data}\n"
@@ -29,6 +29,9 @@ class Client
       # no data
       @res.write "data:\n"
     @res.write "\n"
+    if closeAfterSend
+      log.debug "closing after sending message %s", name
+      @res.end()
 
   attach: () =>
     @req.socket.setTimeout(Infinity)
@@ -41,22 +44,25 @@ class Client
 
     # this is how we'll hook the close of the request so that we can do
     # any cleanup of our
-    registerClose = (clientId, req) ->
-      req.on "close", () ->
+    registerClose = (clientId) =>
+      # we're going to use this for our close method on the object 
+      # so we can close it when the client disconnects or explicitly
+      # if called
+      this.close = () =>
         log.debug "close event raised for #{clientId}"
         delete CONNECTED_CLIENTS[clientId]
         num = 0
         _.each CONNECTED_CLIENTS, () -> num++
         log.debug "Num connectedClients connected: #{num}"
+        @req.removeListener 'close', this.close
+        @res.end()
+      @req.on 'close', this.close
 
     CONNECTED_CLIENTS[@id] = this
     registerClose @id, @req
 
     @sendEvent("id_assign", @id)
     log.debug "attached client: #{@id}"
-
-  close: () =>
-    @res.end()
 
 
 module.exports.Client = Client
