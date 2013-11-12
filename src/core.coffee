@@ -52,7 +52,6 @@ selectConnection = (httpRequest, queryRequest) ->
     templatePath = path.join.apply(path.join, pathParts)
   queryRequest.templatePath = path.join(config.templateDirectory, templatePath)
   queryRequest.connectionConfig = conn
-    
 
 module.exports.init = init
 module.exports.loadDrivers = loadDrivers

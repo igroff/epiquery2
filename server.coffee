@@ -46,7 +46,7 @@ app.get '/sse', (req, res) ->
   client_id = req.param('client_id')
   new sse.Client req, res, client_id
 
-app.get "/terminate/:client_id", (req, res) ->
+app.get "/close/:client_id", (req, res) ->
   log.info "terminate requested for #{req.params.client_id}"
   client = sse.getConnectedClientById(req.params.client_id)
   if client
@@ -57,6 +57,12 @@ app.get "/terminate/:client_id", (req, res) ->
   res.end()
 
 app.get /\/(.+)$/, (req, res) ->
+  res.writeHead(200, {'Content-Type': 'text/html'})
+  res.write "\n"
+  errHandler = (err) ->
+    log.error err
+    res.send { error: "#{JSON.stringify err}"}
+    res.end()
   client = sse.getConnectedClientById(req.param('client_id'))
   if client
     # we allow people to provide any path relative to the templates directory
@@ -65,17 +71,17 @@ app.get /\/(.+)$/, (req, res) ->
     templateContext = _.extend {}, req.body, req.query, req.headers
     qr = new query.QueryRequest(client, templateContext)
     # here we select the appropriate connection based on the inbound request
+    # we also use this information to modify the 
     core.selectConnection req, qr
-    log.debug "using connection configuration: %j", qr.connectionConfig
-    processQueryRequest qr,
-        templateContext,
-        qr.templatePath,
-        () -> client.sendEvent "queryComplete"
-
-  res.writeHead(200, {'Content-Type': 'text/html'})
-  res.write("\n")
-  res.write "Message Sent"
-  res.end()
+    qr.connectionConfig || errHandler "unable to find connection configuraiton"
+    if qr.connectionConfig
+      log.debug "using connection configuration: %j", qr.connectionConfig
+      processQueryRequest qr,
+          templateContext,
+          qr.templatePath,
+          () -> client.sendEvent "queryComplete"
+      res.write "Message Sent"
+      res.end()
 
   
 
