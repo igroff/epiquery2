@@ -37,19 +37,23 @@ init = () ->
 selectConnection = (httpRequest, queryRequest) ->
   # remove any leading '/' and any dubious parent references '..'
   templatePath = httpRequest.path.replace(/\.\./g, '').replace(/^\//, '')
-  # we allow an inbound connection header to override any other method
-  # of selecting a connection
-  conn = httpRequest.get "X-DB-CONNECTION"
-  if not conn
-    # the path contains the name of a conneciton as a the first element
-    # we'll use that to find the connection and change the request
-    # path to a 'real' one
-    templatePath = templatePath.replace(/^\//,'')
-    pathParts = templatePath.split('/')
-    connectionName = pathParts.shift()
+
+  # the path contains the name of a connection as the first element
+  # we'll use that to find the connection and change the request
+  # path to a 'real' one
+
+  pathParts = templatePath.split('/')
+  connectionName = pathParts.shift()
+  if connectionName is 'header'
+    # we allow an inbound connection header to override any other method
+    # of selecting a connection
+    conn = httpRequest.get 'X-DB-CONNECTION'
+  else
+    # we load the connection from our list of configured connections
     conn = config.connections[connectionName]
-    conn || log.error "unable to find connection by name '#{connectionName}'"
-    templatePath = path.join.apply(path.join, pathParts)
+  if not conn
+    return new Error("unable to find connection by name '#{connectionName}'")
+  templatePath = path.join.apply(path.join, pathParts)
   queryRequest.templatePath = path.join(config.templateDirectory, templatePath)
   queryRequest.connectionConfig = conn
 
