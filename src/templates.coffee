@@ -39,11 +39,6 @@ renderers[".mustache"] =  (templateString, context) ->
   template = hogan.compile templateString
   template.render context
 
-# this is purely to facilitate testing
-renderers[".error"] = () ->
-  pants_are cool
-  throw "pants"
-
 # set our default handler, which does nothing
 # but return the templateString it was given
 renderers[""] = (templateString) ->
