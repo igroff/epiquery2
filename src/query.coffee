@@ -62,9 +62,15 @@ class QueryRequest
       queryId: @id
       message: 'endQuery'
     @client.sendEvent 'endQuery', event, @closeConnectionOnEndQuery
-
  
-execute = (driver, config, query, rowCallback, rowsetCallback, dataCallback, cb) ->
+execute = (
+  driver,
+  config,
+  query,
+  rowCallback,
+  rowsetCallback,
+  dataCallback,
+cb) ->
   log.debug(
     "using #{driver.name} to execute query #{query}, with connection %j",
     config

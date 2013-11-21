@@ -45,7 +45,7 @@ class Client
     # this is how we'll hook the close of the request so that we can do
     # any cleanup of our
     registerClose = (clientId) =>
-      # we're going to use this for our close method on the object 
+      # we're going to use this for our close method on the object
       # so we can close it when the client disconnects or explicitly
       # if called
       this.close = () =>
