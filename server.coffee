@@ -17,6 +17,7 @@ app.use '/static', express.static(path.join(__dirname, 'static'))
 app.use app.router
 app.use express.errorHandler()
 
+# initialize the core including driver loading, etc.
 core.init()
 
 processQueryRequest = (queryRequest, onComplete) ->
@@ -35,6 +36,7 @@ processQueryRequest = (queryRequest, onComplete) ->
       renderedTemplate,
       queryRequest.sendRow,
       queryRequest.beginRowset,
+      queryRequest.sendData,
       queryCompleteCallback
   templates.renderTemplate queryRequest.templatePath,
         queryRequest.templateContext,
@@ -86,10 +88,7 @@ app.get /\/(.+)$/, (req, res) ->
       res.send {message: "QueryRequest Recieved"}
   else
       res.send {message: "Unknown client"}
-
   
-
-
 log.info "server starting with configuration"
 log.info "%j", config
 app.listen config.port

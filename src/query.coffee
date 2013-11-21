@@ -22,6 +22,9 @@ class QueryRequest
     # done processing the query
     @queryEndTime = null
 
+  sendData: (data) =>
+    @client.sendData data
+
   sendRow: (row) =>
     event =
       queryId: @id
@@ -61,13 +64,14 @@ class QueryRequest
     @client.sendEvent 'endQuery', event, @closeConnectionOnEndQuery
 
  
-execute = (driver, config, query, rowCallback, rowsetCallback, cb) ->
+execute = (driver, config, query, rowCallback, rowsetCallback, dataCallback, cb) ->
   log.debug(
     "using #{driver.name} to execute query #{query}, with connection %j",
     config
   )
   driverInstance = new driver.class(query, config)
   driverInstance.on 'row', rowCallback
+  driverInstance.on 'data', dataCallback
   driverInstance.on 'beginRowset', rowsetCallback
   driverInstance.on 'endQuery', cb
   driverInstance.on 'error', cb
