@@ -15,3 +15,6 @@ pass/%:
 
 lint:
 	find ./src -name '*.coffee' | xargs ./node_modules/.bin/coffeelint -f ./etc/coffeelint.conf
+	find ./src -name '*.js' | xargs ./node_modules/.bin/jshint 
+	find ./static -name '*.js' | xargs ./node_modules/.bin/jshint 
+

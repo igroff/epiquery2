@@ -8,7 +8,10 @@
   <script type="text/javascript">
     function QueryController($scope){
       $scope.client = new Client();
-      $scope.fire = function () { $scope.client.request('/pants'); }
+      $scope.rows = [];
+      $scope.executeQuery = function () {
+        $scope.client.request($scope.templateName);
+      }
       $scope.client.addEventListener('queryBegin', function(e){
         $scope.lastTemplate = e.template;
         $scope.queryActive = true;
@@ -19,13 +22,24 @@
         $scope.$apply();
       });
 
+      $scope.templateName = "/file/test/my_manifest";
+      $scope.client.addEventListener('row', function(row) {
+        $scope.rows.push(row);
+        $scope.$apply();
+      });
+      $scope.client.addEventListener('queryEnd', function() {
+        $scope.data = JSON.stringify($scope.rows);
+        $scope.$apply();
+      });
     }
   </script>
 </head>
 <body ng-app>
   <div ng-controller="QueryController">
-  <button ng-click="fire()">Fire!</button>
+  <button ng-click="executeQuery()" id="executeQuery">Execute Query!</button>
+  <input type="text" id="templateName" ng-model="templateName"></input>
   <div id="lastTemplate">{{lastTemplate}}</div>
+  <div ng-model="data"></div>
   </div>
 </body>
 </html>

@@ -32,27 +32,33 @@ class QueryRequest
   sendError: (msg) =>
     event =
       queryId: @id
-      message: "error"
+      message: 'error'
       data: msg
     @client.sendEvent 'error', event
 
   beginRowset: (rowSet) =>
     event =
       queryId: @id
-      message: "rowsetBegin"
-    @client.sendEvent 'rowsetBegin', event
+      message: 'beginRowset'
+    @client.sendEvent 'beginRowset', event
 
   endRowset: (rowSet) =>
     event =
       queryId: @id
-      message: "rowsetEnd"
-    @client.sendEvent 'rowsetEnd', event
+      message: 'endRowset'
+    @client.sendEvent 'endRowset', event
 
   beginQuery: () =>
-    @client.sendEvent 'queryBegin', {queryId: @id}
+    event =
+      queryId: @id
+      message: 'beginQuery'
+    @client.sendEvent 'beginQuery', event
 
   endQuery: () =>
-    @client.sendEvent 'queryEnd', {queryId: @id}, @closeConnectionOnEndQuery
+    event =
+      queryId: @id
+      message: 'endQuery'
+    @client.sendEvent 'endQuery', event, @closeConnectionOnEndQuery
 
  
 execute = (driver, config, query, rowCallback, rowsetCallback, cb) ->
