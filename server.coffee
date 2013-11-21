@@ -1,12 +1,12 @@
 #! /usr/bin/env ./node_modules/.bin/coffee
-express = require 'express'
-_       = require 'underscore'
-path    = require 'path'
-log     = require 'simplog'
-sse     = require './src/sse.coffee'
-core    = require './src/core.coffee'
-config  = require './src/config.coffee'
-query   = require './src/query.coffee'
+express   = require 'express'
+_         = require 'underscore'
+path      = require 'path'
+log       = require 'simplog'
+sse       = require './src/sse.coffee'
+core      = require './src/core.coffee'
+config    = require './src/config.coffee'
+query     = require './src/query.coffee'
 templates = require './src/templates.coffee'
 
 app = express()
@@ -56,21 +56,24 @@ app.get "/close/:client_id", (req, res) ->
   res.write "\n"
   res.end()
 
+# this is where we handle inbound query requests, which are defined by the
+# components of the request path, so we'll be picking out the path components
 app.get /\/(.+)$/, (req, res) ->
   errHandler = (err) ->
     log.error err
     res.send { error: err.message}
   client = sse.getConnectedClientById(req.param('client_id'))
+  # this allows the requestor to specify that the SSE connection should be
+  # closed on completion of the query, this is only intended to facilitate
+  # testing
   closeOnEnd = req.param('close_on_end') is "true"
   log.debug "closeOnEnd: %s", closeOnEnd
   if client
-    # we allow people to provide any path relative to the templates directory
-    # so we'll remove the initial / and keep the rest of the path while conveniently
-    # dropping any parent indicators (..)
     templateContext = _.extend {}, req.body, req.query, req.headers
     qr = new query.QueryRequest(client, templateContext, closeOnEnd)
     # here we select the appropriate connection based on the inbound request
-    # we also use this information to modify the 
+    # the information about the template path as well as the connection info
+    # is stored on the QueryRequest object, which is why it's passed in
     selectConnectionResult = core.selectConnection(req, qr)
     if selectConnectionResult instanceof Error
       errHandler selectConnectionResult
