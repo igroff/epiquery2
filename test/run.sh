@@ -2,12 +2,15 @@
 
 function run_tests(){
   DIR=$1
+  TEST_NAME=$2
   for test in $DIR/*;
   do
     if [ -d ${test} ]; then
-      run_tests ${test}
+      run_tests ${test} ${TEST_NAME}
     else
       test_file=${test}
+      test_name=`basename ${test}`
+      [ -n "${TEST_NAME}" ] && [ "${test_name}" != "${TEST_NAME}" ] && continue
       results_file=${test%tests/*}results${test#*/tests}
       expected_file=${test%tests/*}expected${test#*/tests}
       filter_file=${test%tests/*}filters${test#*/tests}
@@ -26,5 +29,7 @@ function run_tests(){
     fi
   done
 }
-
-run_tests ./test/tests
+# we need to be sure we start with no results otherwise we just end up 
+# potentially testing the results of the last run again
+rm -rf test/results/*
+run_tests ./test/tests $1

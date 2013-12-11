@@ -8,7 +8,7 @@ test/templates:
 		templates/
 
 test: lint test/templates
-	./test/run.sh
+	./test/run.sh ${TEST_NAME}
 
 pass/%:
 	cp test/results/$(subst pass/,,$@) test/expected/$(subst pass/,,$@)
