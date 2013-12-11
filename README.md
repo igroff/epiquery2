@@ -146,8 +146,12 @@ datasources.
 ##### Provided Drivers
 * mssql 
 * mysql
-* file
+* file - Expects that the result of a template render will be a valid path.  
+  Given the result of the rendered template, it attempts to open the file
+  indicated and stream the results line-at-a-time to the caller.  Each line
+  comes through as a 'row' event.
 * msmdx
+* render - simply renders the template requested and returns the result
 
 #### Connections
 
