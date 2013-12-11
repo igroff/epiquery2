@@ -1,0 +1,45 @@
+{
+  "message": "QueryRequest Recieved"
+}
+event: id_assign
+data: 2
+
+event: beginQuery
+data: {queryid,"message":"beginQuery"}
+
+event: row
+data: {queryid,"message":"row","columns":"env:"}
+
+event: row
+data: {queryid,"message":"row","columns":"    -"}
+
+event: row
+data: {queryid,"message":"row","columns":"        server_os: Ubuntu"}
+
+event: row
+data: {queryid,"message":"row","columns":"        server_version: 11.10"}
+
+event: row
+data: {queryid,"message":"row","columns":"        server_disk_size_gb: 10"}
+
+event: row
+data: {queryid,"message":"row","columns":"        number_of_servers: 1"}
+
+event: row
+data: {queryid,"message":"row","columns":"        number_of_cpu: 4"}
+
+event: row
+data: {queryid,"message":"row","columns":"        server_memory_gb: 4"}
+
+event: row
+data: {queryid,"message":"row","columns":"        stew: false"}
+
+event: row
+data: {queryid,"message":"row","columns":"        clone_directory: app"}
+
+event: row
+data: {queryid,"message":"row","columns":"        bootstrap_shell_command: cd ~/app/storm ; ./move_keys.sh"}
+
+event: endQuery
+data: {queryid,"message":"endQuery"}
+
