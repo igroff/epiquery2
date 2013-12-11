@@ -8,5 +8,7 @@ args = optimist.argv
 template.renderTemplate(
   args.templatePath,
   JSON.parse(args.context),
-  (err, templateData) -> process.stdout.write(templateData.renderedTemplate); process.exit(1)
+  (err, templateContent, renderedTemplate) ->
+    process.stdout.write(renderedTemplate)
+    process.exit(1)
 )
