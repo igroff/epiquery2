@@ -67,6 +67,8 @@ renderTemplate = (templatePath, templateContent, context, cb) ->
 
 module.exports.renderTemplate = (templatePath, context, cb) ->
   stepsToRender = [
+    # this step is only to get our parameters that our real workers expect
+    # into the callback 'stream'
     (bootstrapCallback) -> bootstrapCallback(null, templatePath, context),
     templateLoader,
     renderTemplate
