@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 #exec > file_emit.log 2>&1
 curl -s 'http://localhost:8080/sse?client_id=2' &
-sleep 0.5
-curl -s 'http://localhost:8080/render/test/echo.dot?client_id=2&close_on_end=true'
-sleep 0.5
+sleep .1
+curl -s 'http://localhost:8080/render/test/echo.dot?client_id=2&close_on_end=true' --data "pants=blue" &
+wait

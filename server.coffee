@@ -60,7 +60,7 @@ app.get "/close/:client_id", (req, res) ->
 
 # this is where we handle inbound query requests, which are defined by the
 # components of the request path, so we'll be picking out the path components
-app.get /\/(.+)$/, (req, res) ->
+queryRequestHandler = (req, res) ->
   errHandler = (err) ->
     log.error err
     res.send { error: err.message}
@@ -72,6 +72,7 @@ app.get /\/(.+)$/, (req, res) ->
   log.debug "closeOnEnd: %s", closeOnEnd
   if client
     templateContext = _.extend {}, req.body, req.query, req.headers
+    log.info "context: #{JSON.stringify templateContext}"
     qr = new query.QueryRequest(client, templateContext, closeOnEnd)
     # here we select the appropriate connection based on the inbound request
     # the information about the template path as well as the connection info
@@ -81,13 +82,12 @@ app.get /\/(.+)$/, (req, res) ->
       errHandler selectConnectionResult
     else
       log.debug "using connection configuration: %j", qr.connectionConfig
-      processQueryRequest qr,
-          templateContext,
-          qr.templatePath,
-          qr.endQuery
+      processQueryRequest qr, qr.endQuery
       res.send {message: "QueryRequest Recieved"}
   else
       res.send {message: "Unknown client"}
+app.get /\/(.+)$/, queryRequestHandler
+app.post /\/(.+)$/, queryRequestHandler
   
 log.info "server starting with configuration"
 log.info "%j", config
