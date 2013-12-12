@@ -43,7 +43,7 @@ function Client() {
     if (thisIsTrue()){
       doThis();
     } else {
-      setTimeout(function () { console.log("doin'"); client.when(thisIsTrue, doThis); }, 100);
+      setTimeout(function () { client.when(thisIsTrue, doThis); }, 100);
     }
   }
 
