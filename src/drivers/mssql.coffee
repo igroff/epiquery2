@@ -11,7 +11,6 @@ class MSSQLDriver extends events.EventEmitter
     request_complete_deferred  = Q.defer()
 
     conn = new tedious.Connection @config
-    log.debug "connecting with %j", @config
     conn.on 'errorMessage', (infoMessage) -> log.error "te %j", infoMessage
     conn.on 'connect', connect_deferred.makeNodeResolver()
     conn.on 'end', () => connect_end_deferred.resolve()
