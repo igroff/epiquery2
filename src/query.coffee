@@ -71,7 +71,7 @@ execute = (
   dataCallback,
 cb) ->
   log.debug(
-    "using #{driver.name} to execute query #{query}, with connection %j",
+    "using #{driver.name} to execute query '#{query}', with connection %j",
     config
   )
   driverInstance = new driver.class(query, config.config)
