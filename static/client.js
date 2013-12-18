@@ -15,7 +15,8 @@ function Client() {
   // this assigns us a client id to use to request data from the server (and have it be sent to us)
   source.addEventListener('id_assign',
     function(e) {
-       client.myId=e.data; console.log("Client ID: " + client.myId);
+      client.myId=e.data;
+      console.log("Client ID: " + client.myId);
     }
   );
   // /sse implementation specific
@@ -35,9 +36,11 @@ function Client() {
   
   this.doRequest = function (template) {
     $.get(template + "?client_id=" + client.myId);
-  }
+  };
 
-  this.haveClientId = function() { return typeof(client.myId) != "undefined"; }
+  this.haveClientId = function() {
+    return typeof(client.myId) != "undefined";
+  };
   
   this.when = function(thisIsTrue, doThis){
     if (thisIsTrue()){
@@ -45,9 +48,9 @@ function Client() {
     } else {
       setTimeout(function () { client.when(thisIsTrue, doThis); }, 100);
     }
-  }
+  };
 
   this.request = function(template){
     this.when(client.haveClientId, function() { client.doRequest(template); });
-  }
+  };
 }

@@ -25,7 +25,6 @@
       $scope.templateName = "/file/test/my_manifest";
       $scope.client.addEventListener('row', function(row) {
         $scope.rows.push(row);
-        $scope.$apply();
       });
       $scope.client.addEventListener('queryEnd', function() {
         $scope.data = JSON.stringify($scope.rows);
