@@ -5,6 +5,7 @@ Q           = require 'q'
 class MySQLDriver extends events.EventEmitter
   constructor: (@query, @config) ->
     connect_deferred = Q.defer()
+    @config.multipleStatements = true
 
     conn = mysql.createConnection @config
     conn.connect connect_deferred.makeNodeResolver()

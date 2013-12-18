@@ -1,0 +1,30 @@
+{
+  "message": "QueryRequest Recieved"
+}
+event: id_assign
+data: 2
+
+event: beginQuery
+data: {queryid,"message":"beginQuery"}
+
+event: row
+data: {queryid,"message":"row","columns":{"fieldCount":0,"affectedRows":0,"insertId":0,"serverStatus":10,"warningCount":1,"message":"","protocol41":true,"changedRows":0}}
+
+event: row
+data: {queryid,"message":"row","columns":{"fieldCount":0,"affectedRows":2,"insertId":0,"serverStatus":42,"warningCount":0,"message":"","protocol41":true,"changedRows":0}}
+
+event: row
+data: {queryid,"message":"row","columns":{"fieldCount":0,"affectedRows":1,"insertId":0,"serverStatus":10,"warningCount":0,"message":"","protocol41":true,"changedRows":0}}
+
+event: row
+data: {queryid,"message":"row","columns":{"fieldCount":0,"affectedRows":1,"insertId":0,"serverStatus":10,"warningCount":0,"message":"","protocol41":true,"changedRows":0}}
+
+event: row
+data: {queryid,"message":"row","columns":{"id":1,"name":"pants"}}
+
+event: row
+data: {queryid,"message":"row","columns":{"id":2,"name":"slacks"}}
+
+event: endQuery
+data: {queryid,"message":"endQuery"}
+

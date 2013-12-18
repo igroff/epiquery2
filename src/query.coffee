@@ -74,7 +74,7 @@ cb) ->
     "using #{driver.name} to execute query #{query}, with connection %j",
     config
   )
-  driverInstance = new driver.class(query, config)
+  driverInstance = new driver.class(query, config.config)
   driverInstance.on 'row', rowCallback
   driverInstance.on 'data', dataCallback
   driverInstance.on 'beginRowset', rowsetCallback
