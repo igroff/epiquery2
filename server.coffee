@@ -63,7 +63,7 @@ app.get "/close/:client_id", (req, res) ->
 queryRequestHandler = (req, res) ->
   errHandler = (err) ->
     log.error err
-    res.send { error: err.message}
+    res.send { error: err.message }
   client = sse.getConnectedClientById(req.param('client_id'))
   # this allows the requestor to specify that the SSE connection should be
   # closed on completion of the query, this is only intended to facilitate
@@ -86,6 +86,7 @@ queryRequestHandler = (req, res) ->
       res.send {message: "QueryRequest Recieved"}
   else
       res.send {message: "Unknown client"}
+
 app.get /\/(.+)$/, queryRequestHandler
 app.post /\/(.+)$/, queryRequestHandler
   
