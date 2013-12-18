@@ -15,7 +15,7 @@
     "underscore": "1.4.4",
     "tedious": "git+https://github.com/intimonkey/tedious.git",
     "hogan.js": "2.0.0",
-    "mysql": "2.0.0-alpha7",
+    "mysql": "2.0.0-rc1",
     "xmla4js": "git+https://github.com/glg/xmla4js.git",
     "simplog": "*",
     "rc": "0.3.1",
