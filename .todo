@@ -1,3 +1,2 @@
 hook up the escaping of templates and replacing of the weird ms word characters
-add js lint to build
 add error handling at the root of request processing try-catch
