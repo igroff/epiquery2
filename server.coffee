@@ -46,7 +46,7 @@ app.get '/sse', (req, res) ->
   # providing the client_id is specifically for testing, if you're doing it
   # for any other reason you're doing it in an un-intended manner
   client_id = req.param('client_id')
-  new sse.Client req, res, client_id
+  sse.createClient req, res, client_id
 
 app.get "/close/:client_id", (req, res) ->
   log.info "terminate requested for #{req.params.client_id}"

@@ -9,6 +9,7 @@ CLIENT_COUNTER=0
 
 CONNECTED_CLIENTS={}
 
+
 class Client
   # id is an optional parameter, it's only here to facilitate testing
   constructor: (@req, @res, @id=null) ->
@@ -65,6 +66,10 @@ class Client
     log.debug "attached client: #{@id}"
 
 
+createClient = (req, res, id=null) ->
+  new Client(req, res, id)
+
 module.exports.Client = Client
 module.exports.connectedClients = CONNECTED_CLIENTS
 module.exports.getConnectedClientById = (id) -> CONNECTED_CLIENTS[id]
+module.exports.createClient = createClient
