@@ -2,6 +2,7 @@ fs      = require 'fs'
 path    = require 'path'
 log     = require 'simplog'
 config  = require './config.coffee'
+events  = require 'events'
 
 DRIVERS={}
 
@@ -55,6 +56,7 @@ selectConnection = (httpRequest, queryRequest) ->
     return new Error("unable to find connection by name '#{connectionName}'")
   templatePath = path.join.apply(path.join, pathParts)
   queryRequest.templatePath = path.join(config.templateDirectory, templatePath)
+  queryRequest.templatePath or throw new Error "no template path!"
   queryRequest.connectionConfig = conn
 
 module.exports.init = init
@@ -62,3 +64,4 @@ module.exports.loadDrivers = loadDrivers
 module.exports.selectDriver = selectDriver
 module.exports.drivers = DRIVERS
 module.exports.selectConnection = selectConnection
+module.exports.events = new events.EventEmitter()
