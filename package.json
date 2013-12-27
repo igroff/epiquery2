@@ -9,6 +9,7 @@
     "zombie": "2.0.0-alpha24"
   },
   "dependencies": {
+    "dot": "1.0.1",
     "coffee-script": "1.6.2",
     "express": "3.1.0",
     "docopt": "0.4.0",
