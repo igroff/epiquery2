@@ -31,6 +31,10 @@
   "engine": {
     "node": "0.10.3"
   },
+  "scripts": {
+    "start": "./server.coffee",
+    "postinstall":"./post-install"
+  },
   "repository": {
     "type": "git",
     "url":  "git://github.com/intimonkey/epiquery2.git"
