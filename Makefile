@@ -1,7 +1,8 @@
+SHELL=/bin/bash
 .PHONY: watch test pass lint
 
 watch:
-	DEBUG=true nodemon --ext .coffee server.coffee
+	DEBUG=true nodemon --ext .coffee --exec bash nodemon_helper
 
 test/templates:
 	cd test/ && git clone https://github.com/intimonkey/epiquery-templates.git \

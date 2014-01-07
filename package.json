@@ -2,7 +2,7 @@
   "name": "epiquery2",
   "version": "0.0.2",
   "description": "run templated queries from the http's using learnings from 1",
-  "main": "server.js",
+  "main": "server.coffee",
   "devDependencies": {
     "coffeelint": "0.6.1",
     "jshint": "2.3.0",
@@ -32,7 +32,7 @@
     "node": "0.10.3"
   },
   "scripts": {
-    "start": "./server.coffee",
+    "start": "[ -r ~/.epiquery2/config ] && . ~/.epiquery2/config ; ./server.coffee",
     "postinstall":"./post-install"
   },
   "repository": {
