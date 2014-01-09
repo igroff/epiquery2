@@ -21,13 +21,14 @@ log     = require 'simplog'
 #
 ###############################################################################
 hack_tilde = (path) ->
-  path.replace(/^~/, process.env.HOME)
+  path = path.replace(/^~/, process.env.HOME) if path
+  return path
 
 CONNECTION_VAR_NAMES=process.env.CONNECTIONS ||
   throw new Error("No connections specified")
 TEMPLATE_DIRECTORY=hack_tilde(process.env.TEMPLATE_DIRECTORY ||
   throw new Error("Need a template directory"))
-DRIVER_DIRECTORY=hack_tilde(process.env.DRIVER_DIRECTORY)
+DRIVER_DIRECTORY=hack_tilde(process.env.DRIVER_DIRECTORY) || null
 PORT=process.env.PORT || 9090
 CONNECTIONS={}
 
