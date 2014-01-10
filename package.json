@@ -32,7 +32,7 @@
     "node": "0.10.3"
   },
   "scripts": {
-    "start": "[ -r ~/.epiquery2/config ] && . ~/.epiquery2/config ; ./server.coffee",
+    "start": "./npm-starter",
     "postinstall":"./post-install"
   },
   "repository": {
