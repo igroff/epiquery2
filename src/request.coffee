@@ -1,21 +1,30 @@
 # vim:ft=coffee
 
-async     = require 'async'
-log       = require 'simplog'
-_         = require 'underscore'
-sse       = require './sse.coffee'
-core      = require './core.coffee'
-config    = require './config.coffee'
-query     = require './query.coffee'
-templates = require './templates.coffee'
+async       = require 'async'
+log         = require 'simplog'
+_           = require 'underscore'
+sse         = require './sse.coffee'
+core        = require './core.coffee'
+config      = require './config.coffee'
+query       = require './query.coffee'
+templates   = require './templates.coffee'
+http_client = require './http.coffee'
+
+
 
 selectClient = (context, callback) ->
   client_id = context.req.param 'client_id'
-  context.client = sse.getConnectedClientById(client_id)
-  if context.client
+  context.receiver = sse.getConnectedClientById(client_id)
+  context.requestor = sse.createRequestor context.req, context.res
+  if context.receiver
     callback null, context
+    context.closeOnEnd = context.req.param('close_on_end') is "true"
   else
-    callback "no client found by id: #{client_id}"
+    context.receiver = http_client.createClient(context.req, context.res)
+    context.requestor = http_client.createRequestor context.req
+    context.closeOnEnd = true
+    callback null, context
+    # create a one-time use client
 
 buildTemplateContext = (context, callback) ->
   context.templateContext = _.extend(
@@ -28,9 +37,8 @@ buildTemplateContext = (context, callback) ->
   callback null, context
 
 createQueryRequest = (context, callback) ->
-  closeOnEnd = context.req.param('close_on_end') is "true"
   context.queryRequest = new query.QueryRequest(
-    context.client, context.templateContext, closeOnEnd
+    context.receiver, context.templateContext, context.closeOnEnd
   )
   callback null, context
 
@@ -45,7 +53,7 @@ selectConnection = (context, callback) ->
     log.debug("using connection configuration: %j",
       context.queryRequest.connectionConfig
     )
-    context.res.send {message: "QueryRequest Recieved"}
+    context.requestor.respondWith {message: "QueryRequest Recieved"}
     callback null, context
 
 renderTemplate = (context, callback) ->
@@ -82,9 +90,10 @@ executeQuery = (context, callback) ->
     queryCompleteCallback
 
 queryRequestHandler = (req, res) ->
+  context = {req: req, res: res}
   async.waterfall [
     # just to create our context
-    (callback) -> callback(null, {req: req, res:res}),
+    (callback) -> callback(null, context),
     selectClient,
     buildTemplateContext,
     createQueryRequest,
@@ -94,6 +103,6 @@ queryRequestHandler = (req, res) ->
   ],
   (err, results) ->
     log.error err
-    res.send { error: err.message }
+    context.requestor.dieWith { error: err.message }
 
 module.exports.queryRequestHandler = queryRequestHandler

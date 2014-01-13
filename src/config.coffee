@@ -2,6 +2,7 @@ rc      = require 'rc'
 path    = require 'path'
 log     = require 'simplog'
 
+# jslint max_line_length: false
 ###############################################################################
 # Configuration:
 #   Our configuration information will come from the environment, configuration
@@ -9,7 +10,7 @@ log     = require 'simplog'
 #   that is required is noted with a * and will be required for the application
 #   to function at all.
 #
-#   CONNECTIONS* - This variable should be a SPACE delimited list of 
+#   CONNECTIONS* - This variable should be a SPACE delimited list of
 #     environment varialbes containing connection configuration information
 #   <CONNECTION_INFO>* - This is a variable as described by the CONNECTIONS
 #     variable, and will contain a JSON object that fully describers a valid

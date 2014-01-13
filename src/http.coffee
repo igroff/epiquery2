@@ -1,29 +1,25 @@
 log     = require 'simplog'
 _       = require 'underscore'
 
-# this is used to create a unique identifier for each client created
-# since numbers can be really, really big in v8 and node is single
-# threaded in its processing of app code, ther's nothing at all special
-# needed for this
-CLIENT_COUNTER=0
-
 CONNECTED_CLIENTS={}
-
+CLIENT_COUNTER=0
 
 class Client
   # id is an optional parameter, it's only here to facilitate testing
-  constructor: (@req, @res, @id=null) ->
-    if not @id
-      @id = "#{CLIENT_COUNTER++}#{process.pid}"
+  constructor: (@req, @res) ->
+    @id = "#{CLIENT_COUNTER++}#{process.pid}"
     @attach()
 
   sendData: (data) =>
-    @res.write "data: #{data}\n\n"
+    for line in data.split('\n')
+      @res.write "data: #{line}\n"
+    @res.write "\n"
 
   sendEvent: (name, data, closeAfterSend=false) =>
     @res.write "event: #{name}\n"
     if data and (typeof(data) is "string")
-      @res.write "data: #{data}\n"
+      for line in data.split('\n')
+        @res.write "data: #{line}"
     else if data
       @res.write "data: #{JSON.stringify data}\n"
     else
@@ -36,13 +32,6 @@ class Client
 
   attach: () =>
     @req.socket.setTimeout(Infinity)
-    @res.writeHead 200, {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive'
-    }
-    @res.write('\n')
-
     # this is how we'll hook the close of the request so that we can do
     # any cleanup of our
     registerClose = (clientId) =>
@@ -65,24 +54,24 @@ class Client
     @sendEvent("id_assign", @id)
     log.debug "attached client: #{@id}"
 
+
 class Requestor
-  constructor: (@req, @res) ->
+  constructor: (@req, @resp) ->
 
   respondWith: (response) =>
-    @res.send response
 
   send: (message) =>
+    @resp.write message
 
   dieWith: (response) =>
-    @respondWith response
+    @resp.send response
 
 createRequestor = (req, res) -> new Requestor(req, res)
 
-createClient = (req, res, id=null) ->
-  new Client(req, res, id)
+createClient = (req, res) ->
+  new Client(req, res)
 
 module.exports.Client = Client
 module.exports.connectedClients = CONNECTED_CLIENTS
-module.exports.getConnectedClientById = (id) -> CONNECTED_CLIENTS[id]
-module.exports.createRequestor = createRequestor
 module.exports.createClient = createClient
+module.exports.createRequestor = createRequestor

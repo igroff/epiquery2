@@ -1,6 +1,6 @@
 #! /usr/bin/env ./node_modules/.bin/coffee
 # vim:ft=coffee
-#
+ 
 express   = require 'express'
 _         = require 'underscore'
 path      = require 'path'
