@@ -73,7 +73,7 @@ class Requestor
 
   send: (message) =>
 
-  dieWith: (response) =>
+  sendError: (response) =>
     @respondWith response
 
 createRequestor = (req, res) -> new Requestor(req, res)

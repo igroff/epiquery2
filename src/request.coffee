@@ -14,17 +14,17 @@ http_client = require './http.coffee'
 
 selectClient = (context, callback) ->
   client_id = context.req.param 'client_id'
-  context.receiver = sse.getConnectedClientById(client_id)
-  context.requestor = sse.createRequestor context.req, context.res
-  if context.receiver
-    callback null, context
+  sse_receiver = sse.getConnectedClientById(client_id)
+  if sse_receiver
+    context.receiver = sse_receiver
+    context.requestor = sse.createRequestor context.req, context.res
     context.closeOnEnd = context.req.param('close_on_end') is "true"
   else
     context.receiver = http_client.createClient(context.req, context.res)
     context.requestor = http_client.createRequestor context.req
+    # http requests are stateless, and thus close on end always
     context.closeOnEnd = true
-    callback null, context
-    # create a one-time use client
+  callback null, context
 
 buildTemplateContext = (context, callback) ->
   context.templateContext = _.extend(
@@ -103,6 +103,6 @@ queryRequestHandler = (req, res) ->
   ],
   (err, results) ->
     log.error err
-    context.requestor.dieWith { error: err.message }
+    context.requestor.sendError { error: err.message }
 
 module.exports.queryRequestHandler = queryRequestHandler

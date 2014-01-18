@@ -19,7 +19,7 @@ class Client
     @res.write "event: #{name}\n"
     if data and (typeof(data) is "string")
       for line in data.split('\n')
-        @res.write "data: #{line}"
+        @res.write "data: #{line}\n"
     else if data
       @res.write "data: #{JSON.stringify data}\n"
     else
@@ -63,7 +63,7 @@ class Requestor
   send: (message) =>
     @resp.write message
 
-  dieWith: (response) =>
+  sendError: (response) =>
     @resp.send response
 
 createRequestor = (req, res) -> new Requestor(req, res)
