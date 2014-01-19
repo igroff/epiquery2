@@ -32,30 +32,13 @@ init = () ->
   # load any additional drivers indicated by configuration
   config.driverDirectory and loadDrivers(config.driverDirectory)
   
-# we select the connection based on the data in the inbound http request
-# this allows us to do things like have an explicit override of the connection
-# passed in via HTTP Header
-selectConnection = (httpRequest, queryRequest) ->
-  # remove any leading '/' and any dubious parent references '..'
-  templatePath = httpRequest.path.replace(/\.\./g, '').replace(/^\//, '')
-
-  # the path contains the name of a connection as the first element
-  # we'll use that to find the connection and change the request
-  # path to a 'real' one
-
-  pathParts = templatePath.split('/')
-  connectionName = pathParts.shift()
-  if connectionName is 'header'
-    # we allow an inbound connection header to override any other method
-    # of selecting a connection
-    conn = httpRequest.get 'X-DB-CONNECTION'
-  else
-    # we load the connection from our list of configured connections
-    conn = config.connections[connectionName]
+selectConnection = (requestor, queryRequest) ->
+  # we load the connection from our list of configured connections
+  conn = requestor.connection ||
+    config.connections[requestor.getConnectionName()]
   if not conn
-    return new Error("unable to find connection by name '#{connectionName}'")
-  templatePath = path.join.apply(path.join, pathParts)
-  queryRequest.templatePath = path.join(config.templateDirectory, templatePath)
+    return new Error("unable to find connection by name '#{requestor.getConnectionName()}'")
+  queryRequest.templatePath = path.join(config.templateDirectory, requestor.getTemplateName())
   queryRequest.templatePath or throw new Error "no template path!"
   queryRequest.connectionConfig = conn
 

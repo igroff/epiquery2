@@ -8,7 +8,7 @@ log       = require 'simplog'
 events    = require 'events'
 core      = require './src/core.coffee'
 config    = require './src/config.coffee'
-sse       = require './src/sse.coffee'
+sse       = require './src/client/sse.coffee'
 queryRequestHandler  = require('./src/request.coffee').queryRequestHandler
 
 app = express()
