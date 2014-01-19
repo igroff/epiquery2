@@ -1,6 +1,6 @@
 log     = require 'simplog'
 _       = require 'underscore'
-HttpRequestor = require('./requestor.coffee').HttpRequestor
+SseRequestor = require('./requestor.coffee').SseRequestor
 
 # this is used to create a unique identifier for each client created
 # since numbers can be really, really big in v8 and node is single
@@ -66,7 +66,7 @@ class Client
     @sendEvent("id_assign", @id)
     log.debug "attached client: #{@id}"
 
-createRequestor = (req, res) -> new HttpRequestor(req, res)
+createRequestor = (req, res) -> new SseRequestor(req, res)
 
 createClient = (req, res, id=null) ->
   new Client(req, res, id)

@@ -32,4 +32,9 @@ class HttpRequestor extends Requestor
   sendError: (response) =>
     @resp.send response
 
+class SseRequestor extends HttpRequestor
+  respondWith: (response) =>
+    @resp.send response
+
 module.exports.HttpRequestor = HttpRequestor
+module.exports.SseRequestor = SseRequestor
