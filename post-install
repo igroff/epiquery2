@@ -1,4 +1,5 @@
 #! /usr/bin/env bash
+[ -r ~/.epiquery2/config ] && . ~/.epiquery2/config
 MY_ORIGIN_URL=`git config -l | grep remote.origin.url | sed -e s[remote.origin.url=[[g`
 REPO_NAME=`basename ${MY_ORIGIN_URL}`
 ORIGIN_ROOT=${MY_ORIGIN_URL%/${REPO_NAME}}
