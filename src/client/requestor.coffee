@@ -32,6 +32,9 @@ class HttpRequestor extends Requestor
   sendError: (response) =>
     @resp.send response
 
+  dieWith: (resopnse) =>
+    @resp.send response
+
 class SseRequestor extends HttpRequestor
   respondWith: (response) =>
     @resp.send response

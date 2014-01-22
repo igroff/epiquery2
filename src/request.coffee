@@ -10,24 +10,6 @@ query       = require './query.coffee'
 templates   = require './templates.coffee'
 http_client = require './client/http.coffee'
 
-buildRequestContext = (context, callback) ->
-  context.receiver_client_id = context.req.param 'client_id'
-  context.closeOnEnd = context.req.param('close_on_end') is "true"
-  context.requestedTemplatePath = context.req.path
-  callback null, context
-
-selectClient = (context, callback) ->
-  sse_receiver = sse.getConnectedClientById(context.receiver_client_id)
-  if sse_receiver
-    context.receiver = sse_receiver
-    context.requestor = sse.createRequestor context.req, context.res
-  else
-    context.receiver = http_client.createClient(context.req, context.res)
-    context.requestor = http_client.createRequestor context.req
-    # http requests are stateless, and thus close on end always
-    context.closeOnEnd = true
-  callback null, context
-
 buildTemplateContext = (context, callback) ->
   context.templateContext = context.requestor.params
   log.info "template context: #{JSON.stringify context.templateContext}"
@@ -86,13 +68,10 @@ executeQuery = (context, callback) ->
     context.queryRequest.sendData,
     queryCompleteCallback
 
-queryRequestHandler = (req, res) ->
-  context = {req: req, res: res}
+queryRequestHandler = (context) ->
   async.waterfall [
     # just to create our context
     (callback) -> callback(null, context),
-    buildRequestContext,
-    selectClient,
     buildTemplateContext,
     createQueryRequest,
     selectConnection,

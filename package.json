@@ -23,7 +23,9 @@
     "rc": "0.3.1",
     "optimist": "0.6.0",
     "async": "0.2.9",
-    "line-by-line": "0.1.1"
+    "line-by-line": "0.1.1",
+    "rbytes": "~1.0.0",
+    "sockjs": "~0.3.8"
   },
   "bin": {
     "update_repo_dir": "bin/update_or_clone_repo"
@@ -33,11 +35,13 @@
   },
   "scripts": {
     "start": "./npm-starter",
-    "postinstall":"./post-install"
+    "postinstall": "./post-install"
   },
   "repository": {
     "type": "git",
-    "url":  "git://github.com/intimonkey/epiquery2.git"
+    "url": "git://github.com/intimonkey/epiquery2.git"
   },
-  "os": ["!win32"]
+  "os": [
+    "!win32"
+  ]
 }

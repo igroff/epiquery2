@@ -6,6 +6,7 @@ _         = require 'underscore'
 path      = require 'path'
 log       = require 'simplog'
 events    = require 'events'
+sockjs    = require 'sockjs'
 core      = require './src/core.coffee'
 config    = require './src/config.coffee'
 sse       = require './src/client/sse.coffee'
@@ -18,6 +19,8 @@ app.use express.bodyParser()
 app.use '/static', express.static(path.join(__dirname, 'static'))
 app.use app.router
 app.use express.errorHandler()
+
+socketServer = sockjs.createServer()
 
 # initialize the core including driver loading, etc.
 core.init()
@@ -38,9 +41,35 @@ app.get "/close/:client_id", (req, res) ->
   res.write "\n"
   res.end()
 
-app.get /\/(.+)$/, queryRequestHandler
-app.post /\/(.+)$/, queryRequestHandler
+httpRequestHandler = (req, res) ->
+  clientId = req.param 'client_id'
+  if clientId
+    log.debug "looking for an sse client by id: #{clientId}"
+    receiver = sse.getConnectedClientById clientId
+    requestor = sse.createRequestor req, res
+    if not receiver
+      log.error "unable to find client by id #{clientId}"
+      requestor.dieWith "no client found by id #{clientId}"
+      return
+    closeOnEnd = req.param('close_on_end') is 'true'
+  else
+    receiver = http_client.createClient(req, res)
+    requestor = http_client.createRequestor req
+    closeOnEnd = true
+  context =
+    receiver_client_id:clientId
+    requestedTemplatePath: req.path
+    closeOnEnd: closeOnEnd
+    requestor: requestor
+    receiver: receiver
+  queryRequestHandler(context)
+    
+  
+
+app.get /\/(.+)$/, httpRequestHandler
+app.post /\/(.+)$/, httpRequestHandler
   
 log.info "server starting with configuration"
 log.info "%j", config
+socketServer.installHandlers(app, {prefix: 'ws'})
 app.listen config.port
