@@ -27,7 +27,8 @@ hack_tilde = (path) ->
 
 CONNECTION_VAR_NAMES=process.env.CONNECTIONS ||
   throw new Error("No connections specified")
-TEMPLATE_DIRECTORY=hack_tilde(process.env.TEMPLATE_DIRECTORY || process.cwd())
+TEMPLATE_DIRECTORY=hack_tilde(process.env.TEMPLATE_DIRECTORY ||
+  path.join(process.cwd(), "templates"))
 DRIVER_DIRECTORY=hack_tilde(process.env.DRIVER_DIRECTORY) || null
 PORT=process.env.PORT || 9090
 CONNECTIONS={}
