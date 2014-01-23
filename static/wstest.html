@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<meta charset="UTF-8">
+
+<html lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title></title>
+  <script src="http://cdn.sockjs.org/sockjs-0.3.min.js"></script>
+  <script type="text/javascript">
+    function show(message){
+      var container = document.createElement('p');
+      container.innerHTML = message;
+      body = document.getElementsByTagName('body')[0];
+      body.appendChild(container);
+    }
+    var ws = new SockJS("/sockjs");
+
+    ws.onopen = function()
+    {
+      var req = {
+        path:"/mssql/test/servername"
+      }
+      ws.send(JSON.stringify(req));
+      show("Message is sent...");
+    };
+    ws.onmessage = function (evt) 
+    { 
+      var received_msg = evt.data;
+      show("Message: " + evt.data);
+    };
+    ws.onclose = function()
+    { 
+      // websocket is closed.
+      show("Connection is closed..."); 
+    };
+  </script>
+</head>
+<body>
+
+</body>
+</html>
