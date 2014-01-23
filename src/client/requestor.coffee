@@ -41,3 +41,4 @@ class SseRequestor extends HttpRequestor
 
 module.exports.HttpRequestor = HttpRequestor
 module.exports.SseRequestor = SseRequestor
+module.exports.Requestor = Requestor

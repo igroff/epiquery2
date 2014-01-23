@@ -14,7 +14,7 @@ loadDrivers = (driverPath) ->
     driverModule = require path.join(driverPath, file)
     if driverModule.DriverClass
       driverName = file.replace(/\.coffee$/,'').replace(/\.js/,'')
-      log.info "loading driver from #{file}"
+      log.debug "loading driver from #{file}"
       DRIVERS[driverName] =
         class: driverModule.DriverClass
         module: driverModule

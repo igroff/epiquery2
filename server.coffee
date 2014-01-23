@@ -7,9 +7,12 @@ path      = require 'path'
 log       = require 'simplog'
 events    = require 'events'
 sockjs    = require 'sockjs'
+http      = require 'http'
 core      = require './src/core.coffee'
 config    = require './src/config.coffee'
 sse       = require './src/client/sse.coffee'
+wsClient  = require './src/client/websocket.coffee'
+http_client          = require './src/client/http.coffee'
 queryRequestHandler  = require('./src/request.coffee').queryRequestHandler
 
 app = express()
@@ -20,7 +23,8 @@ app.use '/static', express.static(path.join(__dirname, 'static'))
 app.use app.router
 app.use express.errorHandler()
 
-socketServer = sockjs.createServer()
+
+socketServer = sockjs.createServer(app)
 
 # initialize the core including driver loading, etc.
 core.init()
@@ -47,8 +51,7 @@ httpRequestHandler = (req, res) ->
     log.debug "looking for an sse client by id: #{clientId}"
     receiver = sse.getConnectedClientById clientId
     requestor = sse.createRequestor req, res
-    if not receiver
-      log.error "unable to find client by id #{clientId}"
+    if not receiver log.error "unable to find client by id #{clientId}"
       requestor.dieWith "no client found by id #{clientId}"
       return
     closeOnEnd = req.param('close_on_end') is 'true'
@@ -64,6 +67,21 @@ httpRequestHandler = (req, res) ->
     receiver: receiver
   queryRequestHandler(context)
     
+socketServer.on 'connection', (conn) ->
+  conn.__client = wsClient.createClient conn
+  log.debug "we got a client"
+  conn.on 'data', (message) ->
+    log.debug "inbound sockjs message #{message}"
+    message = JSON.parse(message)
+    context =
+      requestedTemplatePath: message.path
+      closeOnEnd: message.closeOnEnd
+      requestor: wsClient.createRequestor(this, message)
+      receiver: this.__client
+    queryRequestHandler(context)
+  conn.on 'close', () ->
+    log.debug "sockjs client disconnected"
+
   
 
 app.get /\/(.+)$/, httpRequestHandler
@@ -71,5 +89,6 @@ app.post /\/(.+)$/, httpRequestHandler
   
 log.info "server starting with configuration"
 log.info "%j", config
-socketServer.installHandlers(app, {prefix: 'ws'})
-app.listen config.port
+server = http.createServer(app)
+socketServer.installHandlers(server, {prefix: '/sockjs'})
+server.listen(config.port)
