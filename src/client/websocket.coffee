@@ -3,7 +3,7 @@ _       = require 'underscore'
 path    = require 'path'
 Requestor = require('./requestor.coffee').Requestor
 
-class Client
+class Receiver
   # id is an optional parameter, it's only here to facilitate testing
   constructor: (@socketConnection) ->
 
@@ -50,8 +50,6 @@ class WebSocketRequestor extends Requestor
 
 createRequestor = (req, res) -> new WebSocketRequestor(req, res)
 
-createClient = (socketConnection) -> new Client(socketConnection)
-
-module.exports.Client = Client
-module.exports.createClient = createClient
+module.exports.Client = Receiver
+module.exports.createClient = (conn) -> new Receiver(conn)
 module.exports.createRequestor = createRequestor
