@@ -29,6 +29,9 @@ socketServer = sockjs.createServer(app)
 # initialize the core including driver loading, etc.
 core.init()
 
+app.get '/diagnostic', (req, res) ->
+  res.send message: "ok"
+
 app.get '/sse', (req, res) ->
   # providing the client_id is specifically for testing, if you're doing it
   # for any other reason you're doing it in an un-intended manner
