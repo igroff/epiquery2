@@ -2,65 +2,31 @@ log     = require 'simplog'
 _       = require 'underscore'
 HttpRequestor = require('./requestor.coffee').HttpRequestor
 
-CONNECTED_CLIENTS={}
-CLIENT_COUNTER=0
-
-class Client
+class Receiver
   # id is an optional parameter, it's only here to facilitate testing
   constructor: (@req, @res) ->
-    @id = "#{CLIENT_COUNTER++}#{process.pid}"
-    @attach()
+    @res.write "{\"events\":["
+    @responseOpened = false
 
   sendData: (data) =>
     for line in data.split('\n')
-      @res.write "data: #{line}\n"
-    @res.write "\n"
+      @res.write "#{line}\n"
 
   sendEvent: (name, data, closeAfterSend=false) =>
-    @res.write "event: #{name}\n"
+    @res.write "," if @responseOpened
     if data and (typeof(data) is "string")
       for line in data.split('\n')
-        @res.write "data: #{line}\n"
+        @res.write "#{line}\n"
     else if data
-      @res.write "data: #{JSON.stringify data}\n"
-    else
-      # no data
-      @res.write "data:\n"
-    @res.write "\n"
+      @res.write "#{JSON.stringify data}\n"
     if closeAfterSend
       log.debug "closing after sending message %s", name
+      @res.write "]}"
       @res.end()
-
-  attach: () =>
-    @req.socket.setTimeout(Infinity)
-    # this is how we'll hook the close of the request so that we can do
-    # any cleanup of our
-    registerClose = (clientId) =>
-      # we're going to use this for our close method on the object
-      # so we can close it when the client disconnects or explicitly
-      # if called
-      this.close = () =>
-        log.debug "close event raised for #{clientId}"
-        delete CONNECTED_CLIENTS[clientId]
-        num = 0
-        _.each CONNECTED_CLIENTS, () -> num++
-        log.debug "Num connectedClients connected: #{num}"
-        @req.removeListener 'close', this.close
-        @res.end()
-      @req.on 'close', this.close
-
-    CONNECTED_CLIENTS[@id] = this
-    registerClose @id, @req
-
-    @sendEvent("id_assign", @id)
-    log.debug "attached client: #{@id}"
+    @responseOpened = true
 
 createRequestor = (req, res) -> new HttpRequestor(req, res)
 
-createClient = (req, res) ->
-  new Client(req, res)
-
-module.exports.Client = Client
-module.exports.connectedClients = CONNECTED_CLIENTS
-module.exports.createClient = createClient
+module.exports.Client = Receiver
+module.exports.createClient = (req, res) -> new Receiver(req, res)
 module.exports.createRequestor = createRequestor

@@ -11,7 +11,7 @@ CLIENT_COUNTER=0
 CONNECTED_CLIENTS={}
 
 
-class Client
+class Receiver
   # id is an optional parameter, it's only here to facilitate testing
   constructor: (@req, @res, @id=null) ->
     if not @id
@@ -68,11 +68,8 @@ class Client
 
 createRequestor = (req, res) -> new SseRequestor(req, res)
 
-createClient = (req, res, id=null) ->
-  new Client(req, res, id)
-
-module.exports.Client = Client
+module.exports.Client = Receiver
 module.exports.connectedClients = CONNECTED_CLIENTS
 module.exports.getConnectedClientById = (id) -> CONNECTED_CLIENTS[id]
 module.exports.createRequestor = createRequestor
-module.exports.createClient = createClient
+module.exports.createClient = (req, res, id=null) -> new Receiver(req, res, id)
