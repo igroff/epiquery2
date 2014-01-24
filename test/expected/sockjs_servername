@@ -1,0 +1,4 @@
+connection established
+got some data "{\"queryId\":0,\"message\":\"beginQuery\"}"
+got some data "{\"queryId\":0,\"message\":\"row\",\"columns\":[{\"value\":\"WIN-U3DD36C2UQT\",\"name\":\"\"}]}"
+got some data "{\"queryId\":0,\"message\":\"endQuery\"}"

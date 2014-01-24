@@ -2,7 +2,7 @@ SHELL=/bin/bash
 .PHONY: watch test pass lint
 
 watch:
-	DEBUG=true supervisor -e ".coffee|.js" --exec make debug
+	DEBUG=true supervisor --ignore "./test"  -e ".coffee|.js" --exec make debug
 
 test/templates:
 	cd test/ && git clone https://github.com/intimonkey/epiquery-templates.git \
@@ -13,6 +13,9 @@ test: lint test/templates
 
 pass/%:
 	cp test/results/$(subst pass/,,$@) test/expected/$(subst pass/,,$@)
+
+show/%:
+	cat test/results/$(subst show/,,$@)
 
 lint:
 	find ./src -name '*.coffee' | xargs ./node_modules/.bin/coffeelint -f ./etc/coffeelint.conf

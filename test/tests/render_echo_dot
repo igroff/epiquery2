@@ -1,6 +1,9 @@
 #! /usr/bin/env bash
 #exec > file_emit.log 2>&1
-curl -s 'http://localhost:8080/sse?client_id=2' &
+SSE_OUT=`mktemp ${TMPDIR}/sse.XXXXX`
+REQ_OUT=`mktemp ${TMPDIR}/req.XXXXX`
+curl -s 'http://localhost:8080/sse?client_id=2' > ${SSE_OUT} 2>&1 &
 sleep .1
-curl -s 'http://localhost:8080/render/test/echo.dot?client_id=2&close_on_end=true' --data "pants=blue" &
+curl -s 'http://localhost:8080/render/test/echo.dot?client_id=2&close_on_end=true' --data "pants=blue" > ${REQ_OUT} 2>&1 &
 wait
+cat ${REQ_OUT} ${SSE_OUT}

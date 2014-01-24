@@ -1,6 +1,4 @@
-{
-  "message": "QueryRequest Recieved"
-}
+
 event: id_assign
 data: 2
 

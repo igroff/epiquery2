@@ -8,7 +8,7 @@ client = jsc.create("http://#{SERVER}:#{PORT}/sockjs")
 client.on('connection', () -> console.log "connection established" )
 client.on('data', (e) -> console.log "got some data #{JSON.stringify e}")
 client.on('error', (e) -> console.log "error #{e}")
-client.on('close', (msg) -> console.log msg ; process.exit 0)
+client.on('close', () -> process.exit 0)
 
 message = {path: template, data:data, closeOnEnd: true}
 client.write(JSON.stringify(message))
