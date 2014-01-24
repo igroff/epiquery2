@@ -51,7 +51,8 @@ httpRequestHandler = (req, res) ->
     log.debug "looking for an sse client by id: #{clientId}"
     receiver = sse.getConnectedClientById clientId
     requestor = sse.createRequestor req, res
-    if not receiver log.error "unable to find client by id #{clientId}"
+    if not receiver
+      log.error "unable to find client by id #{clientId}"
       requestor.dieWith "no client found by id #{clientId}"
       return
     closeOnEnd = req.param('close_on_end') is 'true'
