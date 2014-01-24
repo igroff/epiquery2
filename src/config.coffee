@@ -1,4 +1,3 @@
-rc      = require 'rc'
 path    = require 'path'
 log     = require 'simplog'
 

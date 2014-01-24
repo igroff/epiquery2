@@ -1,5 +1,5 @@
 SHELL=/bin/bash
-.PHONY: watch test pass lint
+.PHONY: watch test pass lint clean
 
 watch:
 	DEBUG=true supervisor --ignore "./test"  -e ".coffee|.js" --exec make debug
@@ -27,3 +27,6 @@ static/js/wstest.js: static/js/src/wstest.coffee
 
 debug: static/js/wstest.js
 	DEBUG=true PORT=8080 exec ./bin/npm-starter
+
+clean:
+	rm -rf ./node_modules/
