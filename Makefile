@@ -22,10 +22,10 @@ lint:
 	find ./src -name '*.js' | xargs ./node_modules/.bin/jshint 
 	find ./static -name '*.js' | xargs ./node_modules/.bin/jshint 
 
-static/js/wstest.js: static/js/src/wstest.coffee
-	browserify -t coffeeify static/js/src/wstest.coffee > static/js/wstest.js
+static/js/sockjstest.js: static/js/src/wstest.coffee
+	browserify -t coffeeify static/js/src/wstest.coffee > static/js/sockjstest.js
 
-debug: static/js/wstest.js
+debug: static/js/sockjstest.js
 	DEBUG=true PORT=8080 exec ./bin/npm-starter
 
 clean:
