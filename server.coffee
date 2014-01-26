@@ -5,14 +5,14 @@ express   = require 'express'
 _         = require 'underscore'
 path      = require 'path'
 log       = require 'simplog'
-events    = require 'events'
 sockjs    = require 'sockjs'
 http      = require 'http'
+Context   = require('./src/context').Context
 core      = require './src/core.coffee'
 config    = require './src/config.coffee'
 sse       = require './src/client/sse.coffee'
 wsClient  = require './src/client/websocket.coffee'
-http_client          = require './src/client/http.coffee'
+httpClient          = require './src/client/http.coffee'
 queryRequestHandler  = require('./src/request.coffee').queryRequestHandler
 
 app = express()
@@ -48,8 +48,10 @@ app.get "/close/:client_id", (req, res) ->
   res.write "\n"
   res.end()
 
+
 httpRequestHandler = (req, res) ->
   clientId = req.param 'client_id'
+  c = new Context()
   if clientId
     log.debug "looking for an sse client by id: #{clientId}"
     receiver = sse.getConnectedClientById clientId
@@ -59,17 +61,20 @@ httpRequestHandler = (req, res) ->
       requestor.dieWith "no client found by id #{clientId}"
       return
     closeOnEnd = req.param('close_on_end') is 'true'
+    c.requestor = requestor
+    c.receiver = receiver
   else
-    receiver = http_client.createClient(req, res)
-    requestor = http_client.createRequestor req
-    closeOnEnd = true
-  context =
-    receiver_client_id:clientId
-    requestedTemplatePath: req.path
-    closeOnEnd: closeOnEnd
-    requestor: requestor
-    receiver: receiver
-  queryRequestHandler(context)
+    httpClient.attachResponder c, res
+    qrInfo = httpClient.getQueryRequestInfo req
+    c.requestor =
+      params: qrInfo.params
+      getConnectionName: () -> qrInfo.connectionName
+      getTemplateName: () -> qrInfo.templateName
+      connection: qrInfo.connection
+  c.receiver_client_id = clientId
+  c.requestedTemplatePath = req.path
+  c.closeOnEnd = closeOnEnd
+  queryRequestHandler(c)
     
 socketServer.on 'connection', (conn) ->
   conn.__client = wsClient.createClient conn

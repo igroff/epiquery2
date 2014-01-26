@@ -28,11 +28,12 @@ selectConnection = (context, callback) ->
   if selectConnectionResult instanceof Error
     log.debug "failed to find connection"
     callback selectConnectionResult
+    context.emit 'error', selectConnectionResult
   else
     log.debug("using connection configuration: %j",
       context.queryRequest.connectionConfig
     )
-    context.requestor.respondWith {message: "QueryRequest Recieved"}
+    context.emit 'requestReceived'
     callback null, context
 
 renderTemplate = (context, callback) ->
@@ -47,25 +48,19 @@ renderTemplate = (context, callback) ->
   )
 
 executeQuery = (context, callback) ->
-  context.queryRequest.beginQuery()
   driver = core.selectDriver context.queryRequest.connectionConfig
-  core.events.emit 'queryRequest', context.queryRequest
+  context.emit 'beginQueryExecution'
   queryCompleteCallback = (err) ->
     if err
       log.error err
-      core.events.emit(
-        'queryRequestError',
-        {err: err, queryRequest: context.queryRequest}
-      )
-      context.queryRequest.sendError(err)
-    context.queryRequest.endQuery()
-    core.events.emit 'queryRequestComplete', context.queryRequest
+      context.emit 'error', err
+    context.emit 'completeQueryExecution'
   query.execute driver,
     context.queryRequest.connectionConfig,
     context.renderedTemplate,
-    context.queryRequest.sendRow,
-    context.queryRequest.beginRowset,
-    context.queryRequest.sendData,
+    (row) -> context.emit 'row', row
+    (rowsetData) -> context.emit 'beginRowSet', rowsetData
+    (data) -> context.emit 'data', data
     queryCompleteCallback
 
 queryRequestHandler = (context) ->
@@ -79,7 +74,7 @@ queryRequestHandler = (context) ->
     executeQuery
   ],
   (err, results) ->
-    log.error err
-    context.requestor.sendError { error: err.message }
+    log.error "queryRequestHandler Error: #{err}"
+    context.emit 'error', err
 
 module.exports.queryRequestHandler = queryRequestHandler

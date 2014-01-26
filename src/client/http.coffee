@@ -1,32 +1,38 @@
-log     = require 'simplog'
 _       = require 'underscore'
-HttpRequestor = require('./requestor.coffee').HttpRequestor
+log     = require 'simplog'
+path    = require 'path'
 
-class Receiver
-  # id is an optional parameter, it's only here to facilitate testing
-  constructor: (@req, @res) ->
-    @res.write "{\"events\":["
-    @responseOpened = false
+attachResponder = (context, res) ->
+    c = context
+    res.write '{'
+    c.on 'row', (row) -> res.write(JSON.stringify(row))
+    c.on 'beginRowSet', () -> res.write '{"rowset":['
+    c.on 'data', () -> res.write(JSON.stringify({data: data}))
+    c.on 'error', (err) ->
+      log.error err
+      err = err.message if err.message
+      res.write "\"error\": \"#{err}\"}"
+      res.end()
+    c.on 'completeQueryExecution', () ->
+      res.write "]}"
+      res.end()
 
-  sendData: (data) =>
-    for line in data.split('\n')
-      @res.write "#{line}\n"
+getQueryRequestInfo = (req) ->
+    templatePath = req.path.replace(/\.\./g, '').replace(/^\//, '')
+    pathParts = templatePath.split('/')
+    connectionName = pathParts.shift()
+    connection = null
+    if connectionName is 'header'
+      # we allow an inbound connection header to override any other method
+      # of selecting a connection
+      connection = JSON.parse(@req.get('X-DB-CONNECTION') || null)
+    templatePath = path.join.apply(path.join, pathParts)
+    params = _.extend({}, req.body, req.query, req.headers)
+    returnThis =
+      connectionName: connectionName
+      connection: connection
+      params: params
+      templateName: templatePath
 
-  sendEvent: (name, data, closeAfterSend=false) =>
-    @res.write "," if @responseOpened
-    if data and (typeof(data) is "string")
-      for line in data.split('\n')
-        @res.write "#{line}\n"
-    else if data
-      @res.write "#{JSON.stringify data}\n"
-    if closeAfterSend
-      log.debug "closing after sending message %s", name
-      @res.write "]}"
-      @res.end()
-    @responseOpened = true
-
-createRequestor = (req, res) -> new HttpRequestor(req, res)
-
-module.exports.Client = Receiver
-module.exports.createClient = (req, res) -> new Receiver(req, res)
-module.exports.createRequestor = createRequestor
+module.exports.attachResponder = attachResponder
+module.exports.getQueryRequestInfo = getQueryRequestInfo

@@ -77,7 +77,7 @@ cb) ->
   driverInstance = new driver.class(query, config.config)
   driverInstance.on 'row', rowCallback
   driverInstance.on 'data', dataCallback
-  driverInstance.on 'beginRowset', rowsetCallback
+  driverInstance.on 'beginRowSet', rowsetCallback
   driverInstance.on 'endQuery', cb
   driverInstance.on 'error', cb
 

@@ -27,17 +27,20 @@ class HttpRequestor extends Requestor
   respondWith: (response) =>
 
   send: (message) =>
+    message = JSON.stringify(message) if typeof message isnt "string"
     @resp.write message
 
   sendError: (response) =>
-    @resp.send response
+    @send response
+    @resp.end()
 
   dieWith: (resopnse) =>
-    @resp.send response
+    @send response
+    @resp.end()
 
 class SseRequestor extends HttpRequestor
   respondWith: (response) =>
-    @resp.send response
+    @send response
 
 module.exports.HttpRequestor = HttpRequestor
 module.exports.SseRequestor = SseRequestor
