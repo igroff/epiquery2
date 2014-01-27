@@ -51,18 +51,7 @@ app.get "/close/:client_id", (req, res) ->
 httpRequestHandler = (req, res) ->
   clientId = req.param 'client_id'
   c = new Context()
-  qrInfo = httpClient.getQueryRequestInfo req
-  # backwards compat bullshit, remove this
-  c.requestor =
-    params: qrInfo.params
-    getConnectionName: () -> qrInfo.connectionName
-    getTemplateName: () -> qrInfo.templateName
-    connection: qrInfo.connection
-
-  c.params = qrInfo.params
-  c.connectionName = qrInfo.connectionName
-  c.connection = qrInfo.connection
-  c.templateName = qrInfo.templateName
+  _.extend c, httpClient.getQueryRequestInfo(req)
 
   if c.connectionName and not config.connections[c.connectionName]
     res.send error: "unable to find connection by name '#{c.connectionName}'"
