@@ -7,8 +7,7 @@ data: 2
 event: beginQuery
 data: {queryid,"message":"beginQuery"}
 
-data: select ' pants=blue  client_id=2  close_on_end=true  user-agent=curl/7.24.0 (x86_64-apple-darwin12.0) libcurl/7.24.0 OpenSSL/0.9.8y zlib/1.2.5  host=localhost:8080  accept=*/*  content-length=10  content-type=application/x-www-form-urlencoded ' as everything
-
+data: {queryid,"data":"select ' pants=blue  client_id=2  close_on_end=true  user-agent=curl/7.24.0 (x86_64-apple-darwin12.0) libcurl/7.24.0 OpenSSL/0.9.8y zlib/1.2.5  host=localhost:8080  accept=*/*  content-length=10  content-type=application/x-www-form-urlencoded ' as everything\n","message":"data"}
 
 event: endQuery
 data: {queryid,"message":"endQuery"}

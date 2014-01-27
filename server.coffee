@@ -48,11 +48,26 @@ app.get "/close/:client_id", (req, res) ->
   res.write "\n"
   res.end()
 
-
 httpRequestHandler = (req, res) ->
   clientId = req.param 'client_id'
   c = new Context()
   qrInfo = httpClient.getQueryRequestInfo req
+  # backwards compat bullshit, remove this
+  c.requestor =
+    params: qrInfo.params
+    getConnectionName: () -> qrInfo.connectionName
+    getTemplateName: () -> qrInfo.templateName
+    connection: qrInfo.connection
+
+  c.params = qrInfo.params
+  c.connectionName = qrInfo.connectionName
+  c.connection = qrInfo.connection
+  c.templateName = qrInfo.templateName
+
+  if c.connectionName and not config.connections[c.connectionName]
+    res.send error: "unable to find connection by name '#{c.connectionName}'"
+    return
+
   if clientId
     log.debug "looking for an sse client by id: #{clientId}"
     c.closeOnEnd = req.param('close_on_end') is 'true'
@@ -65,11 +80,6 @@ httpRequestHandler = (req, res) ->
     res.send {message: "QueryRequest Recieved"}
   else
     httpClient.attachResponder c, res
-  c.requestor =
-    params: qrInfo.params
-    getConnectionName: () -> qrInfo.connectionName
-    getTemplateName: () -> qrInfo.templateName
-    connection: qrInfo.connection
   c.receiver_client_id = clientId
   c.requestedTemplatePath = req.path
   queryRequestHandler(c)

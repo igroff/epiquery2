@@ -32,19 +32,8 @@ init = () ->
   # load any additional drivers indicated by configuration
   config.driverDirectory and loadDrivers(config.driverDirectory)
   
-selectConnection = (requestor, queryRequest) ->
-  # we load the connection from our list of configured connections
-  conn = requestor.connection ||
-    config.connections[requestor.getConnectionName()]
-  if not conn
-    return new Error("unable to find connection by name '#{requestor.getConnectionName()}'")
-  queryRequest.templatePath = path.join(config.templateDirectory, requestor.getTemplateName())
-  queryRequest.templatePath or throw new Error "no template path!"
-  queryRequest.connectionConfig = conn
-
 module.exports.init = init
 module.exports.loadDrivers = loadDrivers
 module.exports.selectDriver = selectDriver
 module.exports.drivers = DRIVERS
-module.exports.selectConnection = selectConnection
 module.exports.events = new events.EventEmitter()

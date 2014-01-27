@@ -79,7 +79,7 @@ cb) ->
   queryId = +"#{queryRequestCounter++}#{process.pid}"
   beginCallback(queryId: queryId)
   driverInstance = new driver.class(query, config.config)
-  driverInstance.on 'row', (row) -> rowCallback {queryId: queryId, row: row}
+  driverInstance.on 'row', (row) -> rowCallback {queryId: queryId, columns: row}
   driverInstance.on 'data', (data) -> dataCallback {queryId: queryId, data: data}
   driverInstance.on 'beginRowSet', () -> rowsetCallback {queryId: queryId}
   driverInstance.on 'endQuery', () -> cb null, {queryId: queryId}

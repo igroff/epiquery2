@@ -30,7 +30,7 @@ getQueryRequestInfo = (req) ->
   params = _.extend({}, req.body, req.query, req.headers)
   returnThis =
     connectionName: connectionName
-    connection: connection
+    connectionConfig: connection
     params: params
     templateName: templatePath
 

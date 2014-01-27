@@ -8,7 +8,7 @@ event: beginQuery
 data: {queryid,"message":"beginQuery"}
 
 event: row
-data: {queryid,"message":"row","columns":{"@@hostname":"cornermonkey"}}
+data: {queryid,"columns":{"@@hostname":"cornermonkey"},"message":"row"}
 
 event: endQuery
 data: {queryid,"message":"endQuery"}

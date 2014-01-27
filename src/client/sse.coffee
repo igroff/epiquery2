@@ -18,23 +18,6 @@ class Receiver
       @id = "#{CLIENT_COUNTER++}#{process.pid}"
     @attach()
 
-  sendData: (data) =>
-    @res.write "data: #{data}\n\n"
-
-  sendEvent: (name, data, closeAfterSend=false) =>
-    @res.write "event: #{name}\n"
-    if data and (typeof(data) is "string")
-      @res.write "data: #{data}\n"
-    else if data
-      @res.write "data: #{JSON.stringify data}\n"
-    else
-      # no data
-      @res.write "data:\n"
-    @res.write "\n"
-    if closeAfterSend
-      log.debug "closing after sending message %s", name
-      @res.end()
-
   attach: () =>
     @req.socket.setTimeout(Infinity)
     @res.writeHead 200, {
@@ -63,7 +46,7 @@ class Receiver
     CONNECTED_CLIENTS[@id] = this
     registerClose @id, @req
 
-    @sendEvent("id_assign", @id)
+    @res.write("event: id_assign\ndata: #{@id}\n\n")
     log.debug "attached client: #{@id}"
 
 
@@ -87,14 +70,16 @@ attachResponder = (context, res) ->
   context.on 'beginQuery', (data) ->
     data.message = 'beginQuery'
     sendEvent res, 'beginQuery', data
-  context.on 'row', (row) -> sendEvent res, 'row', row
+  context.on 'row', (columns) ->
+    columns.message = 'row'
+    sendEvent res, 'row', columns
   context.on 'beginRowSet', () ->
     sendEvent res, 'beginRowset', message 'beginRowset'
   context.on 'data', (data) ->
     data.message = 'data'
     sendEvent res, null, data
   context.on 'error', (err) ->
-    sendEvent res, 'error', err, contex.closeOnEnd
+    sendEvent res, 'error', err
     res.end()
   context.on 'endQuery', (data) ->
     data.message = "endQuery"

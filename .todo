@@ -1,3 +1,4 @@
 hook up the escaping of templates and replacing of the weird ms word characters
 add error handling at the root of request processing try-catch
 rename id_assign camel cased
+dump the old requestor bs
