@@ -69,7 +69,6 @@ httpRequestHandler = (req, res) ->
     res.send {message: "QueryRequest Recieved"}
   else
     httpClient.attachResponder c, res
-  c.receiver_client_id = clientId
   c.requestedTemplatePath = req.path
   queryRequestHandler(c)
 
@@ -79,16 +78,17 @@ socketServer.on 'connection', (conn) ->
   conn.on 'data', (message) ->
     log.debug "inbound sockjs message #{message}"
     message = JSON.parse(message)
-    context =
-      requestedTemplatePath: message.path
+    ctxParms =
+      templateName: message.templateName
       closeOnEnd: message.closeOnEnd
-      requestor: wsClient.createRequestor(this, message)
-      receiver: this.__client
+      connectionName: message.connectionName
+      params: message
+    context = new Context(ctxParms)
+    wsClient.attachResponder(context, conn)
+    log.debug "%j", context
     queryRequestHandler(context)
   conn.on 'close', () ->
     log.debug "sockjs client disconnected"
-
-  
 
 app.get /\/(.+)$/, httpRequestHandler
 app.post /\/(.+)$/, httpRequestHandler

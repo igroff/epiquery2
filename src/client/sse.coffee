@@ -1,6 +1,5 @@
 log     = require 'simplog'
 _       = require 'underscore'
-SseRequestor = require('./requestor.coffee').SseRequestor
 
 # this is used to create a unique identifier for each client created
 # since numbers can be really, really big in v8 and node is single
@@ -9,7 +8,6 @@ SseRequestor = require('./requestor.coffee').SseRequestor
 CLIENT_COUNTER=0
 
 CONNECTED_CLIENTS={}
-
 
 class Receiver
   # id is an optional parameter, it's only here to facilitate testing
@@ -87,11 +85,8 @@ attachResponder = (context, res) ->
   context.on 'completeQueryExecution', () ->
     res.end() if context.closeOnEnd
 
-createRequestor = (req, res) -> new SseRequestor(req, res)
-
 module.exports.Client = Receiver
 module.exports.connectedClients = CONNECTED_CLIENTS
 module.exports.getConnectedClientById = (id) -> CONNECTED_CLIENTS[id]
-module.exports.createRequestor = createRequestor
 module.exports.attachResponder = attachResponder
 module.exports.createClient = (req, res, id=null) -> new Receiver(req, res, id)

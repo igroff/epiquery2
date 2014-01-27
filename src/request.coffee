@@ -39,6 +39,7 @@ selectConnection = (context, callback) ->
   callback null, context
 
 getTemplatePath = (context, callback) ->
+  log.debug "getting template path for #{config.templateName}"
   context.templatePath = path.join(config.templateDirectory,
     context.templateName)
   context.queryRequest.templatePath = context.templatePath

@@ -1,2 +1,0 @@
-#! /usr/bin/env bash
-./test/bin/sockjsRunner.coffee '/mssql/test/servername'
