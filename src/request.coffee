@@ -22,7 +22,7 @@ createQueryRequest = (context, callback) ->
   )
   callback null, context
 
-newSelectConnection = (context, callback) ->
+selectConnection = (context, callback) ->
   if not context.connectionConfig
     # no config, need to find one
     if not context.connectionName
@@ -45,21 +45,6 @@ getTemplatePath = (context, callback) ->
   # get rid of this and do it all the same damn way
   throw new Error "no template path!" if not context.templatePath
   callback null, context
-
-selectConnection = (context, callback) ->
-  selectConnectionResult = core.selectConnection(
-    context.requestor, context.queryRequest
-  )
-  if selectConnectionResult instanceof Error
-    log.debug "failed to find connection"
-    callback selectConnectionResult
-    context.emit 'error', selectConnectionResult
-  else
-    log.debug("using connection configuration: %j",
-      context.queryRequest.connectionConfig
-    )
-    context.emit 'requestReceived'
-    callback null, context
 
 renderTemplate = (context, callback) ->
   templates.renderTemplate(
@@ -97,7 +82,7 @@ queryRequestHandler = (context) ->
     buildTemplateContext,
     createQueryRequest,
     getTemplatePath,
-    newSelectConnection,
+    selectConnection,
     renderTemplate,
     executeQuery
   ],
