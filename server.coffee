@@ -60,12 +60,12 @@ httpRequestHandler = (req, res) ->
   if clientId
     log.debug "looking for an sse client by id: #{clientId}"
     c.closeOnEnd = req.param('close_on_end') is 'true'
-    receiver = sse.getConnectedClientById clientId
-    if not receiver
+    client = sse.getConnectedClientById clientId
+    if not client
       log.error "unable to find client by id #{clientId}"
-      requestor.dieWith "no client found by id #{clientId}"
+      res.send error: "no client found by id #{clientId}"
       return
-    sse.attachResponder c, receiver.res
+    sse.attachResponder c, client.res
     res.send {message: "QueryRequest Recieved"}
   else
     httpClient.attachResponder c, res
