@@ -1,6 +1,7 @@
 log     = require 'simplog'
 
 QUERY_REQUEST_COUNTER = 0
+queryRequestCounter = 0
 class QueryRequest
   constructor: (@client, @templateContext, @closeConnectionOnEndQuery) ->
     # the id that will be used to relate events to a particular query
@@ -74,12 +75,13 @@ cb) ->
     "using #{driver.name} to execute query '#{query}', with connection %j",
     config
   )
+  queryId = "#{queryRequestCounter++}#{process.pid}"
   driverInstance = new driver.class(query, config.config)
-  driverInstance.on 'row', rowCallback
-  driverInstance.on 'data', dataCallback
-  driverInstance.on 'beginRowSet', rowsetCallback
-  driverInstance.on 'endQuery', cb
-  driverInstance.on 'error', cb
+  driverInstance.on 'row', (row) -> rowCallback {queryId: queryId, row: row}
+  driverInstance.on 'data', (data) -> dataCallback {queryId: queryId, data: data}
+  driverInstance.on 'beginRowSet', () -> rowsetCallback {queryId: queryId}
+  driverInstance.on 'endQuery', () -> cb null, {queryId: queryId}
+  driverInstance.on 'error', (err) -> cb(err, {queryId: queryId})
 
 module.exports.QueryRequest = QueryRequest
 module.exports.execute = execute
