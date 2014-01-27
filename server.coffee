@@ -52,30 +52,28 @@ app.get "/close/:client_id", (req, res) ->
 httpRequestHandler = (req, res) ->
   clientId = req.param 'client_id'
   c = new Context()
+  qrInfo = httpClient.getQueryRequestInfo req
   if clientId
     log.debug "looking for an sse client by id: #{clientId}"
+    c.closeOnEnd = req.param('close_on_end') is 'true'
     receiver = sse.getConnectedClientById clientId
-    requestor = sse.createRequestor req, res
     if not receiver
       log.error "unable to find client by id #{clientId}"
       requestor.dieWith "no client found by id #{clientId}"
       return
-    closeOnEnd = req.param('close_on_end') is 'true'
-    c.requestor = requestor
-    c.receiver = receiver
+    sse.attachResponder c, receiver.res
+    res.send {message: "QueryRequest Recieved"}
   else
     httpClient.attachResponder c, res
-    qrInfo = httpClient.getQueryRequestInfo req
-    c.requestor =
-      params: qrInfo.params
-      getConnectionName: () -> qrInfo.connectionName
-      getTemplateName: () -> qrInfo.templateName
-      connection: qrInfo.connection
+  c.requestor =
+    params: qrInfo.params
+    getConnectionName: () -> qrInfo.connectionName
+    getTemplateName: () -> qrInfo.templateName
+    connection: qrInfo.connection
   c.receiver_client_id = clientId
   c.requestedTemplatePath = req.path
-  c.closeOnEnd = closeOnEnd
   queryRequestHandler(c)
-    
+
 socketServer.on 'connection', (conn) ->
   conn.__client = wsClient.createClient conn
   log.debug "we got a client"

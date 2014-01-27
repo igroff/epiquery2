@@ -5,38 +5,27 @@ data: 2
 event: beginQuery
 data: {queryid,"message":"beginQuery"}
 
-event: row
-data: {queryid,"message":"row","columns":"env:"}
+data: {queryid,"data":"env:","message":"data"}
 
-event: row
-data: {queryid,"message":"row","columns":"    -"}
+data: {queryid,"data":"    -","message":"data"}
 
-event: row
-data: {queryid,"message":"row","columns":"        server_os: Ubuntu"}
+data: {queryid,"data":"        server_os: Ubuntu","message":"data"}
 
-event: row
-data: {queryid,"message":"row","columns":"        server_version: 11.10"}
+data: {queryid,"data":"        server_version: 11.10","message":"data"}
 
-event: row
-data: {queryid,"message":"row","columns":"        server_disk_size_gb: 10"}
+data: {queryid,"data":"        server_disk_size_gb: 10","message":"data"}
 
-event: row
-data: {queryid,"message":"row","columns":"        number_of_servers: 1"}
+data: {queryid,"data":"        number_of_servers: 1","message":"data"}
 
-event: row
-data: {queryid,"message":"row","columns":"        number_of_cpu: 4"}
+data: {queryid,"data":"        number_of_cpu: 4","message":"data"}
 
-event: row
-data: {queryid,"message":"row","columns":"        server_memory_gb: 4"}
+data: {queryid,"data":"        server_memory_gb: 4","message":"data"}
 
-event: row
-data: {queryid,"message":"row","columns":"        stew: false"}
+data: {queryid,"data":"        stew: false","message":"data"}
 
-event: row
-data: {queryid,"message":"row","columns":"        clone_directory: app"}
+data: {queryid,"data":"        clone_directory: app","message":"data"}
 
-event: row
-data: {queryid,"message":"row","columns":"        bootstrap_shell_command: cd ~/app/storm ; ./move_keys.sh"}
+data: {queryid,"data":"        bootstrap_shell_command: cd ~/app/storm ; ./move_keys.sh","message":"data"}
 
 event: endQuery
 data: {queryid,"message":"endQuery"}

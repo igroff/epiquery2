@@ -7,8 +7,7 @@ data: 2
 event: beginQuery
 data: {queryid,"message":"beginQuery"}
 
-data: /Users/iangroff/manifest.yaml
-
+data: {queryid,"data":"/Users/iangroff/manifest.yaml\n","message":"data"}
 
 event: endQuery
 data: {queryid,"message":"endQuery"}

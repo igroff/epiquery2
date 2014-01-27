@@ -67,6 +67,7 @@ execute = (
   driver,
   config,
   query,
+  beginCallback,
   rowCallback,
   rowsetCallback,
   dataCallback,
@@ -75,7 +76,8 @@ cb) ->
     "using #{driver.name} to execute query '#{query}', with connection %j",
     config
   )
-  queryId = "#{queryRequestCounter++}#{process.pid}"
+  queryId = +"#{queryRequestCounter++}#{process.pid}"
+  beginCallback(queryId: queryId)
   driverInstance = new driver.class(query, config.config)
   driverInstance.on 'row', (row) -> rowCallback {queryId: queryId, row: row}
   driverInstance.on 'data', (data) -> dataCallback {queryId: queryId, data: data}

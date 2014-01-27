@@ -50,14 +50,16 @@ renderTemplate = (context, callback) ->
 executeQuery = (context, callback) ->
   driver = core.selectDriver context.queryRequest.connectionConfig
   context.emit 'beginQueryExecution'
-  queryCompleteCallback = (err) ->
+  queryCompleteCallback = (err, data) ->
     if err
       log.error err
       context.emit 'error', err
+    context.emit 'endQuery', data
     context.emit 'completeQueryExecution'
   query.execute driver,
     context.queryRequest.connectionConfig,
     context.renderedTemplate,
+    (data) -> context.emit 'beginQuery', data
     (row) -> context.emit 'row', row
     (rowsetData) -> context.emit 'beginRowSet', rowsetData
     (data) -> context.emit 'data', data

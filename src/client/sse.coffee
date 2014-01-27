@@ -66,10 +66,47 @@ class Receiver
     @sendEvent("id_assign", @id)
     log.debug "attached client: #{@id}"
 
+
+sendEvent = (res, name, data, closeAfterSend=false) =>
+  if (typeof name isnt undefined) and (name isnt null)
+    res.write "event: #{name}\n"
+
+  if data and (typeof(data) is "string")
+    res.write "data: #{data}\n"
+  else if data
+    res.write "data: #{JSON.stringify data}\n"
+  else
+    # no data
+    res.write "data:\n"
+  res.write "\n"
+  if closeAfterSend
+    log.debug "closing after sending message %s", name
+    res.end()
+
+attachResponder = (context, res) ->
+  context.on 'beginQuery', (data) ->
+    data.message = 'beginQuery'
+    sendEvent res, 'beginQuery', data
+  context.on 'row', (row) -> sendEvent res, 'row', row
+  context.on 'beginRowSet', () ->
+    sendEvent res, 'beginRowset', message 'beginRowset'
+  context.on 'data', (data) ->
+    data.message = 'data'
+    sendEvent res, null, data
+  context.on 'error', (err) ->
+    sendEvent res, 'error', err, contex.closeOnEnd
+    res.end()
+  context.on 'endQuery', (data) ->
+    data.message = "endQuery"
+    sendEvent res, 'endQuery', data
+  context.on 'completeQueryExecution', () ->
+    res.end() if context.closeOnEnd
+
 createRequestor = (req, res) -> new SseRequestor(req, res)
 
 module.exports.Client = Receiver
 module.exports.connectedClients = CONNECTED_CLIENTS
 module.exports.getConnectedClientById = (id) -> CONNECTED_CLIENTS[id]
 module.exports.createRequestor = createRequestor
+module.exports.attachResponder = attachResponder
 module.exports.createClient = (req, res, id=null) -> new Receiver(req, res, id)
