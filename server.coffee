@@ -73,7 +73,6 @@ httpRequestHandler = (req, res) ->
   queryRequestHandler(c)
 
 socketServer.on 'connection', (conn) ->
-  conn.__client = wsClient.createClient conn
   log.debug "we got a client"
   conn.on 'data', (message) ->
     log.debug "inbound sockjs message #{message}"
