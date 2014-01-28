@@ -16,12 +16,6 @@ buildTemplateContext = (context, callback) ->
   log.info "template context: #{JSON.stringify context.templateContext}"
   callback null, context
 
-createQueryRequest = (context, callback) ->
-  context.queryRequest = new query.QueryRequest(
-    context.templateContext, context.queryId
-  )
-  callback null, context
-
 selectConnection = (context, callback) ->
   if not context.connectionConfig
     # no config, need to find one
@@ -35,30 +29,27 @@ selectConnection = (context, callback) ->
       callback msg
   else
     context.connection = connectionConfig
-  context.queryRequest.connectionConfig = context.connection
   callback null, context
 
 getTemplatePath = (context, callback) ->
   log.debug "getting template path for #{config.templateName}"
   context.templatePath = path.join(config.templateDirectory,
     context.templateName)
-  context.queryRequest.templatePath = context.templatePath
   callback(new Error "no template path!") if not context.templatePath
   callback null, context
 
 renderTemplate = (context, callback) ->
   templates.renderTemplate(
-    context.queryRequest.templatePath,
-    context.queryRequest.templateContext,
+    context.templatePath,
+    context.templateContext,
     (err, rawTemplate, renderedTemplate) ->
       context.rawTemplate = rawTemplate
       context.renderedTemplate = renderedTemplate
-      context.queryRequest.renderedTemplate = renderedTemplate
       callback err, context
   )
 
 executeQuery = (context, callback) ->
-  driver = core.selectDriver context.queryRequest.connectionConfig
+  driver = core.selectDriver context.connection
   context.emit 'beginQueryExecution'
   queryCompleteCallback = (err, data) ->
     if err
@@ -67,8 +58,7 @@ executeQuery = (context, callback) ->
     context.emit 'endQuery', data
     context.emit 'completeQueryExecution'
   query.execute driver,
-    context.queryRequest.connectionConfig,
-    context.queryRequest,
+    context,
     (data) -> context.emit 'beginQuery', data
     (row) -> context.emit 'row', row
     (rowsetData) -> context.emit 'beginRowSet', rowsetData
@@ -80,7 +70,6 @@ queryRequestHandler = (context) ->
     # just to create our context
     (callback) -> callback(null, context),
     buildTemplateContext,
-    createQueryRequest,
     getTemplatePath,
     selectConnection,
     renderTemplate,
