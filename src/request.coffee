@@ -18,7 +18,7 @@ buildTemplateContext = (context, callback) ->
 
 createQueryRequest = (context, callback) ->
   context.queryRequest = new query.QueryRequest(
-    context.receiver, context.templateContext, context.closeOnEnd
+    context.templateContext, context.queryId
   )
   callback null, context
 
@@ -69,7 +69,7 @@ executeQuery = (context, callback) ->
     context.emit 'completeQueryExecution'
   query.execute driver,
     context.queryRequest.connectionConfig,
-    context.renderedTemplate,
+    context.queryRequest,
     (data) -> context.emit 'beginQuery', data
     (row) -> context.emit 'row', row
     (rowsetData) -> context.emit 'beginRowSet', rowsetData

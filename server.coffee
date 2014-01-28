@@ -80,6 +80,7 @@ socketServer.on 'connection', (conn) ->
       templateName: message.templateName
       closeOnEnd: message.closeOnEnd
       connectionName: message.connectionName
+      queryId: message.queryId
       params: message
     context = new Context(ctxParms)
     sockjsClient.attachResponder(context, conn)

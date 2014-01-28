@@ -18,7 +18,9 @@
     ws.onopen = function()
     {
       var req = {
-        path:"/mssql/test/servername"
+        templateName:"/test/servername",
+        connectionName:"render",
+        queryId:"pants"
       }
       ws.send(JSON.stringify(req));
       show("Message is sent...");
