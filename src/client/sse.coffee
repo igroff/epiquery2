@@ -85,7 +85,6 @@ attachResponder = (context, res) ->
   context.on 'completeQueryExecution', () ->
     res.end() if context.closeOnEnd
 
-module.exports.Client = Receiver
 module.exports.connectedClients = CONNECTED_CLIENTS
 module.exports.getConnectedClientById = (id) -> CONNECTED_CLIENTS[id]
 module.exports.attachResponder = attachResponder
