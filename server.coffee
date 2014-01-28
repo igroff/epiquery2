@@ -11,7 +11,7 @@ Context   = require('./src/context').Context
 core      = require './src/core.coffee'
 config    = require './src/config.coffee'
 sse       = require './src/client/sse.coffee'
-wsClient  = require './src/client/websocket.coffee'
+sockjsClient  = require './src/client/sockjs.coffee'
 httpClient          = require './src/client/http.coffee'
 queryRequestHandler  = require('./src/request.coffee').queryRequestHandler
 
@@ -82,7 +82,7 @@ socketServer.on 'connection', (conn) ->
       connectionName: message.connectionName
       params: message
     context = new Context(ctxParms)
-    wsClient.attachResponder(context, conn)
+    sockjsClient.attachResponder(context, conn)
     queryRequestHandler(context)
   conn.on 'close', () ->
     log.debug "sockjs client disconnected"
