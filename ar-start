@@ -1,4 +1,4 @@
 #! /usr/bin/env bash
 # vim: ft=sh
 export PORT=${1-8080}
-exec npm start
+exec ./bin/npm-starter
