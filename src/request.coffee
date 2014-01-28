@@ -44,7 +44,7 @@ getTemplatePath = (context, callback) ->
     context.templateName)
   context.queryRequest.templatePath = context.templatePath
   # get rid of this and do it all the same damn way
-  throw new Error "no template path!" if not context.templatePath
+  callback(new Error "no template path!") if not context.templatePath
   callback null, context
 
 renderTemplate = (context, callback) ->
