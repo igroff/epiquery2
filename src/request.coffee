@@ -43,7 +43,6 @@ getTemplatePath = (context, callback) ->
   context.templatePath = path.join(config.templateDirectory,
     context.templateName)
   context.queryRequest.templatePath = context.templatePath
-  # get rid of this and do it all the same damn way
   callback(new Error "no template path!") if not context.templatePath
   callback null, context
 
