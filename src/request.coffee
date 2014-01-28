@@ -4,12 +4,10 @@ async       = require 'async'
 log         = require 'simplog'
 _           = require 'underscore'
 path        = require 'path'
-sse         = require './client/sse.coffee'
 core        = require './core.coffee'
 config      = require './config.coffee'
 query       = require './query.coffee'
 templates   = require './templates.coffee'
-http_client = require './client/http.coffee'
 
 buildTemplateContext = (context, callback) ->
   context.templateContext = context.params
@@ -57,13 +55,10 @@ executeQuery = (context, callback) ->
       context.emit 'error', err
     context.emit 'endQuery', data
     context.emit 'completeQueryExecution'
-  query.execute driver,
+  query.execute(driver,
     context,
-    (data) -> context.emit 'beginQuery', data
-    (row) -> context.emit 'row', row
-    (rowsetData) -> context.emit 'beginRowSet', rowsetData
-    (data) -> context.emit 'data', data
     queryCompleteCallback
+  )
 
 queryRequestHandler = (context) ->
   async.waterfall [
