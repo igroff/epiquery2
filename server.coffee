@@ -52,12 +52,11 @@ httpRequestHandler = (req, res) ->
   clientId = req.param 'client_id'
   c = new Context()
   _.extend c, httpClient.getQueryRequestInfo(req)
-
   if c.connectionName and not config.connections[c.connectionName]
     res.send error: "unable to find connection by name '#{c.connectionName}'"
     return
-
   if clientId
+    # handling an sse request
     log.debug "looking for an sse client by id: #{clientId}"
     c.closeOnEnd = req.param('close_on_end') is 'true'
     client = sse.getConnectedClientById clientId
@@ -84,7 +83,6 @@ socketServer.on 'connection', (conn) ->
       params: message
     context = new Context(ctxParms)
     wsClient.attachResponder(context, conn)
-    log.debug "%j", context
     queryRequestHandler(context)
   conn.on 'close', () ->
     log.debug "sockjs client disconnected"
