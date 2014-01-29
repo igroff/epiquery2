@@ -32,7 +32,7 @@ core.init()
 app.get '/diagnostic', (req, res) ->
   response =
     message: "ok"
-    connections: _.pluck core.drivers, 'name'
+    connections: _.pluck(config.connections, 'name')
   res.send response
 
 app.get '/sse', (req, res) ->
