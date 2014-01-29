@@ -30,7 +30,10 @@ socketServer = sockjs.createServer(app)
 core.init()
 
 app.get '/diagnostic', (req, res) ->
-  res.send message: "ok"
+  response =
+    message: "ok"
+    connections: _.pluck core.drivers, 'name'
+  res.send response
 
 app.get '/sse', (req, res) ->
   # providing the client_id is specifically for testing, if you're doing it
