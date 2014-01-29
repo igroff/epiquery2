@@ -1,7 +1,6 @@
 events      = require 'events'
 log         = require 'simplog'
 xmla        = require 'xmla4js'
-Q           = require 'q'
 
 # Need to emit data, error, end, row endQuery, beginRowset
 class MDXDriver extends events.EventEmitter
