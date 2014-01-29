@@ -28,7 +28,8 @@
     "async": "0.2.9",
     "line-by-line": "0.1.1",
     "rbytes": "1.0.0",
-    "sockjs": "0.3.8"
+    "sockjs": "0.3.8",
+    "q": "0.9.2"
   },
   "bin": {
     "update_repo_dir": "bin/update_or_clone_repo"

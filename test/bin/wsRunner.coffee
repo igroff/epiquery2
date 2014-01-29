@@ -3,8 +3,8 @@
 template = process.argv[3]
 connectionName = process.argv[2]
 data = process.argv[4] || {}
-SERVER=process.EPI_TEST_SERVER || "localhost"
-PORT=process.PORT || 8080
+SERVER=process.env.EPI_TEST_SERVER || "localhost"
+PORT=process.env.PORT || 8080
 WebSocket = require 'ws'
 ws = new WebSocket "ws://#{SERVER}:#{PORT}/sockjs/websocket"
 message =

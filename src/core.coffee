@@ -11,10 +11,10 @@ loadDrivers = (driverPath) ->
   for file in fs.readdirSync(driverPath)
     # ignore hidden files
     continue if file[0] is '.'
+    log.debug "loading driver from #{file}"
     driverModule = require path.join(driverPath, file)
     if driverModule.DriverClass
       driverName = file.replace(/\.coffee$/,'').replace(/\.js/,'')
-      log.debug "loading driver from #{file}"
       DRIVERS[driverName] =
         class: driverModule.DriverClass
         module: driverModule
