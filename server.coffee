@@ -10,9 +10,9 @@ http      = require 'http'
 Context   = require('./src/context').Context
 core      = require './src/core.coffee'
 config    = require './src/config.coffee'
-sse       = require './src/client/sse.coffee'
-sockjsClient  = require './src/client/sockjs.coffee'
-httpClient          = require './src/client/http.coffee'
+sse       = require './src/transport/sse.coffee'
+sockjsClient  = require './src/transport/sockjs.coffee'
+httpClient          = require './src/transport/http.coffee'
 queryRequestHandler  = require('./src/request.coffee').queryRequestHandler
 
 app = express()
