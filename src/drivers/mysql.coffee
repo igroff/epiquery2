@@ -1,9 +1,11 @@
 events      = require 'events'
 mysql       = require 'mysql'
 Q           = require 'q'
+_           = require 'underscore'
 
 class MySQLDriver extends events.EventEmitter
   constructor: (@query, @config) ->
+    @config = _.clone @config
     connect_deferred = Q.defer()
     @config.multipleStatements = true
 
