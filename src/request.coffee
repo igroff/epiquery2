@@ -30,7 +30,7 @@ selectConnection = (context, callback) ->
   callback null, context
 
 getTemplatePath = (context, callback) ->
-  log.debug "getting template path for #{config.templateName}"
+  log.debug "getting template path for #{context.templateName}"
   context.templatePath = path.join(config.templateDirectory,
     context.templateName)
   callback(new Error "no template path!") if not context.templatePath
