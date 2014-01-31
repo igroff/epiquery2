@@ -1,11 +1,30 @@
-WebSocket     = require 'ws'
 EventEmitter  = require('events').EventEmitter
 _             = require 'underscore'
 
+WebSocket = global.WebSocket || global.MozWebSocket
+
+if WebSocket
+  WebSocket.prototype.on = (name, handler) ->
+    if name is 'open'
+      @onopen = handler
+    else if name is 'close'
+      @onclose = handler
+    else if name is 'message'
+      @onmessage = handler
+    else if name is 'error'
+      @onmessage = handler
+else
+  WebSocket = require('ws')
 
 class EpiClient extends EventEmitter
   constructor: (@host, @port=80) ->
-    @ws = new WebSocket("ws://#{@host}:#{@port}/sockjs/websocket")
+    if not @host
+      if window and window.location
+        @ws = new WebSocket("ws://#{window.location.host}/sockjs/websocket")
+      else
+        throw new Error "missing connection information"
+    else
+      @ws = new WebSocket("ws://#{@host}#{":" if @port}#{@port}/sockjs/websocket")
     @queryId = 0
     @ws.on 'message', @onMessage
     @ws.on 'close', @onClose
@@ -17,11 +36,14 @@ class EpiClient extends EventEmitter
         connectionName: connectionName
         data: data
       req.queryId = null || queryId
-      req.closeOnEnd = data.closeOnEnd if data.closeOnEnd
+      req.closeOnEnd = data.closeOnEnd if data
       @ws.send JSON.stringify(req)
 
   onMessage: (message) =>
-    message = JSON.parse(message)
+    # if the browser has wrapped this for use, we'll be interested in its
+    # 'data' element
+    message = message.data if message.type? and message.type = 'message'
+    message = JSON.parse(message) if typeof message is 'string'
     handler = @['on' + message.message]
     if handler
       handler(message)

@@ -1,0 +1,27 @@
+<!DOCTYPE HTML>
+<meta charset="UTF-8">
+
+<html lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title></title>
+  <script src="/static/js/epiclient.js"></script>
+  <script type="text/javascript">
+    function show(message){
+      var container = document.createElement('p');
+      container.innerHTML = message;
+      body = document.getElementsByTagName('body')[0];
+      body.appendChild(container);
+    }
+    var client = new EpiClient()
+    client.on('row', function(r) { console.log(r); });
+    client.on('open', function() { console.log('open'); });
+    client.on('close', function() {console.log('closed'); });
+    client.on('beginQuery', function() {console.log("begin query");});
+    client.query("mysql", "/test/mysql_servername");
+  </script>
+</head>
+<body>
+
+</body>
+</html>
