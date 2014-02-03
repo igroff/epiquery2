@@ -35,6 +35,12 @@
       // websocket is closed.
       show("Connection is closed..."); 
     };
+    
+    function EpiSocketClient(hostname){
+      var host = hostname;
+      var ws = new SockJS("ws://" + hostname + "/sockjs"); 
+      
+    }
   </script>
 </head>
 <body>

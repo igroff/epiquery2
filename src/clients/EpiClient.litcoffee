@@ -7,8 +7,9 @@ multiple environments (node, browser), and do nice things like reconnect,
 and hunt through a collection of servers allowing for the removal of the LB
 as a logical component.
 
-    EventEmitter  = require('events').EventEmitter
-    _             = require 'underscore'
+    EventEmitter      = require('events').EventEmitter
+    _                 = require 'underscore'
+    HuntingWebSocket  = require 'hunting-websocket'
 
 Turns out if you use this in a browser, there's multiple ways you might find
 WebSocket, so we go hunting for them.  Either way, if we find one, we're gonna
@@ -33,27 +34,27 @@ looks.
 Now that we have a consistent WebSocket to play with
 
     class EpiClient extends EventEmitter
-      constructor: (@host, @port=80) ->
-        if not @host
-          if window and window.location
-            @ws = new WebSocket("ws://#{window.location.host}/sockjs/websocket")
-          else
-            throw new Error "missing connection information"
-        else
-          @ws = new WebSocket("ws://#{@host}#{":" if @port}#{@port}/sockjs/websocket")
+      constructor: (@urls) ->
+        @open = false
+        @ws = new HuntingWebSocket(@urls)
         @queryId = 0
-        @ws.on 'message', @onMessage
-        @ws.on 'close', @onClose
+        @ws.onmessage = @onMessage
+        @ws.onclose = @onClose
+        @ws.onopen = () =>
+          @open = true
+        @ws.onerror = (err) -> console.log err
 
       query: (connectionName, template, data, queryId=null) =>
-        @ws.on 'open', () =>
-          req =
-            templateName: template
-            connectionName: connectionName
-            data: data
-          req.queryId = null || queryId
-          req.closeOnEnd = data.closeOnEnd if data
+        req =
+          templateName: template
+          connectionName: connectionName
+          data: data
+        req.queryId = null || queryId
+        req.closeOnEnd = data.closeOnEnd if data
+        if @open
           @ws.send JSON.stringify(req)
+        else
+          setImmediate () => @query connectionName, template, data, queryId
 
       onMessage: (message) =>
         # if the browser has wrapped this for use, we'll be interested in its

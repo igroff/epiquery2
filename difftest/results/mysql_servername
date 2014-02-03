@@ -1,0 +1,15 @@
+{
+  "message": "QueryRequest Recieved"
+}
+event: id_assign
+data: 2
+
+event: beginQuery
+data: {queryid,"message":"beginQuery"}
+
+event: row
+data: {queryid,"columns":{"@@hostname":"cornermonkey"},"message":"row"}
+
+event: endQuery
+data: {queryid,"message":"endQuery"}
+

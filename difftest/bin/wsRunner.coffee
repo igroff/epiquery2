@@ -3,7 +3,7 @@
 WebSocket     = require 'ws'
 EventEmitter  = require('events').EventEmitter
 _             = require 'underscore'
-clients       = require '../../src/clients/EpiClient.coffee'
+clients       = require '../../src/clients/EpiClient.litcoffee'
 
 EpiBufferingClient = clients.EpiBufferingClient
 EpiClient = clients.EpiClient
@@ -16,10 +16,16 @@ SERVER=process.env.EPI_TEST_SERVER || "localhost"
 PORT=process.env.PORT || 8080
 
 
-bc = new EpiBufferingClient SERVER, PORT
+socketServers = [
+  "ws://localhost:8080/sockjs/websocket"
+]
+
+bc = new EpiBufferingClient socketServers
 bc.output = []
 bc.on 'beginQuery', console.log
-bc.on 'endQuery', console.log
+bc.on 'endQuery',(msg) ->
+  console.log(msg)
+  exitWhenDone()
 bc.on 'row', console.log
 bc.query connectionName, template, data, "pants"
 nextData = closeOnEnd: true
@@ -31,9 +37,11 @@ bc.on 'close', () ->
   exitWhenDone()
 res = {}
 # capture our events so we can disply the results in a deterministic order
-c = new EpiClient SERVER, PORT
+c = new EpiClient socketServers
 c.on 'beginQuery', (msg) -> c.beginQueryOutput = 'beginQuery' + JSON.stringify msg
-c.on 'endQuery', (msg) -> c.endQueryOutput = 'endQuery' + JSON.stringify msg
+c.on 'endQuery', (msg) ->
+   c.endQueryOutput = 'endQuery' + JSON.stringify msg
+   exitWhenDone()
 c.on 'row', (msg) ->
   c.rowOutput = [] || c.rowOutput
   c.rowOutput.push 'row' + JSON.stringify msg
