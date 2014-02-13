@@ -24,8 +24,8 @@ lint:
 static/js/sockjstest.js: static/js/src/wstest.coffee
 	browserify -t coffeeify static/js/src/wstest.coffee > static/js/sockjstest.js
 
-static/js/epiclient.js: src/clients/browserclient.coffee src/clients/EpiClient.litcoffee
-	browserify -t coffeeify $< --outfile $@
+static/js/epiclient.js: src/clients/browserclient.coffee src/clients/EpiClient.coffee
+	browserify -t coffeeify src/clients/browserclient.coffee --outfile $@
 
 debug: static/js/sockjstest.js
 	DEBUG=true PORT=8080 exec ./ar-start

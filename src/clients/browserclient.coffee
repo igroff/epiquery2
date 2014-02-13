@@ -1,4 +1,8 @@
-clients = require './EpiClient.litcoffee'
+# vim: ft=coffee
+clients = require './EpiClient.coffee'
 
-global.EpiClient = clients.EpiClient
-global.EpiBufferingClient = clients.EpiBufferingClient
+module.exports.EpiClient = clients.EpiClient
+module.exports.EpiBufferingClient = clients.EpiBufferingClient
+if window?
+  window.EpiClient = clients.EpiClient
+  window.EpiBufferingClient = clients.EpiBufferingClient

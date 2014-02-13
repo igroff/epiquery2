@@ -3,18 +3,52 @@ log     = require 'simplog'
 path    = require 'path'
 
 attachResponder = (context, res) ->
+  nextRowDelim = ""
+  haveOneRowSet = nextRowSetDelim = ""
+  indent = ""
+  stack = []
+  increaseIndent = () -> indent = indent + "  "
+  decreaseIndent = () -> indent = indent[0...-2]
+  ascendOne = () ->
+    decreaseIndent()
+    stack.shift()()
+
   c = context
-  res.write '{'
-  c.on 'row', (row) -> res.write(JSON.stringify(row))
-  c.on 'beginRowSet', () -> res.write '{"rowset":['
-  c.on 'data', (data) -> res.write(JSON.stringify({data: data}))
+  c.on 'row', (row) ->
+    row.message = 'row'
+    res.write("#{nextRowDelim}#{indent}#{JSON.stringify(row)}")
+    nextRowDelim = ",\n"
+
+  c.on 'beginQuery', (d) ->
+    increaseIndent()
+    res.write "{\n#{indent}\"queryId\":#{d.queryId},\n"
+    stack.unshift(() -> res.write "\n#{indent}}\n")
+  c.on 'endQuery', () ->
+    ascendOne()
+
+  c.on 'beginRowSet', () ->
+    if haveOneRowSet
+      res.write "#{indent}#{nextRowSetDelim}[\n"
+    else
+      res.write "#{indent}\"rowsets\":[[\n"
+    increaseIndent()
+    nextRowDelim = ""
+    haveOneRowSet = nextRowSetDelim = ",\n"
+  c.on 'endRowSet', () ->
+    res.write "\n#{indent}]"
+
+  c.on 'data', (data) ->
+    res.write("#{nextRowDelim}#{indent}#{JSON.stringify({data: data})}")
+    nextRowDelim = ",\n"
+
   c.on 'error', (err) ->
     log.error err
     err = err.message if err.message
     res.write "\"error\": \"#{err}\"}"
     res.end()
+
   c.on 'completeQueryExecution', () ->
-    res.write "]}"
+    item() while item = stack.shift()
     res.end()
 
 getQueryRequestInfo = (req) ->

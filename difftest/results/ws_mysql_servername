@@ -1,6 +1,0 @@
-[Error: not opened]
-[Error: not opened]
-{ queryId: 'pants', message: 'endQuery' }
-beginQuery{queryid"nonBufferingClientQueryId","message":"beginQuery"}
-endQuery{queryid"nonBufferingClientQueryId","message":"endQuery"}
-row{queryid"nonBufferingClientQueryId","columns":{"@@hostname":"cornermonkey"},"message":"row"}

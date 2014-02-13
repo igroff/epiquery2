@@ -1,27 +1,52 @@
 <!DOCTYPE HTML>
 <meta charset="UTF-8">
 
-<html lang="en">
+<html lang="en" ng-app='theApp'>
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <title></title>
   <script src="/static/js/epiclient.js"></script>
+  <script src="/static/js/angular.min.js"></script>
   <script type="text/javascript">
     function show(message){
+      console.log(message);
       var container = document.createElement('p');
+      if (typeof(message) === 'object'){
+        message = JSON.stringify(message);
+      }
       container.innerHTML = message;
       body = document.getElementsByTagName('body')[0];
       body.appendChild(container);
     }
-    var client = new EpiClient()
-    client.on('row', function(r) { console.log(r); });
-    client.on('open', function() { console.log('open'); });
-    client.on('close', function() {console.log('closed'); });
-    client.on('beginQuery', function() {console.log("begin query");});
+    var client = new EpiClient("ws://localhost:8080/sockjs/websocket")
+    client.on('row', function(r) { show(r); });
+    client.on('close', show);
+    client.on('beginQuery', show);
+    client.on('endQuery', show);
+    client.on('beginResultSet', show);
     client.query("mysql", "/test/mysql_servername");
+
+    angular.module('theApp', []).controller(
+      'ConfigController',
+      function($http, $scope){
+        $http({method:'GET', url:'/diagnostic'}).
+          success(function(data, status, headers, config){
+            $scope.connectionNames = data.connections;
+          }).
+          error(function(data, status, headers, config){
+            show("there was an error connection to diagnostic, " + data);
+          });
+      });
   </script>
 </head>
 <body>
+  <div id="connections" ng-controller="ConfigController">
+    <h4>Available Connections</h4>
+    <ul>
+      <li ng-repeat="name in connectionNames"> {{name}} </li>
+    </ul>
+  </div>
+
 
 </body>
 </html>

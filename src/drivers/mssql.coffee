@@ -6,6 +6,7 @@ _           = require 'underscore'
 
 class MSSQLDriver extends events.EventEmitter
   constructor: (@query, @config) ->
+    @rowSetStarted = false
     connect_deferred           = Q.defer()
     connect_end_deferred       = Q.defer()
     request_complete_deferred  = Q.defer()
@@ -28,8 +29,12 @@ class MSSQLDriver extends events.EventEmitter
         # we use this event to split up multipe result sets as each result set
         # is preceeded by a columnMetadata event
         request.on 'columnMetadata', () =>
+          this.emit('endRowSet') if @rowSetStarted
           this.emit 'beginRowSet'
+          @rowSetStarted = true
         request.on 'row', (columns) =>
+          this.emit('beginRowSet') if not @rowSetStarted
+          @rowSetStarted = true
           mapper = (column) ->
             {value: column.value, name: column.metadata.colName}
           c = _.map(columns, mapper)

@@ -70,6 +70,7 @@ httpRequestHandler = (req, res) ->
     sse.attachResponder c, client.res
     res.send {message: "QueryRequest Recieved"}
   else
+    # normal ol' http request
     httpClient.attachResponder c, res
   c.requestedTemplatePath = req.path
   queryRequestHandler(c)
