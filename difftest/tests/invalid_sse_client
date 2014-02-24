@@ -1,4 +1,0 @@
-#! /usr/bin/env bash
-#exec > file_emit.log 2>&1
-
-curl -s 'http://localhost:8080/render/test/mysql_servername?client_id=33232'
