@@ -2335,7 +2335,6 @@ EpiClient = (function(_super) {
     this.ws.onmessage = this.onMessage;
     this.ws.onclose = this.onClose;
     this.ws.onopen = function() {
-      log.info("I'm open");
       return _this.open = true;
     };
     this.ws.onerror = function(err) {
@@ -2361,7 +2360,6 @@ EpiClient = (function(_super) {
     if (this.open) {
       return this.ws.send(JSON.stringify(req));
     } else {
-      log.info("socket not open, trying later");
       return setTimeout(this.query, 1000, connectionName, template, data, queryId);
     }
   };

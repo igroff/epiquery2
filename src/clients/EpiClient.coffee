@@ -11,7 +11,6 @@ class EpiClient extends EventEmitter
     @ws.onmessage = @onMessage
     @ws.onclose = @onClose
     @ws.onopen = () =>
-      log.info "I'm open"
       @open = true
     @ws.onerror = (err) ->
       log.error "error: ", err
@@ -26,7 +25,6 @@ class EpiClient extends EventEmitter
     if @open
       @ws.send JSON.stringify(req)
     else
-      log.info "socket not open, trying later"
       setTimeout @query, 1000, connectionName, template, data, queryId
 
   onMessage: (message) =>

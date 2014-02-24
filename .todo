@@ -2,4 +2,6 @@ hook up the escaping of templates and replacing of the weird ms word characters
 add error handling at the root of request processing try-catch
 rename id_assign camel cased
 rename the websocket stuff to sockjs as that is what it is
-need to make invalid connection tests for all transports
+remove sse
+change event names to all lowercase
+remove dynamic loading of drivers
