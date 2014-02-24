@@ -1,32 +1,13 @@
-
-event: id_assign
-data: 2
-
-event: beginQuery
-data: {queryid,"message":"beginQuery"}
-
-data: {queryid,"data":"env:","message":"data"}
-
-data: {queryid,"data":"    -","message":"data"}
-
-data: {queryid,"data":"        server_os: Ubuntu","message":"data"}
-
-data: {queryid,"data":"        server_version: 11.10","message":"data"}
-
-data: {queryid,"data":"        server_disk_size_gb: 10","message":"data"}
-
-data: {queryid,"data":"        number_of_servers: 1","message":"data"}
-
-data: {queryid,"data":"        number_of_cpu: 4","message":"data"}
-
-data: {queryid,"data":"        server_memory_gb: 4","message":"data"}
-
-data: {queryid,"data":"        stew: false","message":"data"}
-
-data: {queryid,"data":"        clone_directory: app","message":"data"}
-
-data: {queryid,"data":"        bootstrap_shell_command: cd ~/app/storm ; ./move_keys.sh","message":"data"}
-
-event: endQuery
-data: {queryid,"message":"endQuery"}
-
+beginQuery{"queryId":"basicSocketQueryId","message":"beginQuery"}
+endQuery{"queryId":"basicSocketQueryId","message":"endQuery"}
+data{"queryId":"basicSocketQueryId","data":"env:","message":"data"}
+data{"queryId":"basicSocketQueryId","data":"    -","message":"data"}
+data{"queryId":"basicSocketQueryId","data":"        server_os: Ubuntu","message":"data"}
+data{"queryId":"basicSocketQueryId","data":"        server_version: 11.10","message":"data"}
+data{"queryId":"basicSocketQueryId","data":"        server_disk_size_gb: 10","message":"data"}
+data{"queryId":"basicSocketQueryId","data":"        number_of_servers: 1","message":"data"}
+data{"queryId":"basicSocketQueryId","data":"        number_of_cpu: 4","message":"data"}
+data{"queryId":"basicSocketQueryId","data":"        server_memory_gb: 4","message":"data"}
+data{"queryId":"basicSocketQueryId","data":"        stew: false","message":"data"}
+data{"queryId":"basicSocketQueryId","data":"        clone_directory: app","message":"data"}
+data{"queryId":"basicSocketQueryId","data":"        bootstrap_shell_command: cd ~/app/storm ; ./move_keys.sh","message":"data"}

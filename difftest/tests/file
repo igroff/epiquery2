@@ -1,6 +1,3 @@
 #! /usr/bin/env bash
-#exec > file_emit.log 2>&1
-curl -s 'http://localhost:8080/sse?client_id=2' &
-sleep .1
-curl -s 'http://localhost:8080/file/test/my_manifest?client_id=2&close_on_end=true' >> /dev/null
-wait
+exec 2>&1
+./test/bin/wsBasic.coffee file '/test/my_manifest'
