@@ -1,30 +1,8 @@
-{
-  "message": "QueryRequest Recieved"
-}
-event: id_assign
-data: 2
-
-event: beginQuery
-data: {queryid,"message":"beginQuery"}
-
-event: row
-data: {queryid,"columns":{"fieldCount":0,"affectedRows":0,"insertId":0,"serverStatus":10,"warningCount":1,"message":"","protocol41":true,"changedRows":0},"message":"row"}
-
-event: row
-data: {queryid,"columns":{"fieldCount":0,"affectedRows":2,"insertId":0,"serverStatus":42,"warningCount":0,"message":"","protocol41":true,"changedRows":0},"message":"row"}
-
-event: row
-data: {queryid,"columns":{"fieldCount":0,"affectedRows":1,"insertId":0,"serverStatus":10,"warningCount":0,"message":"","protocol41":true,"changedRows":0},"message":"row"}
-
-event: row
-data: {queryid,"columns":{"fieldCount":0,"affectedRows":1,"insertId":0,"serverStatus":10,"warningCount":0,"message":"","protocol41":true,"changedRows":0},"message":"row"}
-
-event: row
-data: {queryid,"columns":{"id":1,"name":"pants"},"message":"row"}
-
-event: row
-data: {queryid,"columns":{"id":2,"name":"slacks"},"message":"row"}
-
-event: endQuery
-data: {queryid,"message":"endQuery"}
-
+beginQuery{"queryId":"basicSocketQueryId","message":"beginQuery"}
+endQuery{"queryId":"basicSocketQueryId","message":"endQuery"}
+row{"queryId":"basicSocketQueryId","columns":{"fieldCount":0,"affectedRows":0,"insertId":0,"serverStatus":10,"warningCount":1,"message":"","protocol41":true,"changedRows":0},"message":"row"}
+row{"queryId":"basicSocketQueryId","columns":{"fieldCount":0,"affectedRows":2,"insertId":0,"serverStatus":42,"warningCount":0,"message":"","protocol41":true,"changedRows":0},"message":"row"}
+row{"queryId":"basicSocketQueryId","columns":{"fieldCount":0,"affectedRows":1,"insertId":0,"serverStatus":10,"warningCount":0,"message":"","protocol41":true,"changedRows":0},"message":"row"}
+row{"queryId":"basicSocketQueryId","columns":{"fieldCount":0,"affectedRows":1,"insertId":0,"serverStatus":10,"warningCount":0,"message":"","protocol41":true,"changedRows":0},"message":"row"}
+row{"queryId":"basicSocketQueryId","columns":{"id":1,"name":"pants"},"message":"row"}
+row{"queryId":"basicSocketQueryId","columns":{"id":2,"name":"slacks"},"message":"row"}
