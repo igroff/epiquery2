@@ -12,7 +12,7 @@ test: build lint test/templates
 	./test/run.sh ${TEST_NAME}
 
 pass/%:
-	cp test/results/$(subst pass/,,$@) test/expected/$(subst pass/,,$@)
+	cp difftest/results/$(subst pass/,,$@) difftest/expected/$(subst pass/,,$@)
 
 show/%:
 	cat test/results/$(subst show/,,$@)
