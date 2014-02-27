@@ -32,10 +32,10 @@ class MSSQLDriver extends events.EventEmitter
         # is preceeded by a columnMetadata event
         request.on 'columnMetadata', () =>
           this.emit('endRowSet') if @rowSetStarted
-          this.emit 'beginRowSet'
+          this.emit 'beginrowset'
           @rowSetStarted = true
         request.on 'row', (columns) =>
-          this.emit('beginRowSet') if not @rowSetStarted
+          this.emit('beginrowset') if not @rowSetStarted
           @rowSetStarted = true
           mapper = (column) ->
             {value: column.value, name: column.metadata.colName}
