@@ -1,4 +1,4 @@
-beginQuery{"queryId":"basicSocketQueryId","message":"beginQuery"}
+beginquery{"queryId":"basicSocketQueryId","message":"beginquery"}
 endQuery{"queryId":"basicSocketQueryId","message":"endQuery"}
 data{"queryId":"basicSocketQueryId","data":"env:","message":"data"}
 data{"queryId":"basicSocketQueryId","data":"    -","message":"data"}

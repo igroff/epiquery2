@@ -5,8 +5,8 @@ path    = require 'path'
 attachResponder = (context, conn) ->
   conn.jwrite = (data) =>
     conn.write JSON.stringify(data)
-  context.on 'beginQuery', (data) ->
-    data.message = 'beginQuery'
+  context.on 'beginquery', (data) ->
+    data.message = 'beginquery'
     conn.jwrite data
   context.on 'row', (columns) ->
     columns.message = 'row'

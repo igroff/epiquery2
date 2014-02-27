@@ -13,7 +13,7 @@ execute = (driver, context, cb) ->
     config
   )
   driverInstance = new driver.class(query, config.config)
-  context.emit 'beginQuery', queryId: queryId
+  context.emit 'beginquery', queryId: queryId
   driverInstance.on 'endQuery', () ->
     cb(null, {queryId: queryId})
   driverInstance.on 'beginRowSet', () ->

@@ -1,4 +1,4 @@
-beginQuery{"queryId":"basicSocketQueryId30","message":"beginQuery"}
+beginquery{"queryId":"basicSocketQueryId30","message":"beginquery"}
 endQuery{"queryId":"basicSocketQueryId30","message":"endQuery"}
 data{"queryId":"basicSocketQueryId1","data":"/Users/iangroff/manifest.yaml\n","message":"data"}
 data{"queryId":"basicSocketQueryId2","data":"/Users/iangroff/manifest.yaml\n","message":"data"}

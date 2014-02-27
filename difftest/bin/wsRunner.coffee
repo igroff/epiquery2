@@ -19,7 +19,7 @@ PORT=process.env.PORT || 8080
 
 bc = new EpiBufferingClient "ws://localhost:8080/sockjs/websocket"
 bc.output = []
-bc.on 'beginQuery', (msg) -> console.log(msg)
+bc.on 'beginquery', (msg) -> console.log(msg)
 bc.on 'endQuery', (msg) -> console.log(msg)
 bc.on 'row', console.log
 bc.query connectionName, template, data, "pants"
@@ -34,7 +34,7 @@ res = {}
 # capture our events so we can disply the results in a deterministic order
 c = new EpiClient "ws://localhost:8080/sockjs/websocket"
 c.rowOutput = []
-c.on 'beginQuery', (msg) -> c.beginQueryOutput = 'beginQuery' + JSON.stringify msg
+c.on 'beginquery', (msg) -> c.beginqueryOutput = 'beginquery' + JSON.stringify msg
 c.on 'endQuery', (msg) ->
    c.endQueryOutput = 'endQuery' + JSON.stringify msg
 c.on 'row', (msg) ->
@@ -45,7 +45,7 @@ c.query connectionName, template, nextData, "nonBufferingClientQueryId"
 exitWhenDone = _.after 2, () ->
   for entry in bc.output
     console.log entry
-  console.log c.beginQueryOutput
+  console.log c.beginqueryOutput
   console.log c.endQueryOutput
 
   for row in c.rowOutput

@@ -4,8 +4,8 @@
 event: id_assign
 data: 2
 
-event: beginQuery
-data: {queryid,"message":"beginQuery"}
+event: beginquery
+data: {queryid,"message":"beginquery"}
 
 event: row
 data: {queryid,"message":"row","columns":[{"value":"hello","name":"message"}]}

@@ -1,3 +1,3 @@
-beginQuery{"queryId":"basicSocketQueryId","message":"beginQuery"}
+beginquery{"queryId":"basicSocketQueryId","message":"beginquery"}
 endQuery{"queryId":"basicSocketQueryId","message":"endQuery"}
 data{"queryId":"basicSocketQueryId","data":"select @@hostname\n","message":"data"}

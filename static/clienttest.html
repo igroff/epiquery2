@@ -21,7 +21,7 @@
     var client = new EpiClient("ws://localhost:8080/sockjs/websocket")
     client.on('row', function(r) { show(r); });
     client.on('close', show);
-    client.on('beginQuery', show);
+    client.on('beginquery', show);
     client.on('endQuery', show);
     client.on('beginResultSet', show);
     client.query("mysql", "/test/mysql_servername");

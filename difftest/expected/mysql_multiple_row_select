@@ -1,4 +1,4 @@
-beginQuery{"queryId":"basicSocketQueryId","message":"beginQuery"}
+beginquery{"queryId":"basicSocketQueryId","message":"beginquery"}
 endQuery{"queryId":"basicSocketQueryId","message":"endQuery"}
 row{"queryId":"basicSocketQueryId","columns":{"fieldCount":0,"affectedRows":0,"insertId":0,"serverStatus":10,"warningCount":1,"message":"","protocol41":true,"changedRows":0},"message":"row"}
 row{"queryId":"basicSocketQueryId","columns":{"fieldCount":0,"affectedRows":2,"insertId":0,"serverStatus":42,"warningCount":0,"message":"","protocol41":true,"changedRows":0},"message":"row"}

@@ -2,6 +2,6 @@
 { queryId: 'morePants', message: 'endQuery' }
 resultSet[[{"@@hostname":"cornermonkey"}]]
 resultSet[[{"@@hostname":"cornermonkey"}]]
-beginQuery{queryid"nonBufferingClientQueryId","message":"beginQuery"}
+beginquery{queryid"nonBufferingClientQueryId","message":"beginquery"}
 endQuery{queryid"nonBufferingClientQueryId","message":"endQuery"}
 row{queryid"nonBufferingClientQueryId","columns":{"@@hostname":"cornermonkey"},"message":"row"}

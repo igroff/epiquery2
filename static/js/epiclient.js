@@ -2324,7 +2324,7 @@ EpiClient = (function(_super) {
     this.url = url;
     this.onbeginResultSet = __bind(this.onbeginResultSet, this);
     this.onendQuery = __bind(this.onendQuery, this);
-    this.onbeginQuery = __bind(this.onbeginQuery, this);
+    this.onbeginquery = __bind(this.onbeginquery, this);
     this.ondata = __bind(this.ondata, this);
     this.onrow = __bind(this.onrow, this);
     this.onClose = __bind(this.onClose, this);
@@ -2392,8 +2392,8 @@ EpiClient = (function(_super) {
     return this.emit('data', msg);
   };
 
-  EpiClient.prototype.onbeginQuery = function(msg) {
-    return this.emit('beginQuery', msg);
+  EpiClient.prototype.onbeginquery = function(msg) {
+    return this.emit('beginquery', msg);
   };
 
   EpiClient.prototype.onendQuery = function(msg) {
@@ -2415,7 +2415,7 @@ EpiBufferingClient = (function(_super) {
     this.host = host;
     this.port = port != null ? port : 80;
     this.onbeginResultSet = __bind(this.onbeginResultSet, this);
-    this.onbeginQuery = __bind(this.onbeginQuery, this);
+    this.onbeginquery = __bind(this.onbeginquery, this);
     this.onrow = __bind(this.onrow, this);
     EpiBufferingClient.__super__.constructor.call(this, this.host, this.port);
     this.results = {};
@@ -2425,7 +2425,7 @@ EpiBufferingClient = (function(_super) {
     return this.results[msg.queryId].currentResultSet.push(msg.columns);
   };
 
-  EpiBufferingClient.prototype.onbeginQuery = function(msg) {
+  EpiBufferingClient.prototype.onbeginquery = function(msg) {
     var newResultSet;
 
     newResultSet = [];

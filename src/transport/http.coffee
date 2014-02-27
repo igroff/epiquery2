@@ -19,7 +19,7 @@ attachResponder = (context, res) ->
     res.write("#{nextRowDelim}#{indent}#{JSON.stringify(row)}")
     nextRowDelim = ",\n"
 
-  c.on 'beginQuery', (d) ->
+  c.on 'beginquery', (d) ->
     increaseIndent()
     res.write "{\n#{indent}\"queryId\":#{d.queryId},\n"
     stack.unshift(() -> res.write "\n#{indent}}\n")

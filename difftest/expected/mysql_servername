@@ -1,3 +1,3 @@
-beginQuery{"queryId":"basicSocketQueryId","message":"beginQuery"}
+beginquery{"queryId":"basicSocketQueryId","message":"beginquery"}
 endQuery{"queryId":"basicSocketQueryId","message":"endQuery"}
 row{"queryId":"basicSocketQueryId","columns":{"@@hostname":"cornermonkey"},"message":"row"}
