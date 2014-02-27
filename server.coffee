@@ -10,9 +10,9 @@ http      = require 'http'
 Context   = require('./src/context').Context
 core      = require './src/core.coffee'
 config    = require './src/config.coffee'
-sockjsClient  = require './src/transport/sockjs.coffee'
+sockjsClient        = require './src/transport/sockjs.coffee'
 httpClient          = require './src/transport/http.coffee'
-queryRequestHandler  = require('./src/request.coffee').queryRequestHandler
+queryRequestHandler = require('./src/request.coffee').queryRequestHandler
 
 app = express()
 app.use express.favicon()
