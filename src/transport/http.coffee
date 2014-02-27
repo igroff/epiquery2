@@ -3,53 +3,57 @@ log     = require 'simplog'
 path    = require 'path'
 
 attachResponder = (context, res) ->
-  nextRowDelim = ""
-  haveOneRowSet = nextRowSetDelim = ""
+  delim = ""
   indent = ""
   stack = []
   increaseIndent = () -> indent = indent + "  "
   decreaseIndent = () -> indent = indent[0...-2]
-  ascendOne = () ->
-    decreaseIndent()
-    stack.shift()()
 
   c = context
-  c.on 'row', (row) ->
-    row.message = 'row'
-    res.write("#{nextRowDelim}#{indent}#{JSON.stringify(row)}")
-    nextRowDelim = ",\n"
+  res.write "{\n  \"events\":[\n"
+  stack.unshift( () -> res.write "]}" )
+  increaseIndent()
 
-  c.on 'beginquery', (d) ->
-    increaseIndent()
-    res.write "{\n#{indent}\"queryId\":#{d.queryId},\n"
-    stack.unshift(() -> res.write "\n#{indent}}\n")
-  c.on 'endquery', () ->
-    ascendOne()
-
-  c.on 'beginRowSet', () ->
-    if haveOneRowSet
-      res.write "#{indent}#{nextRowSetDelim}[\n"
-    else
-      res.write "#{indent}\"rowsets\":[[\n"
-    increaseIndent()
-    nextRowDelim = ""
-    haveOneRowSet = nextRowSetDelim = ",\n"
-  c.on 'endRowSet', () ->
-    res.write "\n#{indent}]"
-
-  c.on 'data', (data) ->
-    res.write("#{nextRowDelim}#{indent}#{JSON.stringify({data: data})}")
-    nextRowDelim = ",\n"
-
-  c.on 'error', (err) ->
-    log.error err
-    err = err.message if err.message
-    res.write "\"error\": \"#{err}\"}"
-    res.end()
-
-  c.on 'completeQueryExecution', () ->
+  completeResponse = () ->
     item() while item = stack.shift()
     res.end()
+
+  writeEvent = (evt) ->
+    res.write "#{delim}#{indent}#{JSON.stringify evt}"
+    delim = ",\n"
+
+  c.on 'row', (row) ->
+    row.message = 'row'
+    writeEvent row
+
+  c.on 'beginquery', (d={}) ->
+    d.message = 'beginquery'
+    writeEvent d
+
+  c.on 'endquery', (d={}) ->
+    d.message = 'endquery'
+    writeEvent d
+
+  c.on 'beginRowSet', (d={}) ->
+    d.message = 'beginrowset'
+    writeEvent d
+
+  c.on 'endRowSet', (d={}) ->
+    d.message = 'endRowSet'
+    writeEvent d
+
+  c.on 'data', (data) ->
+    data.message = 'data'
+    writeEvent data
+
+  c.on 'error', (err) ->
+    d = message: 'error'
+    d.error = err.message if err.message
+    log.error err
+    writeEvent d
+    completeResponse()
+
+  c.on 'completeQueryExecution', completeResponse
 
 getQueryRequestInfo = (req) ->
   templatePath = req.path.replace(/\.\./g, '').replace(/^\//, '')
