@@ -1,15 +1,3 @@
-{
-  "message": "QueryRequest Recieved"
-}
-event: id_assign
-data: 2
-
-event: beginquery
-data: {queryid,"message":"beginquery"}
-
-event: row
-data: {queryid,"message":"row","columns":[{"value":"hello","name":"message"}]}
-
-event: endquery
-data: {queryid,"message":"endquery"}
-
+beginquery{"queryId":"basicSocketQueryId","message":"beginquery"}
+endquery{"queryId":"basicSocketQueryId","message":"endquery"}
+row{"queryId":"basicSocketQueryId","columns":[{"value":"Clint Rulez!!!","name":"message"}],"message":"row"}

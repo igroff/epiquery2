@@ -55,7 +55,7 @@ socketServer.on 'connection', (conn) ->
       closeOnEnd: message.closeOnEnd
       connectionName: message.connectionName
       queryId: message.queryId
-      params: message
+      templateContext: message.data
     context = new Context(ctxParms)
     sockjsClient.attachResponder(context, conn)
     queryRequestHandler(context)

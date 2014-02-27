@@ -9,8 +9,7 @@ config      = require './config.coffee'
 query       = require './query.coffee'
 templates   = require './templates.coffee'
 
-buildTemplateContext = (context, callback) ->
-  context.templateContext = context.params
+logTemplateContext = (context, callback) ->
   log.info "template context: #{JSON.stringify context.templateContext}"
   callback null, context
 
@@ -64,7 +63,7 @@ queryRequestHandler = (context) ->
   async.waterfall [
     # just to create our context
     (callback) -> callback(null, context),
-    buildTemplateContext,
+    logTemplateContext,
     getTemplatePath,
     selectConnection,
     renderTemplate,

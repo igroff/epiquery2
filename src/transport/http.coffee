@@ -70,7 +70,7 @@ getQueryRequestInfo = (req) ->
   returnThis =
     connectionName: connectionName
     connectionConfig: connection
-    params: params
+    templateContext: params
     templateName: templatePath
 
 module.exports.attachResponder = attachResponder
