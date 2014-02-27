@@ -48,7 +48,7 @@ renderTemplate = (context, callback) ->
 
 executeQuery = (context, callback) ->
   driver = core.selectDriver context.connection
-  context.emit 'beginqueryExecution'
+  context.emit 'beginqueryexecution'
   queryCompleteCallback = (err, data) ->
     if err
       log.error err
