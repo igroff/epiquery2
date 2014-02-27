@@ -1,0 +1,10 @@
+{
+  "message": "ok",
+  "connections": [
+    "mssql",
+    "file",
+    "mysql",
+    "render",
+    "mdx"
+  ]
+}
