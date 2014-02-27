@@ -41,7 +41,6 @@ httpRequestHandler = (req, res) ->
   if c.connectionName and not config.connections[c.connectionName]
     res.send error: "unable to find connection by name '#{c.connectionName}'"
     return
-  # normal ol' http request
   httpClient.attachResponder c, res
   c.requestedTemplatePath = req.path
   queryRequestHandler(c)
