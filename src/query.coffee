@@ -18,8 +18,8 @@ execute = (driver, context, cb) ->
     cb(null, {queryId: queryId})
   driverInstance.on 'beginrowset', () ->
     context.emit 'beginrowset', {queryId: queryId}
-  driverInstance.on 'endRowSet', (d) ->
-    context.emit 'endRowSet', {queryId: queryId}
+  driverInstance.on 'endrowset', (d) ->
+    context.emit 'endrowset', {queryId: queryId}
   driverInstance.on 'row', (row) ->
     context.emit 'row', {queryId: queryId, columns: row}
   driverInstance.on 'data', (data) ->

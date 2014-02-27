@@ -39,8 +39,8 @@ attachResponder = (context, res) ->
     d.message = 'beginrowset'
     writeEvent d
 
-  c.on 'endRowSet', (d={}) ->
-    d.message = 'endRowSet'
+  c.on 'endrowset', (d={}) ->
+    d.message = 'endrowset'
     writeEvent d
 
   c.on 'data', (data) ->
