@@ -5,7 +5,7 @@ class RenderOnlyDriver extends events.EventEmitter
   
   execute: () =>
     this.emit 'data', @query
-    this.emit 'endQuery'
+    this.emit 'endquery'
 
     
 module.exports.DriverClass = RenderOnlyDriver

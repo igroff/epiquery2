@@ -1,4 +1,4 @@
 connection established
 got some data {queryid,"message":"beginquery"}
 got some data {queryid,"columns":{"@@hostname":"cornermonkey"},"message":"row"}
-got some data {queryid,"message":"endQuery"}
+got some data {queryid,"message":"endquery"}

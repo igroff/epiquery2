@@ -23,7 +23,7 @@ attachResponder = (context, res) ->
     increaseIndent()
     res.write "{\n#{indent}\"queryId\":#{d.queryId},\n"
     stack.unshift(() -> res.write "\n#{indent}}\n")
-  c.on 'endQuery', () ->
+  c.on 'endquery', () ->
     ascendOne()
 
   c.on 'beginRowSet', () ->

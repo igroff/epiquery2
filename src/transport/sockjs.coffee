@@ -21,8 +21,8 @@ attachResponder = (context, conn) ->
     if not err.message
       err.message = err
     conn.jwrite error: err.message.toString()
-  context.on 'endQuery', (data) ->
-    data.message = "endQuery"
+  context.on 'endquery', (data) ->
+    data.message = "endquery"
     conn.jwrite data
   context.on 'completeQueryExecution', () ->
     log.debug "close?: #{context.closeOnEnd}"

@@ -1,5 +1,5 @@
 beginquery{"queryId":"basicSocketQueryId","message":"beginquery"}
-endQuery{"queryId":"basicSocketQueryId","message":"endQuery"}
+endquery{"queryId":"basicSocketQueryId","message":"endquery"}
 data{"queryId":"basicSocketQueryId","data":"env:","message":"data"}
 data{"queryId":"basicSocketQueryId","data":"    -","message":"data"}
 data{"queryId":"basicSocketQueryId","data":"        server_os: Ubuntu","message":"data"}

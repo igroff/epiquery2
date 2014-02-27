@@ -2,7 +2,7 @@ events      = require 'events'
 log         = require 'simplog'
 xmla        = require 'xmla4js'
 
-# Need to emit data, error, end, row endQuery, beginRowset
+# Need to emit data, error, end, row endquery, beginRowset
 class MDXDriver extends events.EventEmitter
   constructor: (@query, @config) ->
 
@@ -30,7 +30,7 @@ class MDXDriver extends events.EventEmitter
         log.error msg
         this.emit 'error', msg
       callback: () =>
-        this.emit 'endQuery'
+        this.emit 'endquery'
 
     xmlaRequest.properties = {}
     xmlaRequest.properties[xmla.Xmla.PROP_CATALOG] = @config.catalog

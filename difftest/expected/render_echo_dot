@@ -1,3 +1,3 @@
 beginquery{"queryId":"basicSocketQueryId","message":"beginquery"}
-endQuery{"queryId":"basicSocketQueryId","message":"endQuery"}
+endquery{"queryId":"basicSocketQueryId","message":"endquery"}
 data{"queryId":"basicSocketQueryId","data":"select ' templateName=/test/echo.dot  connectionName=render  data=[object Object]  queryId=basicSocketQueryId ' as everything\n","message":"data"}

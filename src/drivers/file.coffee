@@ -11,6 +11,6 @@ class FileDriver extends events.EventEmitter
     @lineReader.on 'error', (err) =>
       this.emit 'error', err
     @lineReader.on 'end', () =>
-      this.emit 'endQuery'
+      this.emit 'endquery'
 
 module.exports.DriverClass = FileDriver

@@ -23,7 +23,7 @@ function Client() {
 
   // epiquery events
   source.addEventListener('beginquery', function (e) { console.log(e); });
-  source.addEventListener('endQuery', function (e) { console.log(e); });
+  source.addEventListener('endquery', function (e) { console.log(e); });
   source.addEventListener('row', function (e) { console.log(e);});
   source.addEventListener('beginRowset', function (e) { console.log(e);});
   source.addEventListener('endRowset', function (e) { console.log(e);});

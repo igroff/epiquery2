@@ -53,7 +53,7 @@ executeQuery = (context, callback) ->
     if err
       log.error err
       context.emit 'error', err
-    context.emit 'endQuery', data
+    context.emit 'endquery', data
     context.emit 'completeQueryExecution'
   query.execute(driver,
     context,

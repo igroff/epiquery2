@@ -25,7 +25,7 @@ c.dataOutput = []
 
 exitWhenDone = _.after(repeatCount, () ->
   console.log c.beginqueryOutput
-  console.log c.endQueryOutput
+  console.log c.endqueryOutput
 
   for row in c.rowOutput
     console.log row
@@ -39,8 +39,8 @@ c.on 'row', (msg) ->
   c.rowOutput.push 'row' + JSON.stringify msg
 c.on 'data', (msg) ->
   c.rowOutput.push 'data' + JSON.stringify msg
-c.on 'endQuery', (msg) ->
-  c.endQueryOutput = 'endQuery' + JSON.stringify msg
+c.on 'endquery', (msg) ->
+  c.endqueryOutput = 'endquery' + JSON.stringify msg
   exitWhenDone()
 
 if repeatCount is 1

@@ -10,6 +10,6 @@ data: {queryid,"message":"beginquery"}
 event: row
 data: {queryid,"message":"row","columns":[{"value":"hello","name":"message"}]}
 
-event: endQuery
-data: {queryid,"message":"endQuery"}
+event: endquery
+data: {queryid,"message":"endquery"}
 

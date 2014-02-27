@@ -27,7 +27,7 @@ class MSSQLDriver extends events.EventEmitter
         request_complete_deferred.promise.fin () ->
           conn.close()
         request_complete_deferred.promise.then () =>
-          this.emit 'endQuery'
+          this.emit 'endquery'
         # we use this event to split up multipe result sets as each result set
         # is preceeded by a columnMetadata event
         request.on 'columnMetadata', () =>

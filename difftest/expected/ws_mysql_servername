@@ -1,7 +1,7 @@
-{ queryId: 'pants', message: 'endQuery' }
-{ queryId: 'morePants', message: 'endQuery' }
+{ queryId: 'pants', message: 'endquery' }
+{ queryId: 'morePants', message: 'endquery' }
 resultSet[[{"@@hostname":"cornermonkey"}]]
 resultSet[[{"@@hostname":"cornermonkey"}]]
 beginquery{queryid"nonBufferingClientQueryId","message":"beginquery"}
-endQuery{queryid"nonBufferingClientQueryId","message":"endQuery"}
+endquery{queryid"nonBufferingClientQueryId","message":"endquery"}
 row{queryid"nonBufferingClientQueryId","columns":{"@@hostname":"cornermonkey"},"message":"row"}
