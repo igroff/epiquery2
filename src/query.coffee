@@ -25,5 +25,6 @@ execute = (driver, context, cb) ->
   driverInstance.on 'data', (data) ->
     context.emit 'data', {queryId: queryId, data: data}
   driverInstance.on 'error', (err) -> cb(err, {queryId: queryId})
+  driverInstance.execute()
 
 module.exports.execute = execute

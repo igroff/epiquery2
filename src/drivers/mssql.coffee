@@ -6,6 +6,8 @@ _           = require 'underscore'
 
 class MSSQLDriver extends events.EventEmitter
   constructor: (@query, @config) ->
+  
+  execute: () =>
     @rowSetStarted = false
     connect_deferred           = Q.defer()
     connect_end_deferred       = Q.defer()

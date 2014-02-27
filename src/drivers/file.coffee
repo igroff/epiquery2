@@ -3,7 +3,9 @@ events      = require 'events'
 
 class FileDriver extends events.EventEmitter
   constructor: (@filePath) ->
-    @lineReader = new LineReader(filePath.replace(/\n/,''))
+
+  execute: () =>
+    @lineReader = new LineReader(@filePath.replace(/\n/,''))
     @lineReader.on 'line', (line) =>
       this.emit 'data', line
     @lineReader.on 'error', (err) =>

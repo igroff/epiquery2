@@ -5,6 +5,8 @@ xmla        = require 'xmla4js'
 # Need to emit data, error, end, row endQuery, beginRowset
 class MDXDriver extends events.EventEmitter
   constructor: (@query, @config) ->
+
+  execute: () =>
     xmlaRequest =
       async: true
       url: @config.url

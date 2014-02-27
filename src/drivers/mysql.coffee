@@ -5,6 +5,8 @@ _           = require 'underscore'
 
 class MySQLDriver extends events.EventEmitter
   constructor: (@query, @config) ->
+
+  execute: () =>
     @config = _.clone @config
     connect_deferred = Q.defer()
     @config.multipleStatements = true
