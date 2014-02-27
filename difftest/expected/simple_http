@@ -1,0 +1,17 @@
+{
+  "events":[
+  {queryid,"message":"beginquery"},
+  {queryid,"data":"env:","message":"data"},
+  {queryid,"data":"    -","message":"data"},
+  {queryid,"data":"        server_os: Ubuntu","message":"data"},
+  {queryid,"data":"        server_version: 11.10","message":"data"},
+  {queryid,"data":"        server_disk_size_gb: 10","message":"data"},
+  {queryid,"data":"        number_of_servers: 1","message":"data"},
+  {queryid,"data":"        number_of_cpu: 4","message":"data"},
+  {queryid,"data":"        server_memory_gb: 4","message":"data"},
+  {queryid,"data":"        stew: false","message":"data"},
+  {queryid,"data":"        clone_directory: app","message":"data"},
+  {queryid,"data":"        bootstrap_shell_command: cd ~/app/storm ; ./move_keys.sh","message":"data"},
+  {queryid,"message":"endquery"}
+  ]
+}

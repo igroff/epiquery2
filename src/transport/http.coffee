@@ -12,7 +12,7 @@ attachResponder = (context, res) ->
   c = context
   res.header 'Content-Type', 'application/javascript'
   res.write "{\n  \"events\":[\n"
-  stack.unshift( () -> res.write "]}" )
+  stack.unshift( () -> res.write "\n#{indent}]\n}\n" )
   increaseIndent()
 
   completeResponse = () ->
