@@ -10,6 +10,7 @@ attachResponder = (context, res) ->
   decreaseIndent = () -> indent = indent[0...-2]
 
   c = context
+  res.header 'Content-Type', 'application/javascript'
   res.write "{\n  \"events\":[\n"
   stack.unshift( () -> res.write "]}" )
   increaseIndent()
