@@ -2325,6 +2325,7 @@ EpiClient = (function(_super) {
     this.onbeginResultSet = __bind(this.onbeginResultSet, this);
     this.onendQuery = __bind(this.onendQuery, this);
     this.onbeginQuery = __bind(this.onbeginQuery, this);
+    this.ondata = __bind(this.ondata, this);
     this.onrow = __bind(this.onrow, this);
     this.onClose = __bind(this.onClose, this);
     this.onMessage = __bind(this.onMessage, this);
@@ -2385,6 +2386,10 @@ EpiClient = (function(_super) {
 
   EpiClient.prototype.onrow = function(msg) {
     return this.emit('row', msg);
+  };
+
+  EpiClient.prototype.ondata = function(msg) {
+    return this.emit('data', msg);
   };
 
   EpiClient.prototype.onbeginQuery = function(msg) {

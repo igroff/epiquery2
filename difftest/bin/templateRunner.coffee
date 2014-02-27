@@ -5,9 +5,11 @@ log       = require 'simplog'
 
 args = optimist.argv
 
+context = JSON.parse(args.context)
+templatePath = args.templatePath
 template.renderTemplate(
-  args.templatePath,
-  JSON.parse(args.context),
+  templatePath,
+  context,
   (err, templateContent, renderedTemplate) ->
     process.stdout.write(renderedTemplate)
     process.exit(1)

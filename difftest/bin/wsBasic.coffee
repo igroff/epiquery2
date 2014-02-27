@@ -11,7 +11,7 @@ EpiClient = clients.EpiClient
 
 template = process.argv[3]
 connectionName = process.argv[2]
-data = process.argv[4] || {}
+data = JSON.parse(process.argv[4] || "{}")
 SERVER=process.env.EPI_TEST_SERVER || "localhost"
 PORT=process.env.PORT || 8080
 data.closeOnEnd = true
@@ -20,7 +20,8 @@ data.closeOnEnd = true
 c = new EpiClient "ws://localhost:8080/sockjs/websocket"
 c.rowOutput = []
 c.dataOutput = []
-c.on 'beginQuery', (msg) -> c.beginQueryOutput = 'beginQuery' + JSON.stringify msg
+c.on 'beginQuery', (msg) ->
+  c.beginQueryOutput = 'beginQuery' + JSON.stringify msg
 c.on 'endQuery', (msg) ->
    c.endQueryOutput = 'endQuery' + JSON.stringify msg
 c.on 'row', (msg) ->

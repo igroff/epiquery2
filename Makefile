@@ -9,13 +9,10 @@ test/templates:
 		templates/
 
 test: build lint test/templates
-	./test/run.sh ${TEST_NAME}
+	difftest run ${TEST_NAME}
 
 pass/%:
 	cp difftest/results/$(subst pass/,,$@) difftest/expected/$(subst pass/,,$@)
-
-show/%:
-	cat test/results/$(subst show/,,$@)
 
 lint:
 	find ./src -name '*.coffee' | xargs ./node_modules/.bin/coffeelint -f ./etc/coffeelint.conf

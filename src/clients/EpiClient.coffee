@@ -38,6 +38,7 @@ class EpiClient extends EventEmitter
 
   onClose: () => @emit 'close'
   onrow: (msg) => @emit 'row', msg
+  ondata: (msg) => @emit 'data', msg
   onbeginQuery: (msg) => @emit 'beginQuery', msg
   onendQuery: (msg) => @emit 'endQuery', msg
   onbeginResultSet: (msg) => @emit 'beginResultSet', msg

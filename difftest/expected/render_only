@@ -1,14 +1,3 @@
-{
-  "message": "QueryRequest Recieved"
-}
-event: id_assign
-data: 2
-
-event: beginQuery
-data: {queryid,"message":"beginQuery"}
-
-data: {queryid,"data":"/Users/iangroff/manifest.yaml\n","message":"data"}
-
-event: endQuery
-data: {queryid,"message":"endQuery"}
-
+beginQuery{"queryId":"basicSocketQueryId","message":"beginQuery"}
+endQuery{"queryId":"basicSocketQueryId","message":"endQuery"}
+data{"queryId":"basicSocketQueryId","data":"/Users/iangroff/manifest.yaml\n","message":"data"}

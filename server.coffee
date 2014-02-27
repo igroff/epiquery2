@@ -10,7 +10,6 @@ http      = require 'http'
 Context   = require('./src/context').Context
 core      = require './src/core.coffee'
 config    = require './src/config.coffee'
-sse       = require './src/transport/sse.coffee'
 sockjsClient  = require './src/transport/sockjs.coffee'
 httpClient          = require './src/transport/http.coffee'
 queryRequestHandler  = require('./src/request.coffee').queryRequestHandler
@@ -35,22 +34,6 @@ app.get '/diagnostic', (req, res) ->
     connections: _.pluck(config.connections, 'name')
   res.send response
 
-app.get '/sse', (req, res) ->
-  # providing the client_id is specifically for testing, if you're doing it
-  # for any other reason you're doing it in an un-intended manner
-  client_id = req.param('client_id')
-  sse.createClient req, res, client_id
-
-app.get "/close/:client_id", (req, res) ->
-  log.info "terminate requested for #{req.params.client_id}"
-  client = sse.getConnectedClientById(req.params.client_id)
-  if client
-    log.debug "terminating client #{req.params.client_id}"
-    client.close()
-  res.writeHead(200, {'Content-Type': 'text/html'})
-  res.write "\n"
-  res.end()
-
 httpRequestHandler = (req, res) ->
   clientId = req.param 'client_id'
   c = new Context()
@@ -58,20 +41,8 @@ httpRequestHandler = (req, res) ->
   if c.connectionName and not config.connections[c.connectionName]
     res.send error: "unable to find connection by name '#{c.connectionName}'"
     return
-  if clientId
-    # handling an sse request
-    log.debug "looking for an sse client by id: #{clientId}"
-    c.closeOnEnd = req.param('close_on_end') is 'true'
-    client = sse.getConnectedClientById clientId
-    if not client
-      log.error "unable to find client by id #{clientId}"
-      res.send error: "no client found by id #{clientId}"
-      return
-    sse.attachResponder c, client.res
-    res.send {message: "QueryRequest Recieved"}
-  else
-    # normal ol' http request
-    httpClient.attachResponder c, res
+  # normal ol' http request
+  httpClient.attachResponder c, res
   c.requestedTemplatePath = req.path
   queryRequestHandler(c)
 

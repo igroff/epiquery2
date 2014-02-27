@@ -1,2 +1,2 @@
 #! /usr/bin/env bash
-./test/bin/sockjsRunner.coffee mysql '/test/mysql_servername'
+./difftest/bin/sockjsRunner.coffee mysql '/test/mysql_servername'

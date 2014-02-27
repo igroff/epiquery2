@@ -1,2 +1,2 @@
 #! /usr/bin/env bash
-./test/bin/templateRunner.coffee --templatePath ./test/templates/test/echo.mustache --context '{"pants":"blue jeans","message":"Clint Rulez!!!"}'
+./difftest/bin/templateRunner.coffee --templatePath ./difftest/templates/test/echo.mustache --context '{"pants":"blue jeans","message":"Clint Rulez!!!"}'

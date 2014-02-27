@@ -1,2 +1,2 @@
 #! /usr/bin/env bash
-./test/bin/wsRunner.coffee mysql '/test/mysql_servername'
+./difftest/bin/wsRunner.coffee mysql '/test/mysql_servername'
