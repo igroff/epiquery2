@@ -18,9 +18,11 @@ attachResponder = (context, conn) ->
     conn.jwrite data
   context.on 'error', (err) ->
     # if there's no .message it's gonna need to be a string
-    if not err.message
-      err.message = err
-    conn.jwrite error: err.message.toString()
+    response =
+      error: err.message || err
+      message: 'error'
+    log.error "sockjs error: #{response.error}"
+    conn.jwrite response
   context.on 'endquery', (data) ->
     data.message = "endquery"
     conn.jwrite data

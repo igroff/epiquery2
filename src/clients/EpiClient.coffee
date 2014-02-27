@@ -41,6 +41,7 @@ class EpiClient extends EventEmitter
   ondata: (msg) => @emit 'data', msg
   onbeginquery: (msg) => @emit 'beginquery', msg
   onendquery: (msg) => @emit 'endquery', msg
+  onerror: (msg) => @emit 'error', msg
   onbeginResultSet: (msg) => @emit 'beginResultSet', msg
 
 class EpiBufferingClient extends EpiClient

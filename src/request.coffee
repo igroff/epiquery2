@@ -50,7 +50,7 @@ executeQuery = (context, callback) ->
   context.emit 'beginqueryexecution'
   queryCompleteCallback = (err, data) ->
     if err
-      log.error err
+      log.error "error executing query #{err}"
       context.emit 'error', err
     context.emit 'endquery', data
     context.emit 'completequeryexecution'

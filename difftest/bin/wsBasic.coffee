@@ -22,6 +22,7 @@ PORT=process.env.PORT || 8080
 c = new EpiClient "ws://localhost:8080/sockjs/websocket"
 c.rowOutput = []
 c.dataOutput = []
+c.errorOutput = []
 
 exitWhenDone = _.after(repeatCount, () ->
   console.log c.beginqueryOutput
@@ -31,6 +32,8 @@ exitWhenDone = _.after(repeatCount, () ->
     console.log row
   for row in c.dataOutput
     console.log row
+  for error in c.errorOutput
+    console.log error
   process.exit 0
 )
 c.on 'beginquery', (msg) ->
@@ -42,6 +45,8 @@ c.on 'data', (msg) ->
 c.on 'endquery', (msg) ->
   c.endqueryOutput = 'endquery' + JSON.stringify msg
   exitWhenDone()
+c.on 'error', (msg) ->
+  c.errorOutput.push 'error' + JSON.stringify msg
 
 if repeatCount is 1
   c.query(connectionName, template, data, "basicSocketQueryId")
