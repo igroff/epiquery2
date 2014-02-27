@@ -4,15 +4,17 @@ WebSocket     = require 'ws'
 EventEmitter  = require('events').EventEmitter
 _             = require 'underscore'
 clients       = require '../../src/clients/EpiClient.coffee'
+optimist      = require 'optimist'
 
 EpiBufferingClient = clients.EpiBufferingClient
 EpiClient = clients.EpiClient
 
+args = optimist.argv
 
-template = process.argv[3]
-connectionName = process.argv[2]
-data = JSON.parse(process.argv[4] || "{}")
-repeatCount = Number(process.argv[5] || 1)
+template = args.template
+connectionName = args.connection
+data = JSON.parse(args.data || "{}")
+repeatCount = Number(args.repeat || 1)
 SERVER=process.env.EPI_TEST_SERVER || "localhost"
 PORT=process.env.PORT || 8080
 
