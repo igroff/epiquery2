@@ -54,7 +54,7 @@ attachResponder = (context, res) ->
     writeEvent d
     completeResponse()
 
-  c.on 'completeQueryExecution', completeResponse
+  c.on 'completequeryexecution', completeResponse
 
 getQueryRequestInfo = (req) ->
   templatePath = req.path.replace(/\.\./g, '').replace(/^\//, '')
