@@ -11,8 +11,12 @@ attachResponder = (context, conn) ->
   context.on 'row', (columns) ->
     columns.message = 'row'
     conn.jwrite columns
-  context.on 'beginrowset', () ->
-    conn.jwrite message: 'beginrowset'
+  context.on 'beginrowset', (data) ->
+    data.message = 'beginrowset'
+    conn.jwrite data
+  context.on 'endrowset', (data) ->
+    data.message = 'endrowset'
+    conn.jwrite data
   context.on 'data', (data) ->
     data.message = 'data'
     conn.jwrite data
