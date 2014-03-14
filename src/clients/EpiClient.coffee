@@ -35,14 +35,14 @@ class EpiClient extends EventEmitter
     handler = @['on' + message.message]
     if handler
       handler(message)
-
+  
   onClose: () => @emit 'close'
   onrow: (msg) => @emit 'row', msg
   ondata: (msg) => @emit 'data', msg
   onbeginquery: (msg) => @emit 'beginquery', msg
   onendquery: (msg) => @emit 'endquery', msg
   onerror: (msg) => @emit 'error', msg
-  onbeginResultSet: (msg) => @emit 'beginResultSet', msg
+  onbeginresultset: (msg) => @emit 'beginresultset', msg
 
 class EpiBufferingClient extends EpiClient
   constructor: (@host, @port=80) ->
@@ -58,7 +58,7 @@ class EpiBufferingClient extends EpiClient
     @results[msg.queryId].currentResultSet = newResultSet
     @results[msg.queryId].resultSets.push newResultSet
 
-  onbeginResultSet: (msg) =>
+  onbeginresultset: (msg) =>
     newResultSet = []
     @results[msg.queryId] = resultSets: []
     @results[msg.queryId].currentResultSet = newResultSet
