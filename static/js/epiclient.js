@@ -2326,7 +2326,7 @@ EpiClient = (function(_super) {
     var _this = this;
 
     this.url = url;
-    this.onbeginresultset = __bind(this.onbeginresultset, this);
+    this.onbeginrowset = __bind(this.onbeginrowset, this);
     this.onerror = __bind(this.onerror, this);
     this.onendquery = __bind(this.onendquery, this);
     this.onbeginquery = __bind(this.onbeginquery, this);
@@ -2409,8 +2409,8 @@ EpiClient = (function(_super) {
     return this.emit('error', msg);
   };
 
-  EpiClient.prototype.onbeginresultset = function(msg) {
-    return this.emit('beginresultset', msg);
+  EpiClient.prototype.onbeginrowset = function(msg) {
+    return this.emit('beginrowset', msg);
   };
 
   return EpiClient;
@@ -2423,7 +2423,7 @@ EpiBufferingClient = (function(_super) {
   function EpiBufferingClient(host, port) {
     this.host = host;
     this.port = port != null ? port : 80;
-    this.onbeginresultset = __bind(this.onbeginresultset, this);
+    this.onbeginrowset = __bind(this.onbeginrowset, this);
     this.onbeginquery = __bind(this.onbeginquery, this);
     this.onrow = __bind(this.onrow, this);
     EpiBufferingClient.__super__.constructor.call(this, this.host, this.port);
@@ -2445,7 +2445,7 @@ EpiBufferingClient = (function(_super) {
     return this.results[msg.queryId].resultSets.push(newResultSet);
   };
 
-  EpiBufferingClient.prototype.onbeginresultset = function(msg) {
+  EpiBufferingClient.prototype.onbeginrowset = function(msg) {
     var newResultSet;
 
     newResultSet = [];
