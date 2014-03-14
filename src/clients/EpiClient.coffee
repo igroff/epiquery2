@@ -51,16 +51,10 @@ class EpiBufferingClient extends EpiClient
 
   onrow: (msg) =>
     @results[msg.queryId].currentResultSet.push(msg.columns)
-
-  onbeginquery: (msg) =>
-    newResultSet = []
-    @results[msg.queryId] = resultSets: []
-    @results[msg.queryId].currentResultSet = newResultSet
-    @results[msg.queryId].resultSets.push newResultSet
-
+  
   onbeginrowset: (msg) =>
     newResultSet = []
-    @results[msg.queryId] = resultSets: []
+    @results[msg.queryId] ||= resultSets: []
     @results[msg.queryId].currentResultSet = newResultSet
     @results[msg.queryId].resultSets.push newResultSet
 
