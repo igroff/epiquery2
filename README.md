@@ -69,7 +69,13 @@ through epiquery.
 ##### query
 Executes a Query using the data provided.  
 
-    {"message":"query", "template":"/path/to/template.mustache", "queryId":"", "data":{}}
+    {
+      "message":"query",
+      "templateName":"/test/servername",
+      "connectionName"="mssql",
+      "queryId":"",
+      "data":{}
+    }
 
 * template - the path to the template desired.  This is relative to the root of the templates
   directory.
