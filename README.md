@@ -35,9 +35,10 @@ results to epiquery.
 ## Configuration 
 
 Configuration of epiquery is done entirely through environment variables, this
-is done to simplify the deployment specifically within [Starphleet](https://github.com/wballard/starphleet).  The configuration can be done solely through environment variables or,
-as a convenience, epiquery will source a file ~/.epiquery2/config in which the 
-variables can be specified.
+is done to simplify the deployment specifically within 
+[Starphleet](https://github.com/wballard/starphleet).  The configuration can
+be done solely through environment variables or, as a convenience, epiquery
+will source a file `~/.epiquery2/config` in which the variables can be specified.
 
 
 * `TEMPLATE_REPO_URL` - (required) specifies the git repository from which the templates will be loaded
@@ -46,16 +47,15 @@ the templates will be put into a directory named 'templates' within epiquery's w
 * `CONNECTIONS` - A space delimited list of names of environment variables which contain
 the JSON encoded information needed to configure the various drivers.  Ya, gnarly.  We'll do this one through examples.
 
-### Example Configuration (~/.epiquery2/config)
+#### Sample Configuration (~/.epiquery2/config)
         export TEMPLATE_REPO_URL=https://github.com/intimonkey/epiquery-templates.git
         export TEMPLATE_DIRECTORY=~/Development/epiquery2/difftest/templates
-        export CONNECTIONS="EPI_C_RENDER2 EPI_C_MSSQL EPI_C_FILE EPI_C_MYSQL EPI_C_RENDER EPI_C_503_MDX"
+        export CONNECTIONS="EPI_C_MSSQL EPI_C_FILE EPI_C_MYSQL EPI_C_RENDER EPI_C_MSSQL_RO"
         export EPI_C_FILE='{"driver":"file","config":{},"name":"file"}'
         export EPI_C_RENDER='{"driver":"render","config":{},"name":"render"}'
         export EPI_C_MSSQL='{"driver":"mssql","name":"mssql","config":{"server":"10.211.55.5","password":"GLGROUP_LIVE","userName":"GLGROUP_LIVE","options":{"port":1433}}}'
-        export EPI_BAD_MSSQL='{"driver":"mssql","name":"bad_mssql","config":{"server":"10.55.5","password":"GLGROUP_LIVE","userName":"GLGROUP_LIVE","options":{"port":1433}}}'
         export EPI_C_MYSQL='{"name":"mysql","driver":"mysql","config":{"host":"localhost","user":"root","password":""}}'
-        export EPI_C_MSSQL_GLGLIVE250="{\"driver\":\"mssql\",\"name\":\"db250\",\"config\":{\"server\":\"${DATABASE_GLGLIVE_READONLY_SERVER}\",\"password\":\"${DATABASE_GLGLIVE_READONLY_PASSWORD}\",\"userName\":\"${DATABASE_GLGLIVE_READONLY_USER}\",\"options\":{\"port\":1433}}}"
+        export EPI_C_MSSQL_RO="{\"driver\":\"mssql\",\"name\":\"db250\",\"config\":{\"server\":\"${DATABASE_READONLY_SERVER}\",\"password\":\"${DATABASE_READONLY_PASSWORD}\",\"userName\":\"${DATABASE_READONLY_USER}\",\"options\":{\"port\":1433}}}"
 
 ## Interface
 
@@ -66,55 +66,54 @@ through epiquery.
 
 #### Messages
 
-##### Query
+##### query
 Executes a Query using the data provided.  
 
     {"message":"query", "template":"/path/to/template.mustache", "queryId":"", "data":{}}
 
 * template - the path to the template desired.  This is relative to the root of the templates
   directory.
-* queryId - A unique identifier used to refer to the query throughout it's Active period. It will be included with all messages generated during it's processing. It is the caller's responsability to generate a unique id for each query requested.
+* queryId - A unique identifier used to refer to the query throughout it's Active period.
+   It will be included with all messages generated during it's processing.
+   It is the caller's responsability to generate a unique id for each query requested.
 * data - An object that will be used as the template context when rendering.
 
-##### Row
-A message containing a single row of data from the execution of a query, associated with a containing result set.
+#### Events
+
+##### row
+A message containing a single row of data from the execution of a query,
+associated with the containing result set.
 
     {"message":"row", "queryId":"", "columns":{"col_name": "col_value"}}
 
-##### ResultSet Begin
+##### beginrowset
 Used to indicate that a result set has begun.  Some providers, given a particular query, 
 can return multiple result sets, this message indicates the start of a new result set from the
 execution of a given query.  Individual query processing is synchronous, so while there is no
 in built way to tie a particular section of a Query to a result set directly, each query contained
 within the Query sent to the provider can result in a distinct result set, and thus the 
-emission of a 'ResultSet Begin' message.
+emission of a 'beginrowset' message.
 
-    {"message":"resultset_begin", "queryId":""}
+    {"message":"beginrowset", "queryId":""}
 
-##### ResultSet End
+##### endrowset
 For each result set that is started, there will be a corresponding end message sent.
 
-    {"message":"resultset_end", "queryId":""}
+    {"message":"endrowset", "queryId":""}
 
-##### Query Begin
+##### beginquery
 Indicates that a particular query request has begun processing.  While a Query is active
 other messages related to that query (having the same queryId) can and generally will
 be raised.
 
-    {"message":"query_begin", "queryId":""}
+    {"message":"beginquery", "queryId":""}
 
-##### Query Complete
+##### endquery
 Indicates that a particular query has completed, all of it's data having been returned.  Indicates the 
 final stage of an Active Query, once this event is raised the associated Query is no longer considered
 active.
 
-    {"message":"query_complete", "queryId":"", "rowCount":3}
-
-### Query Driver Interface
-
-executeQuery(text, rowCallback, recordsetCallback)
-
-### Design thoughts
+    {"message":"endquery", "queryId":""}
 
 #### Request Tracking
 
@@ -126,30 +125,13 @@ system.  Specifically this is to help debugging as the concept of epiquery is
 very concise and simple, it should support a robust handling of that functionality
 
 
-#### Data Source 'Drivers'
-
-Epiquery simply provides a consistent interface to query data from various
-disparate datasources (often Relational, and almost always best treated as 
-streaming data sources).  To support this and allow for ease of extending
-the system to support other datasources epiquery will support individual
-Drivers handling the interface to the various supported data sources.  Epiquery
-will explicitly support a set of built in drivers and handling of 'after market'
-or user created drivers as well to facilitate extension to support additonal
-datasources.
-
 ##### Provided Drivers
-* mssql 
-* mysql
+* mssql - based on tedious, used to query an MS SQL Server instance
+* mysql - uses the mysql npm package
 * file - Expects that the result of a template render will be a valid path.  
   Given the result of the rendered template, it attempts to open the file
   indicated and stream the results line-at-a-time to the caller.  Each line
   comes through as a 'row' event.
-* msmdx
+* msmdx - allows for MDX querying of a Microsoft Analysis Server interface
 * render - simply renders the template requested and returns the result
 
-#### Connections
-
-Epiquery supports configuration of multiple, named, connections to be used
-when executing a QueryRequets.  In addition it allows for specification of
-all required connection information within the request, allowing for connection
-to arbitrary supported data sources.
