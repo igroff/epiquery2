@@ -46,8 +46,16 @@ the templates will be put into a directory named 'templates' within epiquery's w
 * `CONNECTIONS` - A space delimited list of names of environment variables which contain
 the JSON encoded information needed to configure the various drivers.  Ya, gnarly.  We'll do this one through examples.
 
-
-
+### Example Configuration (~/.epiquery2/config)
+        export TEMPLATE_REPO_URL=https://github.com/intimonkey/epiquery-templates.git
+        export TEMPLATE_DIRECTORY=~/Development/epiquery2/difftest/templates
+        export CONNECTIONS="EPI_C_RENDER2 EPI_C_MSSQL EPI_C_FILE EPI_C_MYSQL EPI_C_RENDER EPI_C_503_MDX"
+        export EPI_C_FILE='{"driver":"file","config":{},"name":"file"}'
+        export EPI_C_RENDER='{"driver":"render","config":{},"name":"render"}'
+        export EPI_C_MSSQL='{"driver":"mssql","name":"mssql","config":{"server":"10.211.55.5","password":"GLGROUP_LIVE","userName":"GLGROUP_LIVE","options":{"port":1433}}}'
+        export EPI_BAD_MSSQL='{"driver":"mssql","name":"bad_mssql","config":{"server":"10.55.5","password":"GLGROUP_LIVE","userName":"GLGROUP_LIVE","options":{"port":1433}}}'
+        export EPI_C_MYSQL='{"name":"mysql","driver":"mysql","config":{"host":"localhost","user":"root","password":""}}'
+        export EPI_C_MSSQL_GLGLIVE250="{\"driver\":\"mssql\",\"name\":\"db250\",\"config\":{\"server\":\"${DATABASE_GLGLIVE_READONLY_SERVER}\",\"password\":\"${DATABASE_GLGLIVE_READONLY_PASSWORD}\",\"userName\":\"${DATABASE_GLGLIVE_READONLY_USER}\",\"options\":{\"port\":1433}}}"
 
 ## Interface
 
