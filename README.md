@@ -1,4 +1,3 @@
-# Not Even Really Documentation (NERD)
 ## Definitions
 
 * Query - Used to refer to the rendered result of processing a template in
@@ -6,71 +5,57 @@ response to a query message.  Specifically we use this to refer to the
 resulting string as it is sent to the target server.  A Query as we've defined
 here may well contain multiple queries against the target data source
 resulting in multiple result sets.
+
 * Active Query - A Query is considered to be active while it is being
 processed by epiquery.  This time is specifically that which is bounded by
 Query Begin and Query Complete messages.
+
 * QueryRequest - An inbound request for epiquery to render and execute a 
 template against a specific connection.
+
 * Data Source - A server from which epiquery is capable of retrieving data for
 a query.
 
+* Driver - the software (module) responsible for managing the translation of
+a Query into the appropriate form for the destination service, and raising
+events as data is returned.  It sends the query to the database and returns
+results to epiquery.
+
+* Named Connection - a connection to a single data source accessed by epiquery.
+
+* epiquery - this application described within the repository hosting this README
+
+
 ## Supported data sources
-* Microsoft SQL Server - as supported by the tedious npm package (although it has been patched
-for a date issue). Driver name: mssql
-* MySQL - Driver name: mysql
+* Microsoft SQL Server 
+* MySQL
+* Microsoft SQL Server Analysis Services (MDX)
+* File system
 
 ## Configuration 
 
-Config, JSON object accessible via environment variable `EPIQUERY_CONFIG` as
-either the object itself (JSON) or a file containing JSON.
+Configuration of epiquery is done entirely through environment variables, this
+is done to simplify the deployment specifically within [Starphleet](https://github.com/wballard/starphleet).  The configuration can be done solely through environment variables or,
+as a convenience, epiquery will source a file ~/.epiquery2/config in which the 
+variables can be specified.
 
-#### Configuration Structure
-Provides the configuration information for an epiquery instance, a skeleton
-with all options is listed below:
 
-    {
-      "connections":{}
-      "templateDir":"",
-      "port":8080
-    }
+* `TEMPLATE_REPO_URL` - (required) specifies the git repository from which the templates will be loaded
+* `TEMPLATE_DIRECTORY` - (optional) Where the templates will be found, if not specified
+the templates will be put into a directory named 'templates' within epiquery's working directory.
+* `CONNECTIONS` - A space delimited list of names of environment variables which contain
+the JSON encoded information needed to configure the various drivers.  Ya, gnarly.  We'll do this one through examples.
 
-##### Connection Config
-Named connections are mapped to inbound requests, determining what connection will be used to
-process the rendered query template.  Connection names are indicated by providing the name of the
-desired connection in the inbound request, see below for details.
 
-###### Connection Configuration Element
-Individual (named) connections are configured using a connection element, as a member of the
-connections list in the epiquery configuration object.  The config property of the element is
-configuration data that is specific to the driver.
 
-    {
-      "driver":"",
-      "config":{}
-    }
 
-#### Sample Configuration
-    {
-      "connections":{
-        "sql__old":{"driver":"mssql","config": {"user":"", "password":"", "host":"", "port":""}},
-        "sql_conn":{"driver":"mssql","config": {"user":"", "password":"", "host":"", "port":""}},
-        "sql_con2":{"driver":"mssql","config": {"user":"", "password":"", "host":"", "port":""}},
-        "mysql":   {"driver":"mysql","config": {"user":"", "password":"", "host":"", "port":""}}
-      },
-      "templateDir":"",
-      "httpPort":8080
-    }
- 
 ## Interface
 
   The systems to which epiquery provides access are generally streaming data
-sources.  The only supported interface is websockets as it allows for simple
-event based interface more compatable with streaming data
+sources.  The only interface epiquery supports is websockets as it allows for simple
+event based interface more compatable with the streaming data sources accessed
+through epiquery.
 
-##### Compatability
-    As a convenience there is a veneer that maps the underlying socket protocol into a REST like interface. The REST interface is backwards compatible with an older epiquery interface offering less functionality and being quite a bit less sophisticated than the socket interface.  
-
-    New uses of the system should be based on the socket interface and have nothing to do with the REST interface. The REST interface is solely for backwards compatability and is lacking in several areas including missing a streaming response, which makes it a poor choice for large data sets as the whole response will be buffered before responding.
 #### Messages
 
 ##### Query
