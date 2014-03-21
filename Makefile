@@ -4,11 +4,11 @@ SHELL=/bin/bash
 watch:
 	DEBUG=true supervisor --ignore "./test"  -e ".coffee|.js" --exec bash ./ar-start
 
-test/templates:
-	cd test/ && git clone https://github.com/intimonkey/epiquery-templates.git \
+difftest/templates:
+	cd test/ && git clone https://github.com/intimonkey/epiquery2-templates.git \
 		templates/
 
-test: build lint test/templates
+test: build lint difftest/templates
 	difftest run ${TEST_NAME}
 
 pass/%:
