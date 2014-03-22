@@ -13,6 +13,8 @@ attachResponder = (context, conn) ->
     conn.jwrite columns
   context.on 'beginrowset', () ->
     conn.jwrite message: 'beginrowset'
+  context.on 'endrowset', () ->
+    conn.jwrite message: 'endrowset'
   context.on 'data', (data) ->
     data.message = 'data'
     conn.jwrite data
