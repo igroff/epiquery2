@@ -34,6 +34,7 @@ selectConnection = (context, callback) ->
       callback msg
   else
     context.connection = connectionConfig
+  context.Stats.connectionName = context.connection.name
   callback null, context
 
 getTemplatePath = (context, callback) ->
