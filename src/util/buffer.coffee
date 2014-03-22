@@ -4,4 +4,13 @@ class RingBuffer
     @buffer = []
     @curPos = 0
 
-  insert: () =>
+  store: (element) =>
+    @buffer[@curPos++] = element
+    @curPos = 0 if @curPos >= @size
+    undefined
+
+  getEntries: () =>
+    entries = (item for item in @buffer)
+
+module.exports.RingBuffer = RingBuffer
+
