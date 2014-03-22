@@ -34,6 +34,9 @@ app.get '/diagnostic', (req, res) ->
     connections: _.pluck(config.connections, 'name')
   res.send response
 
+app.get '/stats', (req, res) ->
+  res.send recentQueries: core.QueryStats.buffer.getEntries()
+
 httpRequestHandler = (req, res) ->
   clientId = req.param 'client_id'
   c = new Context()

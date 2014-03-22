@@ -3,6 +3,7 @@ path    = require 'path'
 log     = require 'simplog'
 config  = require './config.coffee'
 events  = require 'events'
+buffer  = require './util/buffer.coffee'
 
 DRIVERS={}
 
@@ -36,4 +37,5 @@ module.exports.init = init
 module.exports.loadDrivers = loadDrivers
 module.exports.selectDriver = selectDriver
 module.exports.drivers = DRIVERS
+module.exports.QueryStats = {buffer: new buffer.CircularBuffer(25)}
 module.exports.events = new events.EventEmitter()
