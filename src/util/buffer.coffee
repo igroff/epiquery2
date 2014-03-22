@@ -1,5 +1,5 @@
 
-class RingBuffer
+class CircularBuffer
   constructor: (@size=10) ->
     @buffer = []
     @curPos = 0
@@ -12,5 +12,5 @@ class RingBuffer
   getEntries: () =>
     entries = (item for item in @buffer)
 
-module.exports.RingBuffer = RingBuffer
+module.exports.CircularBuffer = CircularBuffer
 
