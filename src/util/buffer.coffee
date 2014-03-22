@@ -11,6 +11,9 @@ class CircularBuffer
 
   getEntries: () =>
     entries = (item for item in @buffer)
+  
+  toString: () =>
+    "#{JSON.stringify @getEntries()}"
 
 module.exports.CircularBuffer = CircularBuffer
 
