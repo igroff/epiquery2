@@ -1,3 +1,3 @@
 hook up the escaping of templates and replacing of the weird ms word characters
 add error handling at the root of request processing try-catch
-remove dynamic loading of drivers
+collect last n exec times for each query processed and add that info to stats

@@ -3,3 +3,4 @@ x 01/27/14 21:48:11  dump the old requestor bs
 x 02/27/14 10:16:32  change event names to all lowercase
 x 02/27/14 10:16:47  remove sse
 x 02/27/14 11:54:29  downcase all the internal event names
+x 03/21/14 22:24:03  remove dynamic loading of drivers
