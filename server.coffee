@@ -44,6 +44,7 @@ app.get '/stats', (req, res) ->
       ret[k] = "#{v}"
       ret
     recentQueries: core.QueryStats.buffer.getEntries()
+    inflightQueries: core.getInflightQueries()
     serverTime: new Date()
   res.send stats
 

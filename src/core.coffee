@@ -8,7 +8,7 @@ buffer  = require './util/buffer.coffee'
 
 DRIVERS={}
 QUERY_EXEC_TIME_STATS={}
-QUERIES_IN_FLIGHT={}
+QUERIES_EXECUTED={}
 
 loadDrivers = (driverPath) ->
   log.info "loading drivers from %s", driverPath
@@ -40,6 +40,23 @@ trackExecutionTime = (templateName, executionTime) ->
   if QUERY_EXEC_TIME_STATS[templateName] == undefined
     QUERY_EXEC_TIME_STATS[templateName] = new buffer.CircularBuffer(25)
   QUERY_EXEC_TIME_STATS[templateName].store(executionTime)
+
+trackInflightQuery = (templateName) ->
+  if not QUERIES_EXECUTED[templateName]
+    QUERIES_EXECUTED[templateName] = 0
+  QUERIES_EXECUTED[templateName]++
+
+removeInflightQuery = (templateName) ->
+  if QUERIES_EXECUTED[templateName]
+    QUERIES_EXECUTED[templateName] = QUERIES_EXECUTED[templateName] - 1
+
+getInflightQueries = () ->
+  inflightQueries = {}
+  _.each QUERIES_EXECUTED, (v, k, l) ->
+    inflightQueries[k] = v if v > 0
+  return inflightQueries
+
+    
   
 module.exports.init = init
 module.exports.loadDrivers = loadDrivers
@@ -48,4 +65,7 @@ module.exports.drivers = DRIVERS
 module.exports.QueryStats = {buffer: new buffer.CircularBuffer(25)}
 module.exports.storeQueryExecutionTime = trackExecutionTime
 module.exports.getQueryExecutionTimes = QUERY_EXEC_TIME_STATS
+module.exports.trackInflightQuery = trackInflightQuery
+module.exports.removeInflightQuery = removeInflightQuery
+module.exports.getInflightQueries = getInflightQueries
 module.exports.events = new events.EventEmitter()

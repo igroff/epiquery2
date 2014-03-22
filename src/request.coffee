@@ -64,6 +64,7 @@ executeQuery = (context, callback) ->
       context.emit 'error', err
     context.emit 'endquery', data
     context.emit 'completequeryexecution'
+    core.removeInflightQuery context.templateName
     callback null, context
   query.execute(driver,
     context,
@@ -84,7 +85,10 @@ collectStats = (context, callback) ->
 queryRequestHandler = (context) ->
   async.waterfall [
     # just to create our context
-    (callback) -> callback(null, context),
+    (callback) ->
+      core.trackInflightQuery context.templateName
+      callback(null, context)
+    ,
     setupContext,
     logTemplateContext,
     getTemplatePath,
