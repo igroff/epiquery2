@@ -74,6 +74,12 @@ collectStats = (context, callback) ->
   stats = context.Stats
   stats.executionTimeInMillis = stats.endDate.getTime() - stats.startDate.getTime()
   core.QueryStats.buffer.store stats
+  # storing the exec time for this query so we can track recent query
+  # times by template
+  core.storeQueryExecutionTime(
+    context.templateName
+    stats.executionTimeInMillis
+  )
 
 queryRequestHandler = (context) ->
   async.waterfall [

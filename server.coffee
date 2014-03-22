@@ -35,7 +35,17 @@ app.get '/diagnostic', (req, res) ->
   res.send response
 
 app.get '/stats', (req, res) ->
-  res.send recentQueries: core.QueryStats.buffer.getEntries()
+  stats =
+    # execution time data is a object contiaining 
+    # "templateName": <CircularBuffer of recent exedution times>
+    # properties
+    recentExecutionTimes: _.map core.getQueryExecutionTimes, (v, k, l) ->
+      ret = {}
+      ret[k] = "#{v}"
+      ret
+    recentQueries: core.QueryStats.buffer.getEntries()
+    serverTime: new Date()
+  res.send stats
 
 httpRequestHandler = (req, res) ->
   clientId = req.param 'client_id'
