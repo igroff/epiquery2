@@ -62,7 +62,7 @@ httpRequestHandler = (req, res) ->
 socketServer.on 'connection', (conn) ->
   log.debug "we got a client"
   conn.on 'data', (message) ->
-    log.debug "inbound sockjs message #{message}"
+    log.debug "inbound message #{message}"
     message = JSON.parse(message)
     ctxParms =
       templateName: message.templateName
