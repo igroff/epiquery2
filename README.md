@@ -60,17 +60,15 @@ the JSON encoded information needed to configure the various drivers.  Ya, gnarl
 ## Interface
 
   The systems to which epiquery provides access are generally streaming data
-sources.  The only interface epiquery supports is websockets as it allows for simple
-event based interface more compatable with the streaming data sources accessed
-through epiquery.
+sources.  The primary interface provided by epiquery is websockets as it allows for
+an event based interface more compatable with the streaming data sources exposed.
 
 #### Messages
 
 ##### query
-Executes a Query using the data provided.  
+Executes a Query using the data provided.
 
     {
-      "message":"query",
       "templateName":"/test/servername",
       "connectionName"="mssql",
       "queryId":"",
@@ -97,7 +95,7 @@ Used to indicate that a result set has begun.  Some providers, given a particula
 can return multiple result sets, this message indicates the start of a new result set from the
 execution of a given query.  Individual query processing is synchronous, so while there is no
 in built way to tie a particular section of a Query to a result set directly, each query contained
-within the Query sent to the provider can result in a distinct result set, and thus the 
+within the QueryRequest sent to the provider can result in a distinct result set, and thus the 
 emission of a 'beginrowset' message.
 
     {"message":"beginrowset", "queryId":""}
