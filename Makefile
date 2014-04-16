@@ -5,7 +5,7 @@ watch:
 	DEBUG=true supervisor --ignore "./test"  -e ".coffee|.js" --exec bash ./ar-start
 
 difftest/templates:
-	cd test/ && git clone https://github.com/intimonkey/epiquery2-templates.git \
+	cd difftest/ && git clone https://github.com/igroff/epiquery-templates.git \
 		templates/
 
 test: build lint difftest/templates
