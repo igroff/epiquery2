@@ -61,7 +61,8 @@ executeQuery = (context, callback) ->
     context.Stats.endDate = new Date()
     if err
       log.error "error executing query #{err}"
-      context.emit 'error', err
+      context.emit 'error', err, data
+
     context.emit 'endquery', data
     context.emit 'completequeryexecution'
     core.removeInflightQuery context.templateName

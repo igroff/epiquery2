@@ -3,17 +3,29 @@ _                 = require 'underscore'
 log               = require 'simplog'
 WebSocket         = require 'ws'
 
+
+socketState = 
+  CONNECTING: 0
+  OPEN: 1
+  CLOSING: 2
+  CLOSED: 3
+
+
 class EpiClient extends EventEmitter
   constructor: (@url) ->
+    @connect()
+
+  connect: =>
+    return if @ws?.readyState == socketState.CONNECTING
+    
     @ws = new WebSocket(@url)
     @queryId = 0
-    @open = false
     @ws.onmessage = @onMessage
     @ws.onclose = @onClose
     @ws.onopen = () =>
-      @open = true
+      log.info "Epiclient connection opened"
     @ws.onerror = (err) ->
-      log.error "error: ", err
+      log.error "ws error: ", err
 
   query: (connectionName, template, data, queryId=null) =>
     req =
@@ -22,9 +34,15 @@ class EpiClient extends EventEmitter
       data: data
     req.queryId = null || queryId
     req.closeOnEnd = data.closeOnEnd if data
-    if @open
-      @ws.send JSON.stringify(req)
+    
+    if @ws.readyState == socketState.OPEN
+      try 
+        @ws.send JSON.stringify(req)
+      catch ex
+        @connect()
+        setTimeout @query, 1000, connectionName, template, data, queryId
     else
+      @connect()
       setTimeout @query, 1000, connectionName, template, data, queryId
 
   onMessage: (message) =>
@@ -35,14 +53,17 @@ class EpiClient extends EventEmitter
     handler = @['on' + message.message]
     if handler
       handler(message)
+  
+  onClose: () => 
+    @emit 'close', { reconnecting: true }
+    @connect()
 
-  onClose: () => @emit 'close'
   onrow: (msg) => @emit 'row', msg
   ondata: (msg) => @emit 'data', msg
   onbeginquery: (msg) => @emit 'beginquery', msg
   onendquery: (msg) => @emit 'endquery', msg
   onerror: (msg) => @emit 'error', msg
-  onbeginResultSet: (msg) => @emit 'beginResultSet', msg
+  onbeginrowset: (msg) => @emit 'beginrowset', msg
 
 class EpiBufferingClient extends EpiClient
   constructor: (@host, @port=80) ->
@@ -51,16 +72,10 @@ class EpiBufferingClient extends EpiClient
 
   onrow: (msg) =>
     @results[msg.queryId].currentResultSet.push(msg.columns)
-
-  onbeginquery: (msg) =>
+  
+  onbeginrowset: (msg) =>
     newResultSet = []
-    @results[msg.queryId] = resultSets: []
-    @results[msg.queryId].currentResultSet = newResultSet
-    @results[msg.queryId].resultSets.push newResultSet
-
-  onbeginResultSet: (msg) =>
-    newResultSet = []
-    @results[msg.queryId] = resultSets: []
+    @results[msg.queryId] ||= resultSets: []
     @results[msg.queryId].currentResultSet = newResultSet
     @results[msg.queryId].resultSets.push newResultSet
 
