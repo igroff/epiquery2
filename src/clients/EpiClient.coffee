@@ -4,7 +4,7 @@ log               = require 'simplog'
 WebSocket         = require 'ws'
 
 
-socketState = 
+socketState =
   CONNECTING: 0
   OPEN: 1
   CLOSING: 2
@@ -36,7 +36,7 @@ class EpiClient extends EventEmitter
     req.closeOnEnd = data.closeOnEnd if data
     
     if @ws.readyState == socketState.OPEN
-      try 
+      try
         @ws.send JSON.stringify(req)
       catch ex
         @connect()
@@ -54,7 +54,7 @@ class EpiClient extends EventEmitter
     if handler
       handler(message)
   
-  onClose: () => 
+  onClose: () =>
     @emit 'close', { reconnecting: true }
     @connect()
 
