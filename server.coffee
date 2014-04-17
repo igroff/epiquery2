@@ -34,6 +34,11 @@ app.get '/diagnostic', (req, res) ->
     connections: _.pluck(config.connections, 'name')
   res.send response
 
+app.get '/templates', (req, res) ->
+  response =
+    templates: []
+  res.send response
+
 app.get '/stats', (req, res) ->
   stats =
     # execution time data is a object contiaining 
