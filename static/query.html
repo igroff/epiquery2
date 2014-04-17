@@ -7,6 +7,12 @@
   <title></title>
   <script src="/static/js/epiclient.js"></script>
   <script src="/static/js/angular.min.js"></script>
+  <link rel="stylesheet" href="app.css"></link>
+  <style>
+    #queryOutput {
+      overflow: scroll;
+    }
+  </style>
   <script type="text/javascript">
     function show(message){
       console.log(message);
@@ -23,7 +29,8 @@
     client.on('close', show);
     client.on('beginquery', show);
     client.on('endquery', show);
-    client.on('beginResultSet', show);
+    client.on('data', show);
+    client.on('beginrowset', show);
 
     angular.module('theApp', []).controller(
       'QueryController',
@@ -33,7 +40,7 @@
             diagInfo = data;
             $scope.connectionNames = data.connections;
             $scope.connections = data.connections;
-            $scope.connection = data.connections[0];
+            $scope.connection = "mysql";
           }).
           error(function(data, status, headers, config){
             show("there was an error connection to diagnostic, " + data);
@@ -49,16 +56,17 @@
 </head>
 <body>
   <div id="connections" ng-controller="QueryController">
-    <h4>Available Connections</h4>
-    <ul>
-      <li ng-repeat="name in connectionNames"> {{name}} </li>
-    </ul>
-    <label for="connection">Connection</label><input id="connection" type="text" ng-model="connection"/>
-    <p>
-    <label for="template">Template</label><input id="template" type="text" ng-model="template"/>
-    <p>
-    <label for="data">Data</label><TextArea id="data" ng-model="data"></TextArea>
-    <button ng-click="runQuery()">Run Query</button>
+    <form class="simple-form">
+      <label for="connection">Connection</label>
+      <select ng-model="connection" ng-options="connection for connection in connections">
+        <option value="">Available Connections</option>
+      </select>
+      <p>
+      <label for="template">Template</label><input id="template" type="text" ng-model="template"/>
+      <p>
+      <label for="data">Data</label><TextArea id="data" ng-model="data"></TextArea>
+      <button ng-click="runQuery()">Run Query</button>
+    </form>
   </div>
 
   <div id="queryOutput">
