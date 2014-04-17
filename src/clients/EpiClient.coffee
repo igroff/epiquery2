@@ -1,8 +1,14 @@
 EventEmitter      = require('events').EventEmitter
 _                 = require 'underscore'
 log               = require 'simplog'
-WebSocket         = require './hunting-websocket.litcoffee'
+WebSocket         = require 'ws'
 
+
+socketState =
+  CONNECTING: 0
+  OPEN: 1
+  CLOSING: 2
+  CLOSED: 3
 
 
 class EpiClient extends EventEmitter
@@ -10,19 +16,16 @@ class EpiClient extends EventEmitter
     @connect()
 
   connect: =>
-    # we have a couple possible implementations here, HuntingWebsocket
-    # expects an array of urls, so we make that if needed
-    if not _.isArray(@url)
-      if WebSocket.name is "HuntingWebsocket"
-        @url = [@url]
+    return if @ws?.readyState == socketState.CONNECTING
+    
     @ws = new WebSocket(@url)
     @queryId = 0
     @ws.onmessage = @onMessage
     @ws.onclose = @onClose
     @ws.onopen = () =>
-      log.info "Epiclient connection opened"
+      log.debug "Epiclient connection opened"
     @ws.onerror = (err) ->
-      log.error "EpiClient socket error: ", err
+      log.error "ws error: ", err
 
   query: (connectionName, template, data, queryId=null) =>
     req =
@@ -32,8 +35,15 @@ class EpiClient extends EventEmitter
     req.queryId = null || queryId
     req.closeOnEnd = data.closeOnEnd if data
     
-    log.info "executing query: ", template
-    @ws.send JSON.stringify(req)
+    if @ws.readyState == socketState.OPEN
+      try
+        @ws.send JSON.stringify(req)
+      catch ex
+        @connect()
+        setTimeout @query, 1000, connectionName, template, data, queryId
+    else
+      @connect()
+      setTimeout @query, 1000, connectionName, template, data, queryId
 
   onMessage: (message) =>
     # if the browser has wrapped this for use, we'll be interested in its
@@ -52,7 +62,7 @@ class EpiClient extends EventEmitter
   ondata: (msg) => @emit 'data', msg
   onbeginquery: (msg) => @emit 'beginquery', msg
   onendquery: (msg) => @emit 'endquery', msg
-  onerror: (msg) => log.error msg
+  onerror: (msg) => @emit 'error', msg
   onbeginrowset: (msg) => @emit 'beginrowset', msg
 
 class EpiBufferingClient extends EpiClient
@@ -64,6 +74,12 @@ class EpiBufferingClient extends EpiClient
     @results[msg.queryId].currentResultSet.push(msg.columns)
   
   onbeginrowset: (msg) =>
+    newResultSet = []
+    @results[msg.queryId] ||= resultSets: []
+    @results[msg.queryId].currentResultSet = newResultSet
+    @results[msg.queryId].resultSets.push newResultSet
+
+  onbeginquery: (msg) =>
     newResultSet = []
     @results[msg.queryId] ||= resultSets: []
     @results[msg.queryId].currentResultSet = newResultSet
