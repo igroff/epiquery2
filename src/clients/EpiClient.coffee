@@ -1,14 +1,8 @@
 EventEmitter      = require('events').EventEmitter
 _                 = require 'underscore'
 log               = require 'simplog'
-WebSocket         = require 'ws'
+WebSocket         = require './hunting-websocket.litcoffee'
 
-
-socketState =
-  CONNECTING: 0
-  OPEN: 1
-  CLOSING: 2
-  CLOSED: 3
 
 
 class EpiClient extends EventEmitter
@@ -16,8 +10,11 @@ class EpiClient extends EventEmitter
     @connect()
 
   connect: =>
-    return if @ws?.readyState == socketState.CONNECTING
-    
+    # we have a couple possible implementations here, HuntingWebsocket
+    # expects an array of urls, so we make that if needed
+    if not _.isArray(@url)
+      if WebSocket.name is "HuntingWebsocket"
+        @url = [@url]
     @ws = new WebSocket(@url)
     @queryId = 0
     @ws.onmessage = @onMessage
@@ -25,7 +22,7 @@ class EpiClient extends EventEmitter
     @ws.onopen = () =>
       log.info "Epiclient connection opened"
     @ws.onerror = (err) ->
-      log.error "ws error: ", err
+      log.error "EpiClient socket error: ", err
 
   query: (connectionName, template, data, queryId=null) =>
     req =
@@ -35,15 +32,8 @@ class EpiClient extends EventEmitter
     req.queryId = null || queryId
     req.closeOnEnd = data.closeOnEnd if data
     
-    if @ws.readyState == socketState.OPEN
-      try
-        @ws.send JSON.stringify(req)
-      catch ex
-        @connect()
-        setTimeout @query, 1000, connectionName, template, data, queryId
-    else
-      @connect()
-      setTimeout @query, 1000, connectionName, template, data, queryId
+    log.info "executing query: ", template
+    @ws.send JSON.stringify(req)
 
   onMessage: (message) =>
     # if the browser has wrapped this for use, we'll be interested in its
