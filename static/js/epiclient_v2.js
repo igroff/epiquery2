@@ -2313,7 +2313,7 @@ function ws(uri, protocols, opts) {
 if (WebSocket) ws.prototype = WebSocket.prototype;
 
 },{}],9:[function(require,module,exports){
-var EpiBufferingClient, EpiClient, EventEmitter, WebSocket, log, socketState, _,
+var EpiBufferingClient, EpiClient, EventEmitter, WebSocket, log, _,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -2324,14 +2324,7 @@ _ = require('underscore');
 
 log = require('simplog');
 
-WebSocket = require('ws');
-
-socketState = {
-  CONNECTING: 0,
-  OPEN: 1,
-  CLOSING: 2,
-  CLOSED: 3
-};
+WebSocket = require('./hunting-websocket.litcoffee');
 
 EpiClient = (function(_super) {
   __extends(EpiClient, _super);
@@ -2352,26 +2345,27 @@ EpiClient = (function(_super) {
   }
 
   EpiClient.prototype.connect = function() {
-    var _ref,
-      _this = this;
+    var _this = this;
 
-    if (((_ref = this.ws) != null ? _ref.readyState : void 0) === socketState.CONNECTING) {
-      return;
+    if (!_.isArray(this.url)) {
+      if (WebSocket.name === "HuntingWebsocket") {
+        this.url = [this.url];
+      }
     }
     this.ws = new WebSocket(this.url);
     this.queryId = 0;
     this.ws.onmessage = this.onMessage;
     this.ws.onclose = this.onClose;
     this.ws.onopen = function() {
-      return log.debug("Epiclient connection opened");
+      return log.info("Epiclient connection opened");
     };
     return this.ws.onerror = function(err) {
-      return log.error("ws error: ", err);
+      return log.error("EpiClient socket error: ", err);
     };
   };
 
   EpiClient.prototype.query = function(connectionName, template, data, queryId) {
-    var ex, req;
+    var req;
 
     if (queryId == null) {
       queryId = null;
@@ -2385,18 +2379,8 @@ EpiClient = (function(_super) {
     if (data) {
       req.closeOnEnd = data.closeOnEnd;
     }
-    if (this.ws.readyState === socketState.OPEN) {
-      try {
-        return this.ws.send(JSON.stringify(req));
-      } catch (_error) {
-        ex = _error;
-        this.connect();
-        return setTimeout(this.query, 1000, connectionName, template, data, queryId);
-      }
-    } else {
-      this.connect();
-      return setTimeout(this.query, 1000, connectionName, template, data, queryId);
-    }
+    log.info("executing query: ", template);
+    return this.ws.send(JSON.stringify(req));
   };
 
   EpiClient.prototype.onMessage = function(message) {
@@ -2438,7 +2422,7 @@ EpiClient = (function(_super) {
   };
 
   EpiClient.prototype.onerror = function(msg) {
-    return this.emit('error', msg);
+    return log.error(msg);
   };
 
   EpiClient.prototype.onbeginrowset = function(msg) {
@@ -2455,7 +2439,6 @@ EpiBufferingClient = (function(_super) {
   function EpiBufferingClient(host, port) {
     this.host = host;
     this.port = port != null ? port : 80;
-    this.onbeginquery = __bind(this.onbeginquery, this);
     this.onbeginrowset = __bind(this.onbeginrowset, this);
     this.onrow = __bind(this.onrow, this);
     EpiBufferingClient.__super__.constructor.call(this, this.host, this.port);
@@ -2477,17 +2460,6 @@ EpiBufferingClient = (function(_super) {
     return this.results[msg.queryId].resultSets.push(newResultSet);
   };
 
-  EpiBufferingClient.prototype.onbeginquery = function(msg) {
-    var newResultSet, _base, _name;
-
-    newResultSet = [];
-    (_base = this.results)[_name = msg.queryId] || (_base[_name] = {
-      resultSets: []
-    });
-    this.results[msg.queryId].currentResultSet = newResultSet;
-    return this.results[msg.queryId].resultSets.push(newResultSet);
-  };
-
   return EpiBufferingClient;
 
 })(EpiClient);
@@ -2497,7 +2469,7 @@ module.exports.EpiClient = EpiClient;
 module.exports.EpiBufferingClient = EpiBufferingClient;
 
 
-},{"events":1,"simplog":6,"underscore":7,"ws":8}],10:[function(require,module,exports){
+},{"./hunting-websocket.litcoffee":11,"events":1,"simplog":6,"underscore":7}],10:[function(require,module,exports){
 var clients;
 
 clients = require('./EpiClient.coffee');
@@ -2512,4 +2484,194 @@ if (typeof window !== "undefined" && window !== null) {
 }
 
 
-},{"./EpiClient.coffee":9}]},{},[10])
+},{"./EpiClient.coffee":9}],11:[function(require,module,exports){
+var HuntingWebsocket, ReconnectingWebSocket, WebSocket, log;
+
+log = require('simplog');
+
+ReconnectingWebSocket = require('./reconnecting-websocket.litcoffee');
+
+WebSocket = WebSocket || require('ws');
+
+HuntingWebsocket = (function() {
+  function HuntingWebsocket(urls) {
+    var openAtAll, socket, url, _i, _len, _ref,
+      _this = this;
+
+    this.urls = urls;
+    openAtAll = false;
+    this.lastSocket = void 0;
+    this.sockets = [];
+    _ref = this.urls;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      url = _ref[_i];
+      socket = new ReconnectingWebSocket(url);
+      this.sockets.push(socket);
+      socket.onmessage = function(evt) {
+        return _this.onmessage(evt);
+      };
+      socket.onerror = function(err) {
+        return _this.onerror(err);
+      };
+      socket.onopen = function(evt) {
+        if (!openAtAll) {
+          openAtAll = true;
+          return _this.onopen(evt);
+        }
+      };
+      socket.onreconnect = function(evt) {
+        return _this.onreconnect(evt);
+      };
+    }
+    this.forceclose = false;
+  }
+
+  HuntingWebsocket.prototype.send = function(data) {
+    var err, socket, trySockets, _i, _len, _ref;
+
+    trySockets = this.sockets.slice(0);
+    if (this.lastSocket) {
+      trySockets.unshift(this.lastSocket);
+    }
+    for (_i = 0, _len = trySockets.length; _i < _len; _i++) {
+      socket = trySockets[_i];
+      try {
+        if (socket.readyState === WebSocket.OPEN) {
+          socket.send(data);
+          if (socket.url !== ((_ref = this.lastSocket) != null ? _ref.url : void 0)) {
+            this.lastSocket = socket;
+            this.onserver({
+              server: socket.url
+            });
+          }
+          return;
+        } else {
+          socket.connect();
+        }
+      } catch (_error) {
+        err = _error;
+        this.onerror(err);
+      }
+    }
+  };
+
+  HuntingWebsocket.prototype.close = function() {
+    var socket, _i, _len, _ref;
+
+    _ref = this.sockets;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      socket = _ref[_i];
+      socket.close();
+    }
+    return this.onclose();
+  };
+
+  HuntingWebsocket.prototype.onopen = function(event) {};
+
+  HuntingWebsocket.prototype.onreconnect = function(event) {};
+
+  HuntingWebsocket.prototype.onclose = function(event) {};
+
+  HuntingWebsocket.prototype.onserver = function(event) {};
+
+  HuntingWebsocket.prototype.onmessage = function(event) {};
+
+  HuntingWebsocket.prototype.onerror = function(event) {};
+
+  return HuntingWebsocket;
+
+})();
+
+module.exports = HuntingWebsocket;
+
+
+},{"./reconnecting-websocket.litcoffee":12,"simplog":6,"ws":8}],12:[function(require,module,exports){
+var RECONNECT_TIMEOUT, ReconnectingWebSocket, WebSocket, log,
+  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+log = require("simplog");
+
+WebSocket = WebSocket || require('ws');
+
+RECONNECT_TIMEOUT = 3 * 1000;
+
+ReconnectingWebSocket = (function() {
+  function ReconnectingWebSocket(url, reconnectTimeout) {
+    this.url = url;
+    this.connect = __bind(this.connect, this);
+    this.forceclose = false;
+    this.reconnectTimeout = reconnectTimeout || RECONNECT_TIMEOUT;
+    this.readyState = WebSocket.CONNECTING;
+    this.connectionCount = 0;
+    this.connect();
+  }
+
+  ReconnectingWebSocket.prototype.connect = function(andSendThis) {
+    var _this = this;
+
+    this.ws = new WebSocket(this.url);
+    this.ws.onopen = function(event) {
+      _this.readyState = WebSocket.OPEN;
+      if (_this.connectionCount++) {
+        _this.onreconnect(event);
+      } else {
+        _this.onopen(event);
+      }
+      if (andSendThis) {
+        return _this.send(andSendThis);
+      }
+    };
+    this.ws.onclose = function(event) {
+      if (_this.forceclose) {
+        _this.readyState = WebSocket.CLOSED;
+        return _this.onclose(event);
+      } else {
+        _this.readyState = WebSocket.CONNECTING;
+        return setTimeout(_this.connect, _this.reconnectTimeout);
+      }
+    };
+    this.ws.onmessage = function(event) {
+      return _this.onmessage(event);
+    };
+    return this.ws.onerror = function(event) {
+      return _this.onerror(event);
+    };
+  };
+
+  ReconnectingWebSocket.prototype.send = function(data) {
+    var error;
+
+    log.info("sending ", data);
+    try {
+      return this.ws.send(data);
+    } catch (_error) {
+      error = _error;
+      return this.connect(data);
+    }
+  };
+
+  ReconnectingWebSocket.prototype.close = function() {
+    this.forceclose = true;
+    return this.ws.close();
+  };
+
+  ReconnectingWebSocket.prototype.onopen = function(event) {};
+
+  ReconnectingWebSocket.prototype.onclose = function(event) {};
+
+  ReconnectingWebSocket.prototype.onreconnect = function(event) {};
+
+  ReconnectingWebSocket.prototype.onmessage = function(event) {};
+
+  ReconnectingWebSocket.prototype.onerror = function(event) {};
+
+  ReconnectingWebSocket.prototype.onsend = function(event) {};
+
+  return ReconnectingWebSocket;
+
+})();
+
+module.exports = ReconnectingWebSocket;
+
+
+},{"simplog":6,"ws":8}]},{},[10])

@@ -24,7 +24,10 @@
       output = document.getElementById('queryOutput');
       output.appendChild(container);
     }
-    var client = new EpiClient("ws://localhost:8080/sockjs/websocket")
+    var client = new EpiClient([
+      "ws://localhost:8080/sockjs/websocket",
+      "ws://localhost:8080/sockjs/websocket"
+      ])
     client.on('row', function(r) { show(r); });
     client.on('close', show);
     client.on('beginquery', show);
