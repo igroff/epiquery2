@@ -7,11 +7,26 @@ reconnection and other valuable features.
 There are currently two versions of the client:
 ##### client version 1
 
-    http://epiquery2.server.at.yourdomain/static/js/epiclient.js
+      http://some.epiquery2.server/static/js/epiclient.js
+    
+      // v1 takes a single url
+      var client = new EpiClient("ws://some.epiquery2.server/sockjs/websocket");
 
 ##### client version 2
 
-    http://epiquery2.server.at.yourdomain/static/js/epiclient_v2.js
+      http://some.epiquery.server/static/js/epiclient_v2.js
+    
+      //with v2 an array of urls is required
+      client = new EpiClient([
+        "ws://some.epiquery2.server/sockjs/websocket",
+        "ws://another.epiquery2.server/sockjs/websocket"
+      ]);
+
+Both of the clients support automatic reconnection, the v2 client supports
+the specification of multiple epiquery2 servers for which it will handle automatic
+failover in the case of errors contacting the epiquery2 server.
+
+There are examples of usage in `static/js/clienttest.html` and `static/js/clienttest_v2.html`
 
 ## Definitions
 

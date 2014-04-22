@@ -18,7 +18,8 @@
       body = document.getElementsByTagName('body')[0];
       body.appendChild(container);
     }
-    var client = new EpiClient("ws://localhost:8080/sockjs/websocket")
+    // this is only global for testing purposes
+    client = new EpiClient("ws://localhost:8080/sockjs/websocket")
     client.on('row', function(r) { show(r); });
     client.on('close', show);
     client.on('beginquery', show);
