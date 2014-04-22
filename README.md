@@ -1,3 +1,18 @@
+## I don't care, how do I use it.
+
+Epiquery2 provides a client you can use to connect, there's a couple versions 
+and the client simplifies your interaction with epiquery2 as well as providing
+reconnection and other valuable features.
+
+There are currently two versions of the client:
+##### client version 1
+
+    http://epiquery2.server.at.yourdomain/static/js/epiclient.js
+
+##### client version 2
+
+    http://epiquery2.server.at.yourdomain/static/js/epiclient_v2.js
+
 ## Definitions
 
 * Query - Used to refer to the rendered result of processing a template in
