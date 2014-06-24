@@ -2502,7 +2502,6 @@ ReconnectingWebSocket = (function() {
     this.workQueue = __bind(this.workQueue, this);
     this.connect = __bind(this.connect, this);
     this.forceClose = false;
-    this.readyState = WebSocket.CONNECTING;
     this.connectionCount = 0;
     this.connect();
     this.messageBuffer = [];
@@ -2523,8 +2522,10 @@ ReconnectingWebSocket = (function() {
       log.debug("cleaning up old socket");
     }
     this.ws = new WebSocket(this.url);
+    if (typeof window !== "undefined" && window !== null) {
+      window["ian"] = this.ws;
+    }
     this.ws.onopen = function(event) {
-      _this.readyState = WebSocket.OPEN;
       if (_this.connectionCount++) {
         return _this.onreconnect(event);
       } else {
@@ -2533,10 +2534,7 @@ ReconnectingWebSocket = (function() {
     };
     this.ws.onclose = function(event) {
       if (_this.forceClose) {
-        _this.readyState = WebSocket.CLOSED;
         return _this.onclose(event);
-      } else {
-        return _this.readyState = WebSocket.CONNECTING;
       }
     };
     this.ws.onmessage = function(event) {
@@ -2550,19 +2548,23 @@ ReconnectingWebSocket = (function() {
   ReconnectingWebSocket.prototype.workQueue = function() {
     var error, message;
 
-    while (message = this.messageBuffer.shift()) {
-      try {
-        this.ws.send(message);
-        this.onsend({
-          sent: message
-        });
-      } catch (_error) {
-        error = _error;
-        log.debug("unable to send message, putting it back on the q");
-        this.messageBuffer.push(message);
-        this.connect();
-        break;
+    if (this.ws.readyState === 1) {
+      while (message = this.messageBuffer.shift()) {
+        try {
+          this.ws.send(message);
+          this.onsend({
+            sent: message
+          });
+        } catch (_error) {
+          error = _error;
+          log.debug("unable to send message, putting it back on the q");
+          this.messageBuffer.push(message);
+          this.connect();
+          break;
+        }
       }
+    } else {
+      this.connect();
     }
     return setTimeout(this.workQueue, 128);
   };

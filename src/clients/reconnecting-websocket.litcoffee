@@ -25,7 +25,6 @@ This may work on the client or the server. Because we love you.
     class ReconnectingWebSocket
       constructor: (@url) ->
         @forceClose = false
-        @readyState = WebSocket.CONNECTING
         @connectionCount = 0
         @connect()
         @messageBuffer = []
@@ -44,8 +43,8 @@ The all powerful connect function, sets up events and error handling.
           log.debug "cleaning up old socket"
         @ws = new WebSocket(@url)
 
+        window?["ian"] = @ws
         @ws.onopen = (event) =>
-          @readyState = WebSocket.OPEN
           if @connectionCount++
             @onreconnect(event)
           else
@@ -53,24 +52,24 @@ The all powerful connect function, sets up events and error handling.
 
         @ws.onclose = (event) =>
           if @forceClose
-            @readyState = WebSocket.CLOSED
             @onclose(event)
-          else
-            @readyState = WebSocket.CONNECTING
 
         @ws.onmessage = (event) => @onmessage(event)
         @ws.onerror = (event) => @onerror(event)
   
       workQueue: () =>
-        while message = @messageBuffer.shift()
-          try
-            @ws.send message
-            @onsend(sent: message)
-          catch error
-            log.debug "unable to send message, putting it back on the q"
-            @messageBuffer.push message
-            @connect()
-            break
+        if @ws.readyState is 1 # open
+          while message = @messageBuffer.shift()
+            try
+              @ws.send message
+              @onsend(sent: message)
+            catch error
+              log.debug "unable to send message, putting it back on the q"
+              @messageBuffer.push message
+              @connect()
+              break
+        else
+          @connect()
         setTimeout @workQueue, 128
 
       send: (data) =>

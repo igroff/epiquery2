@@ -32,6 +32,9 @@
     angular.module('theApp', []).controller(
       'ConfigController',
       function($http, $scope){
+        $scope.query = function(){
+          client.query("mysql", "/test/mysql_servername");
+        }
         $http({method:'GET', url:'/diagnostic'}).
           success(function(data, status, headers, config){
             $scope.connectionNames = data.connections;
@@ -44,6 +47,7 @@
 </head>
 <body>
   <div id="connections" ng-controller="ConfigController">
+    <button ng-click="query()">Query!</button>
     <h4>Available Connections</h4>
     <ul>
       <li ng-repeat="name in connectionNames"> {{name}} </li>
