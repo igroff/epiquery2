@@ -1,5 +1,3 @@
-{ queryId: 'pants', message: 'endquery' }
-{ queryId: 'morePants', message: 'endquery' }
 resultSet[[{"@@hostname":"cornermonkey"}]]
 resultSet[[{"@@hostname":"cornermonkey"}]]
 beginquery{queryid"nonBufferingClientQueryId","message":"beginquery"}

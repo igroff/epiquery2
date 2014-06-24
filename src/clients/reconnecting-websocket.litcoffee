@@ -24,45 +24,58 @@ This may work on the client or the server. Because we love you.
 
     class ReconnectingWebSocket
       constructor: (@url) ->
+        @messageBuffer = []
         @forceClose = false
-        @reconnectTimeout = 2
         @readyState = WebSocket.CONNECTING
+        @backoffTimeout = 2
         @connectionCount = 0
         @connect()
-
+        @workQueue()
+  
 The all powerful connect function, sets up events and error handling.
 
       connect: (andSendThis) =>
+        try
+          if @ws
+            # null this out because it's the only thing that could
+            # keep the socket from being GCd
+            @ws.onmessage = null
+            @ws.close()
+        catch error
+          log.debug "cleaning up old socket"
         @ws = new WebSocket(@url)
+
         @ws.onopen = (event) =>
-          @reconnectTimeout = 2
           @readyState = WebSocket.OPEN
           if @connectionCount++
             @onreconnect(event)
           else
             @onopen(event)
-          @send(andSendThis) if andSendThis
+
         @ws.onclose = (event) =>
           if @forceClose
             @readyState = WebSocket.CLOSED
             @onclose(event)
           else
             @readyState = WebSocket.CONNECTING
-            @reconnectTimeout = Math.pow(@reconnectTimeout, 2)
-            setTimeout @connect, @reconnectTimeout
-        @ws.onmessage = (event) =>
-          @onmessage(event)
-        @ws.onerror = (event) =>
-          @onerror(event)
+
+        @ws.onmessage = (event) => @onmessage(event)
+        @ws.onerror = (event) => @onerror(event)
+  
+      workQueue: () =>
+        while message = @messageBuffer.shift()
+          try
+            @ws.send message
+            @onsend(sent: message)
+          catch error
+            log.debug "unable to send message, putting it back on the q"
+            @messageBuffer.push message
+            @connect()
+            break
+        setTimeout @workQueue, 128
 
       send: (data) =>
-        sender = =>
-          try
-              @ws.send(data)
-              @onsend(data)
-          catch error
-            @connect(data)
-        setTimeout sender, 0
+        @messageBuffer.push data
 
       close: ->
         @forceClose = true

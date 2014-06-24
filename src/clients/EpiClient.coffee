@@ -23,6 +23,7 @@ class EpiClient extends EventEmitter
       log.debug "Epiclient connection opened"
     @ws.onerror = (err) ->
       log.error "EpiClient socket error: ", err
+    @ws.onsend = @onsend
 
   query: (connectionName, template, data, queryId=null) =>
     req =
@@ -31,6 +32,8 @@ class EpiClient extends EventEmitter
       data: data
     req.queryId = null || queryId
     req.closeOnEnd = data.closeOnEnd if data
+    # if someone has asked us to close on end, we want our fancy
+    # underlying reconnectint sockets to not reconnect
     @ws.forceClose = req.closeOnEnd
     
     log.debug "executing query: #{template} data:#{JSON.stringify(data)}"
@@ -52,8 +55,9 @@ class EpiClient extends EventEmitter
   ondata: (msg) => @emit 'data', msg
   onbeginquery: (msg) => @emit 'beginquery', msg
   onendquery: (msg) => @emit 'endquery', msg
-  onerror: (msg) => log.error msg
+  onerror: (msg) => @emit 'error', msg
   onbeginrowset: (msg) => @emit 'beginrowset', msg
+  onsend: (msg) => @emit 'send', msg
 
 class EpiBufferingClient extends EpiClient
   constructor: (@url) ->

@@ -2331,6 +2331,7 @@ EpiClient = (function(_super) {
 
   function EpiClient(url) {
     this.url = url;
+    this.onsend = __bind(this.onsend, this);
     this.onbeginrowset = __bind(this.onbeginrowset, this);
     this.onerror = __bind(this.onerror, this);
     this.onendquery = __bind(this.onendquery, this);
@@ -2359,9 +2360,10 @@ EpiClient = (function(_super) {
     this.ws.onopen = function() {
       return log.debug("Epiclient connection opened");
     };
-    return this.ws.onerror = function(err) {
+    this.ws.onerror = function(err) {
       return log.error("EpiClient socket error: ", err);
     };
+    return this.ws.onsend = this.onsend;
   };
 
   EpiClient.prototype.query = function(connectionName, template, data, queryId) {
@@ -2420,11 +2422,15 @@ EpiClient = (function(_super) {
   };
 
   EpiClient.prototype.onerror = function(msg) {
-    return log.error(msg);
+    return this.emit('error', msg);
   };
 
   EpiClient.prototype.onbeginrowset = function(msg) {
     return this.emit('beginrowset', msg);
+  };
+
+  EpiClient.prototype.onsend = function(msg) {
+    return this.emit('send', msg);
   };
 
   return EpiClient;
@@ -2505,28 +2511,37 @@ ReconnectingWebSocket = (function() {
   function ReconnectingWebSocket(url) {
     this.url = url;
     this.send = __bind(this.send, this);
+    this.workQueue = __bind(this.workQueue, this);
     this.connect = __bind(this.connect, this);
+    this.messageBuffer = [];
     this.forceClose = false;
-    this.reconnectTimeout = 2;
     this.readyState = WebSocket.CONNECTING;
+    this.backoffTimeout = 2;
     this.connectionCount = 0;
     this.connect();
+    this.workQueue();
   }
 
   ReconnectingWebSocket.prototype.connect = function(andSendThis) {
-    var _this = this;
+    var error,
+      _this = this;
 
+    try {
+      if (this.ws) {
+        this.ws.onmessage = null;
+        this.ws.close();
+      }
+    } catch (_error) {
+      error = _error;
+      log.debug("cleaning up old socket");
+    }
     this.ws = new WebSocket(this.url);
     this.ws.onopen = function(event) {
-      _this.reconnectTimeout = 2;
       _this.readyState = WebSocket.OPEN;
       if (_this.connectionCount++) {
-        _this.onreconnect(event);
+        return _this.onreconnect(event);
       } else {
-        _this.onopen(event);
-      }
-      if (andSendThis) {
-        return _this.send(andSendThis);
+        return _this.onopen(event);
       }
     };
     this.ws.onclose = function(event) {
@@ -2534,9 +2549,7 @@ ReconnectingWebSocket = (function() {
         _this.readyState = WebSocket.CLOSED;
         return _this.onclose(event);
       } else {
-        _this.readyState = WebSocket.CONNECTING;
-        _this.reconnectTimeout = Math.pow(_this.reconnectTimeout, 2);
-        return setTimeout(_this.connect, _this.reconnectTimeout);
+        return _this.readyState = WebSocket.CONNECTING;
       }
     };
     this.ws.onmessage = function(event) {
@@ -2547,22 +2560,28 @@ ReconnectingWebSocket = (function() {
     };
   };
 
-  ReconnectingWebSocket.prototype.send = function(data) {
-    var sender,
-      _this = this;
+  ReconnectingWebSocket.prototype.workQueue = function() {
+    var error, message;
 
-    sender = function() {
-      var error;
-
+    while (message = this.messageBuffer.shift()) {
       try {
-        _this.ws.send(data);
-        return _this.onsend(data);
+        this.ws.send(message);
+        this.onsend({
+          sent: message
+        });
       } catch (_error) {
         error = _error;
-        return _this.connect(data);
+        log.debug("unable to send message, putting it back on the q");
+        this.messageBuffer.push(message);
+        this.connect();
+        break;
       }
-    };
-    return setTimeout(sender, 0);
+    }
+    return setTimeout(this.workQueue, 128);
+  };
+
+  ReconnectingWebSocket.prototype.send = function(data) {
+    return this.messageBuffer.push(data);
   };
 
   ReconnectingWebSocket.prototype.close = function() {
