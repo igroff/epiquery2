@@ -73,11 +73,5 @@ class EpiBufferingClient extends EpiClient
     @results[msg.queryId].currentResultSet = newResultSet
     @results[msg.queryId].resultSets.push newResultSet
 
-  onbeginquery: (msg) =>
-    newResultSet = []
-    @results[msg.queryId] ||= resultSets: []
-    @results[msg.queryId].currentResultSet = newResultSet
-    @results[msg.queryId].resultSets.push newResultSet
-
 module.exports.EpiClient = EpiClient
 module.exports.EpiBufferingClient = EpiBufferingClient

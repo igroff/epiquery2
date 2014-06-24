@@ -19,7 +19,7 @@ class MySQLDriver extends events.EventEmitter
       query = conn.query @query
       query.on 'result', (row) => this.emit 'row', row
       query.on 'error',  (error) => this.emit 'error', error
-      query.on 'fields', (fields) => console.log(fields)
+      query.on 'fields', (fields) => this.emit 'beginrowset', fields
       query.on 'end',    () => this.emit 'endquery'
     ).fail( (error) => this.emit 'error', error
     ).finally( () -> conn.end() )
