@@ -1,7 +1,7 @@
 EventEmitter      = require('events').EventEmitter
 _                 = require 'underscore'
 log               = require 'simplog'
-WebSocket         = require './hunting-websocket.litcoffee'
+WebSocket         = require './reconnecting-websocket.litcoffee'
 
 
 
@@ -12,15 +12,15 @@ class EpiClient extends EventEmitter
   connect: =>
     # we have a couple possible implementations here, HuntingWebsocket
     # expects an array of urls, so we make that if needed
-    if not _.isArray(@url)
-      if WebSocket.name is "HuntingWebsocket"
+    if WebSocket.name is "HuntingWebsocket"
+      if not _.isArray(@url)
         @url = [@url]
     @ws = new WebSocket(@url)
     @queryId = 0
     @ws.onmessage = @onMessage
     @ws.onclose = @onClose
     @ws.onopen = () =>
-      log.info "Epiclient connection opened"
+      log.debug "Epiclient connection opened"
     @ws.onerror = (err) ->
       log.error "EpiClient socket error: ", err
 
@@ -31,8 +31,9 @@ class EpiClient extends EventEmitter
       data: data
     req.queryId = null || queryId
     req.closeOnEnd = data.closeOnEnd if data
+    @ws.forceClose = req.closeOnEnd
     
-    log.info "executing query: ", template
+    log.debug "executing query: #{template} data:#{JSON.stringify(data)}"
     @ws.send JSON.stringify(req)
 
   onMessage: (message) =>
@@ -45,8 +46,7 @@ class EpiClient extends EventEmitter
       handler(message)
   
   onClose: () =>
-    @emit 'close', { reconnecting: true }
-    @connect()
+    @emit 'close'
 
   onrow: (msg) => @emit 'row', msg
   ondata: (msg) => @emit 'data', msg
@@ -56,14 +56,20 @@ class EpiClient extends EventEmitter
   onbeginrowset: (msg) => @emit 'beginrowset', msg
 
 class EpiBufferingClient extends EpiClient
-  constructor: (@host, @port=80) ->
-    super(@host, @port)
+  constructor: (@url) ->
+    super(@url)
     @results = {}
 
   onrow: (msg) =>
     @results[msg.queryId].currentResultSet.push(msg.columns)
   
   onbeginrowset: (msg) =>
+    newResultSet = []
+    @results[msg.queryId] ||= resultSets: []
+    @results[msg.queryId].currentResultSet = newResultSet
+    @results[msg.queryId].resultSets.push newResultSet
+
+  onbeginquery: (msg) =>
     newResultSet = []
     @results[msg.queryId] ||= resultSets: []
     @results[msg.queryId].currentResultSet = newResultSet

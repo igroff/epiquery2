@@ -34,20 +34,23 @@ res = {}
 # capture our events so we can disply the results in a deterministic order
 c = new EpiClient "ws://localhost:8080/sockjs/websocket"
 c.rowOutput = []
-c.on 'beginquery', (msg) -> c.beginqueryOutput = 'beginquery' + JSON.stringify msg
+c.on 'beginquery', (msg) ->
+  c.beginqueryOutput = 'beginquery' + JSON.stringify msg
 c.on 'endquery', (msg) ->
-   c.endqueryOutput = 'endquery' + JSON.stringify msg
+  c.endqueryOutput = 'endquery' + JSON.stringify msg
 c.on 'row', (msg) ->
   c.rowOutput.push 'row' + JSON.stringify msg
-c.on 'close', () -> exitWhenDone()
+c.on 'close', () ->
+  exitWhenDone()
+
 c.query connectionName, template, nextData, "nonBufferingClientQueryId"
 
-exitWhenDone = _.after 2, () ->
+exitWhenDone = _.after(2, () ->
   for entry in bc.output
     console.log entry
   console.log c.beginqueryOutput
   console.log c.endqueryOutput
-
   for row in c.rowOutput
     console.log row
   process.exit 0
+)
