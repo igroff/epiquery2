@@ -2513,16 +2513,15 @@ ReconnectingWebSocket = (function() {
     this.send = __bind(this.send, this);
     this.workQueue = __bind(this.workQueue, this);
     this.connect = __bind(this.connect, this);
-    this.messageBuffer = [];
     this.forceClose = false;
     this.readyState = WebSocket.CONNECTING;
-    this.backoffTimeout = 2;
     this.connectionCount = 0;
     this.connect();
+    this.messageBuffer = [];
     this.workQueue();
   }
 
-  ReconnectingWebSocket.prototype.connect = function(andSendThis) {
+  ReconnectingWebSocket.prototype.connect = function() {
     var error,
       _this = this;
 

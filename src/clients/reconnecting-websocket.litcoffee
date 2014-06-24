@@ -24,17 +24,16 @@ This may work on the client or the server. Because we love you.
 
     class ReconnectingWebSocket
       constructor: (@url) ->
-        @messageBuffer = []
         @forceClose = false
         @readyState = WebSocket.CONNECTING
-        @backoffTimeout = 2
         @connectionCount = 0
         @connect()
+        @messageBuffer = []
         @workQueue()
   
 The all powerful connect function, sets up events and error handling.
 
-      connect: (andSendThis) =>
+      connect: () =>
         try
           if @ws
             # null this out because it's the only thing that could
