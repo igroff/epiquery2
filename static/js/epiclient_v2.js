@@ -2522,9 +2522,6 @@ ReconnectingWebSocket = (function() {
       log.debug("cleaning up old socket");
     }
     this.ws = new WebSocket(this.url);
-    if (typeof window !== "undefined" && window !== null) {
-      window["ian"] = this.ws;
-    }
     this.ws.onopen = function(event) {
       if (_this.connectionCount++) {
         return _this.onreconnect(event);

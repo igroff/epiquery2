@@ -42,8 +42,6 @@ The all powerful connect function, sets up events and error handling.
         catch error
           log.debug "cleaning up old socket"
         @ws = new WebSocket(@url)
-
-        window?["ian"] = @ws
         @ws.onopen = (event) =>
           if @connectionCount++
             @onreconnect(event)
