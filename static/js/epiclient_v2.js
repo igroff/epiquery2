@@ -2499,36 +2499,30 @@ ReconnectingWebSocket = (function() {
   function ReconnectingWebSocket(url) {
     this.url = url;
     this.send = __bind(this.send, this);
-    this.workQueue = __bind(this.workQueue, this);
+    this.processMessageBuffer = __bind(this.processMessageBuffer, this);
     this.connect = __bind(this.connect, this);
     this.forceClose = false;
-    this.connectionCount = 0;
-    this.connect();
     this.messageBuffer = [];
-    this.workQueue();
+    this.connect();
+    this.processMessageBufferInterval;
   }
 
   ReconnectingWebSocket.prototype.connect = function() {
-    var error,
+    var error, _ref, _ref1,
       _this = this;
 
     try {
-      if (this.ws) {
-        this.ws.onmessage = null;
-        this.ws.close();
+      if ((_ref = this.ws) != null) {
+        _ref.onmessage = null;
+      }
+      if ((_ref1 = this.ws) != null) {
+        _ref1.close();
       }
     } catch (_error) {
       error = _error;
-      log.debug("cleaning up old socket");
+      log.error("unexpected error cleaning up old socket " + error);
     }
     this.ws = new WebSocket(this.url);
-    this.ws.onopen = function(event) {
-      if (_this.connectionCount++) {
-        return _this.onreconnect(event);
-      } else {
-        return _this.onopen(event);
-      }
-    };
     this.ws.onclose = function(event) {
       if (_this.forceClose) {
         return _this.onclose(event);
@@ -2537,21 +2531,23 @@ ReconnectingWebSocket = (function() {
     this.ws.onmessage = function(event) {
       return _this.onmessage(event);
     };
-    return this.ws.onerror = function(event) {
+    this.ws.onerror = function(event) {
       return _this.onerror(event);
+    };
+    return this.ws.onopen = function(event) {
+      _this.onopen(event);
+      return _this.processMessageBufferInterval = setInterval(_this.processMessageBuffer, 128);
     };
   };
 
-  ReconnectingWebSocket.prototype.workQueue = function() {
-    var error, message;
+  ReconnectingWebSocket.prototype.processMessageBuffer = function() {
+    var error, message, _results;
 
     if (this.ws.readyState === 1) {
+      _results = [];
       while (message = this.messageBuffer.shift()) {
         try {
-          this.ws.send(message);
-          this.onsend({
-            sent: message
-          });
+          _results.push(this.ws.send(message));
         } catch (_error) {
           error = _error;
           log.debug("unable to send message, putting it back on the q");
@@ -2560,14 +2556,14 @@ ReconnectingWebSocket = (function() {
           break;
         }
       }
+      return _results;
     } else {
-      this.connect();
+      return this.connect();
     }
-    return setTimeout(this.workQueue, 128);
   };
 
-  ReconnectingWebSocket.prototype.send = function(data) {
-    return this.messageBuffer.push(data);
+  ReconnectingWebSocket.prototype.send = function(message) {
+    return this.messageBuffer.push(message);
   };
 
   ReconnectingWebSocket.prototype.close = function() {
@@ -2577,15 +2573,11 @@ ReconnectingWebSocket = (function() {
 
   ReconnectingWebSocket.prototype.onopen = function(event) {};
 
-  ReconnectingWebSocket.prototype.onclose = function(event) {};
-
-  ReconnectingWebSocket.prototype.onreconnect = function(event) {};
-
   ReconnectingWebSocket.prototype.onmessage = function(event) {};
 
-  ReconnectingWebSocket.prototype.onerror = function(event) {};
+  ReconnectingWebSocket.prototype.onclose = function(event) {};
 
-  ReconnectingWebSocket.prototype.onsend = function(event) {};
+  ReconnectingWebSocket.prototype.onerror = function(event) {};
 
   return ReconnectingWebSocket;
 
