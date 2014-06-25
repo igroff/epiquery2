@@ -1,0 +1,14 @@
+{"queryId":"basicSocketQueryId","message":"beginquery"}
+{"queryId":"basicSocketQueryId","message":"beginrowset"}
+{"queryId":"basicSocketQueryId","columns":[{"value":1,"name":"Res1"}],"message":"row"}
+{"queryId":"basicSocketQueryId","message":"endrowset"}
+{"queryId":"basicSocketQueryId","message":"beginrowset"}
+{"queryId":"basicSocketQueryId","columns":[{"value":2,"name":"Res2"}],"message":"row"}
+{"queryId":"basicSocketQueryId","message":"endrowset"}
+{"queryId":"basicSocketQueryId","message":"beginrowset"}
+{"queryId":"basicSocketQueryId","columns":[{"value":3,"name":"Res3"}],"message":"row"}
+{"queryId":"basicSocketQueryId","message":"endrowset"}
+{"queryId":"basicSocketQueryId","message":"beginrowset"}
+{"queryId":"basicSocketQueryId","columns":[{"value":4,"name":"Res4"}],"message":"row"}
+{"queryId":"basicSocketQueryId","message":"endrowset"}
+{"queryId":"basicSocketQueryId","message":"endquery"}

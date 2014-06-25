@@ -5,7 +5,7 @@
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <title></title>
-  <script src="/static/js/epiclient.js"></script>
+  <script src="/static/js/epiclient_v2.js"></script>
   <script src="/static/js/angular.min.js"></script>
   <script type="text/javascript">
     function show(message){
@@ -19,7 +19,9 @@
       body.appendChild(container);
     }
     // this is only global for testing purposes
-    client = new EpiClient("ws://localhost:8080/sockjs/websocket")
+    // the significant change here (from v1) is that the client takes
+    // an array of urls to connect to
+    client = new EpiClient(["ws://localhost:8080/sockjs/websocket"]);
     client.on('row', function(r) { show(r); });
     client.on('close', show);
     client.on('beginquery', show);
@@ -30,6 +32,9 @@
     angular.module('theApp', []).controller(
       'ConfigController',
       function($http, $scope){
+        $scope.query = function(){
+          client.query("mysql", "/test/mysql_servername");
+        }
         $http({method:'GET', url:'/diagnostic'}).
           success(function(data, status, headers, config){
             $scope.connectionNames = data.connections;
@@ -42,6 +47,7 @@
 </head>
 <body>
   <div id="connections" ng-controller="ConfigController">
+    <button ng-click="query()">Query!</button>
     <h4>Available Connections</h4>
     <ul>
       <li ng-repeat="name in connectionNames"> {{name}} </li>

@@ -1,0 +1,2 @@
+#! /usr/bin/env bash
+./difftest/bin/wsRunner.coffee mysql '/test/mysql_multiple_simple_select'

@@ -5,6 +5,7 @@ EventEmitter  = require('events').EventEmitter
 _             = require 'underscore'
 clients       = require '../../src/clients/EpiClient.coffee'
 optimist      = require 'optimist'
+Q             = require 'q'
 
 EpiBufferingClient = clients.EpiBufferingClient
 EpiClient = clients.EpiClient
@@ -24,7 +25,10 @@ c.rowOutput = []
 c.dataOutput = []
 c.errorOutput = []
 
-exitWhenDone = _.after(repeatCount, () ->
+executionComplete = Q.defer()
+callMeTillDone = _.after( repeatCount, executionComplete.resolve )
+
+dumpOutput = () ->
   console.log c.beginqueryOutput
   console.log c.endqueryOutput
 
@@ -35,7 +39,7 @@ exitWhenDone = _.after(repeatCount, () ->
   for error in c.errorOutput
     console.log error
   process.exit 0
-)
+
 c.on 'beginquery', (msg) ->
   c.beginqueryOutput = 'beginquery' + JSON.stringify msg
 c.on 'row', (msg) ->
@@ -44,7 +48,7 @@ c.on 'data', (msg) ->
   c.rowOutput.push 'data' + JSON.stringify msg
 c.on 'endquery', (msg) ->
   c.endqueryOutput = 'endquery' + JSON.stringify msg
-  exitWhenDone()
+  callMeTillDone()
 c.on 'error', (msg) ->
   c.errorOutput.push 'error' + JSON.stringify msg
 
@@ -52,3 +56,10 @@ if repeatCount is 1
   c.query(connectionName, template, data, "basicSocketQueryId")
 else
   c.query(connectionName, template, data, "basicSocketQueryId#{num}") for num in [1..repeatCount]
+
+timedOut = ->
+  console.log "timed out!"
+  process.exit 1
+
+executionComplete.promise.then dumpOutput
+setTimeout timedOut, 5000

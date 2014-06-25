@@ -34,6 +34,25 @@ app.get '/diagnostic', (req, res) ->
     connections: _.pluck(config.connections, 'name')
   res.send response
 
+app.get '/templates', (req, res) ->
+  response =
+    templates: []
+  res.send response
+
+app.get '/stats', (req, res) ->
+  stats =
+    # execution time data is a object contiaining 
+    # "templateName": <CircularBuffer of recent exedution times>
+    # properties
+    recentExecutionTimes: _.map core.getQueryExecutionTimes, (v, k, l) ->
+      ret = {}
+      ret[k] = "#{v}"
+      ret
+    recentQueries: core.QueryStats.buffer.getEntries()
+    inflightQueries: core.getInflightQueries()
+    serverTime: new Date()
+  res.send stats
+
 httpRequestHandler = (req, res) ->
   clientId = req.param 'client_id'
   c = new Context()
@@ -48,7 +67,7 @@ httpRequestHandler = (req, res) ->
 socketServer.on 'connection', (conn) ->
   log.debug "we got a client"
   conn.on 'data', (message) ->
-    log.debug "inbound sockjs message #{message}"
+    log.debug "inbound message #{message}"
     message = JSON.parse(message)
     ctxParms =
       templateName: message.templateName

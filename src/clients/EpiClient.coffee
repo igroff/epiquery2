@@ -1,14 +1,8 @@
 EventEmitter      = require('events').EventEmitter
 _                 = require 'underscore'
 log               = require 'simplog'
-WebSocket         = require 'ws'
+WebSocket         = require './reconnecting-websocket.litcoffee'
 
-
-socketState = 
-  CONNECTING: 0
-  OPEN: 1
-  CLOSING: 2
-  CLOSED: 3
 
 
 class EpiClient extends EventEmitter
@@ -16,16 +10,20 @@ class EpiClient extends EventEmitter
     @connect()
 
   connect: =>
-    return if @ws?.readyState == socketState.CONNECTING
-    
+    # we have a couple possible implementations here, HuntingWebsocket
+    # expects an array of urls, so we make that if needed
+    if WebSocket.name is "HuntingWebsocket"
+      if not _.isArray(@url)
+        @url = [@url]
     @ws = new WebSocket(@url)
     @queryId = 0
     @ws.onmessage = @onMessage
     @ws.onclose = @onClose
     @ws.onopen = () =>
-      log.info "Epiclient connection opened"
+      log.debug "Epiclient connection opened"
     @ws.onerror = (err) ->
-      log.error "ws error: ", err
+      log.error "EpiClient socket error: ", err
+    @ws.onsend = @onsend
 
   query: (connectionName, template, data, queryId=null) =>
     req =
@@ -34,16 +32,12 @@ class EpiClient extends EventEmitter
       data: data
     req.queryId = null || queryId
     req.closeOnEnd = data.closeOnEnd if data
+    # if someone has asked us to close on end, we want our fancy
+    # underlying reconnectint sockets to not reconnect
+    @ws.forceClose = req.closeOnEnd
     
-    if @ws.readyState == socketState.OPEN
-      try 
-        @ws.send JSON.stringify(req)
-      catch ex
-        @connect()
-        setTimeout @query, 1000, connectionName, template, data, queryId
-    else
-      @connect()
-      setTimeout @query, 1000, connectionName, template, data, queryId
+    log.debug "executing query: #{template} data:#{JSON.stringify(data)}"
+    @ws.send JSON.stringify(req)
 
   onMessage: (message) =>
     # if the browser has wrapped this for use, we'll be interested in its
@@ -54,9 +48,8 @@ class EpiClient extends EventEmitter
     if handler
       handler(message)
   
-  onClose: () => 
-    @emit 'close', { reconnecting: true }
-    @connect()
+  onClose: () =>
+    @emit 'close'
 
   onrow: (msg) => @emit 'row', msg
   ondata: (msg) => @emit 'data', msg
@@ -64,10 +57,11 @@ class EpiClient extends EventEmitter
   onendquery: (msg) => @emit 'endquery', msg
   onerror: (msg) => @emit 'error', msg
   onbeginrowset: (msg) => @emit 'beginrowset', msg
+  onsend: (msg) => @emit 'send', msg
 
 class EpiBufferingClient extends EpiClient
-  constructor: (@host, @port=80) ->
-    super(@host, @port)
+  constructor: (@url) ->
+    super(@url)
     @results = {}
 
   onrow: (msg) =>

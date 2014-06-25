@@ -5,7 +5,7 @@
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <title></title>
-  <script src="/static/js/epiclient.js"></script>
+  <script src="/static/js/epiclient_v2.js"></script>
   <script src="/static/js/angular.min.js"></script>
   <script type="text/javascript">
     function show(message){
@@ -19,12 +19,7 @@
       body.appendChild(container);
     }
     // this is only global for testing purposes
-    client = new EpiClient("ws://localhost:8080/sockjs/websocket")
-    client.on('row', function(r) { show(r); });
-    client.on('close', show);
-    client.on('beginquery', show);
-    client.on('endquery', show);
-    client.on('beginResultSet', show);
+    client = new EpiBufferingClient("ws://localhost:8080/sockjs/websocket")
     client.query("mysql", "/test/mysql_servername");
 
     angular.module('theApp', []).controller(
