@@ -11,7 +11,8 @@ ws = new ReconnectingWebSocket('ws://...');
 ##ws
 A reference to the contained WebSocket in case you need to poke under the hood.
 
-This may work on the client or the server.
+We're allowing this to work in a browser or not by providing services via
+ws if we don't already have a WebSocket
 
     WebSocket = WebSocket or require('ws')
 
@@ -22,8 +23,6 @@ This may work on the client or the server.
         @connect()
         @processMessageBufferInterval
   
-The all powerful connect function, sets up events and error handling.
-
       connect: () =>
         try
             # null this out because it's the only thing that could
@@ -39,11 +38,19 @@ The all powerful connect function, sets up events and error handling.
         @ws.onerror = (event) => @onerror(event)
         @ws.onopen = (event) =>
           @onopen(event)
-          @processMessageBufferInterval =
-            setInterval @processMessageBuffer, 128
-
+          @processMessageBuffer()
   
       processMessageBuffer: () =>
+        # if you call us, and were not already 'running' we start and return
+        # letting the 'normal' path process any messages
+        if not @processMessageBufferInterval
+          @processMessageBufferInterval =
+            setInterval @processMessageBuffer, 128
+          return
+      
+        # first we check to see if we're open, there appears to be a 
+        # error raised on send if the socket is not open, this error
+        # is uncatchable at the time of this writing, so we check.
         if @ws.readyState is 1 # open
           while message = @messageBuffer.shift()
             try
@@ -53,11 +60,17 @@ The all powerful connect function, sets up events and error handling.
               @messageBuffer.push message
               @connect()
               break
+        # it's not open so we'll reconnect and let the next pass pick up
+        # any messages
         else
           @connect()
 
       send: (message) =>
         @messageBuffer.push message
+        # process messages will either immediately process any messages we have
+        # start the 'processMessageBuffer worker' or trigger a reconnect in a
+        # more timely manner
+        @processMessageBuffer()
 
       close: ->
         @forceClose = true

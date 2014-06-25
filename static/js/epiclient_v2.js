@@ -2536,13 +2536,17 @@ ReconnectingWebSocket = (function() {
     };
     return this.ws.onopen = function(event) {
       _this.onopen(event);
-      return _this.processMessageBufferInterval = setInterval(_this.processMessageBuffer, 128);
+      return _this.processMessageBuffer();
     };
   };
 
   ReconnectingWebSocket.prototype.processMessageBuffer = function() {
     var error, message, _results;
 
+    if (!this.processMessageBufferInterval) {
+      this.processMessageBufferInterval = setInterval(this.processMessageBuffer, 128);
+      return;
+    }
     if (this.ws.readyState === 1) {
       _results = [];
       while (message = this.messageBuffer.shift()) {
@@ -2563,7 +2567,8 @@ ReconnectingWebSocket = (function() {
   };
 
   ReconnectingWebSocket.prototype.send = function(message) {
-    return this.messageBuffer.push(message);
+    this.messageBuffer.push(message);
+    return this.processMessageBuffer();
   };
 
   ReconnectingWebSocket.prototype.close = function() {
