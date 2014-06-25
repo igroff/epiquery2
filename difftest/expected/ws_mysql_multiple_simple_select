@@ -1,0 +1,8 @@
+{ queryId: 'pants', message: 'beginquery' }
+{ queryId: 'morePants', message: 'beginquery' }
+resultSet[[{"1":1}],[{"2":2}]]
+resultSet[[{"1":1}],[{"2":2}]]
+beginquery{"queryId":"nonBufferingClientQueryId","message":"beginquery"}
+endquery{"queryId":"nonBufferingClientQueryId","message":"endquery"}
+row{"queryId":"nonBufferingClientQueryId","columns":{"1":1},"message":"row"}
+row{"queryId":"nonBufferingClientQueryId","columns":{"2":2},"message":"row"}
