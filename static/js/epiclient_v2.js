@@ -2378,10 +2378,6 @@ EpiClient = (function(_super) {
       data: data
     };
     req.queryId = null || queryId;
-    if (data) {
-      req.closeOnEnd = data.closeOnEnd;
-    }
-    this.ws.forceClose = req.closeOnEnd;
     log.debug("executing query: " + template + " data:" + (JSON.stringify(data)));
     return this.ws.send(JSON.stringify(req));
   };

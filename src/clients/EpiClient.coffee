@@ -31,11 +31,6 @@ class EpiClient extends EventEmitter
       connectionName: connectionName
       data: data
     req.queryId = null || queryId
-    req.closeOnEnd = data.closeOnEnd if data
-    # if someone has asked us to close on end, we want our fancy
-    # underlying reconnectint sockets to not reconnect
-    @ws.forceClose = req.closeOnEnd
-    
     log.debug "executing query: #{template} data:#{JSON.stringify(data)}"
     @ws.send JSON.stringify(req)
 
