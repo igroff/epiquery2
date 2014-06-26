@@ -2331,7 +2331,6 @@ EpiClient = (function(_super) {
 
   function EpiClient(url) {
     this.url = url;
-    this.onsend = __bind(this.onsend, this);
     this.onbeginrowset = __bind(this.onbeginrowset, this);
     this.onerror = __bind(this.onerror, this);
     this.onendquery = __bind(this.onendquery, this);
@@ -2360,10 +2359,9 @@ EpiClient = (function(_super) {
     this.ws.onopen = function() {
       return log.debug("Epiclient connection opened");
     };
-    this.ws.onerror = function(err) {
+    return this.ws.onerror = function(err) {
       return log.error("EpiClient socket error: ", err);
     };
-    return this.ws.onsend = this.onsend;
   };
 
   EpiClient.prototype.query = function(connectionName, template, data, queryId) {
@@ -2423,10 +2421,6 @@ EpiClient = (function(_super) {
 
   EpiClient.prototype.onbeginrowset = function(msg) {
     return this.emit('beginrowset', msg);
-  };
-
-  EpiClient.prototype.onsend = function(msg) {
-    return this.emit('send', msg);
   };
 
   return EpiClient;

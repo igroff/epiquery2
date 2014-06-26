@@ -23,7 +23,6 @@ class EpiClient extends EventEmitter
       log.debug "Epiclient connection opened"
     @ws.onerror = (err) ->
       log.error "EpiClient socket error: ", err
-    @ws.onsend = @onsend
 
   query: (connectionName, template, data, queryId=null) =>
     req =
@@ -52,7 +51,6 @@ class EpiClient extends EventEmitter
   onendquery: (msg) => @emit 'endquery', msg
   onerror: (msg) => @emit 'error', msg
   onbeginrowset: (msg) => @emit 'beginrowset', msg
-  onsend: (msg) => @emit 'send', msg
 
 class EpiBufferingClient extends EpiClient
   constructor: (@url) ->
