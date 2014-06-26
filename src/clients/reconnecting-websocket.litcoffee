@@ -21,33 +21,33 @@ ws if we don't already have a WebSocket
         @forceClose = false
         @messageBuffer = []
         @connect()
-        @processMessageBufferInterval
+
+we try to keep our messasges going for as long as we have any, as a precaution
+we check periodically and process any pending messages
+
+        setInterval @processMessageBuffer, 512
   
       connect: () =>
-        try
-            # null this out because it's the only thing that could
-            # keep the socket from being GCd
-            @ws?.onmessage = null
-            @ws?.close()
-        catch error
-          log.error "unexpected error cleaning up old socket #{error}"
-        @ws = new WebSocket(@url)
 
+we will ignore connects if we've explicitly been asked to close
+
+        return if @forceClose
+
+cleaning up anything that might keep our WebSocket from being GC
+
+        @ws?.onclose = null
+        @ws?.onerror = null
+        @ws = new WebSocket(@url)
         @ws.onclose = (event) =>  @onclose(event) if @forceClose
         @ws.onmessage = (event) => @onmessage(event)
-        @ws.onerror = (event) => @onerror(event)
+        @ws.onerror = (event) => @connect()
         @ws.onopen = (event) =>
           @onopen(event)
           @processMessageBuffer()
   
       processMessageBuffer: () =>
-        # if you call us, and were not already 'running' we start and return
-        # letting the 'normal' path process any messages
-        if not @processMessageBufferInterval
-          @processMessageBufferInterval =
-            setInterval @processMessageBuffer, 128
-          return
-      
+        # we just return if there are no messages to send
+        return if @messageBuffer.length is 0
         # first we check to see if we're open, there appears to be a 
         # error raised on send if the socket is not open, this error
         # is uncatchable at the time of this writing, so we check.
@@ -55,14 +55,19 @@ ws if we don't already have a WebSocket
           while message = @messageBuffer.shift()
             try
               @ws.send message
+              log.info "message away"
             catch error
-              log.debug "unable to send message, putting it back on the q"
+              log.error "unable to send message, putting it back on the q"
               @messageBuffer.push message
               @connect()
               break
-        # it's not open so we'll reconnect and let the next pass pick up
-        # any messages
+        else if @ws.readyState is 0 # connecting
+          log.error "connecting, waiting"
+          return # do nothing, let it connect
         else
+          log.error "unexpected ready state #{@ws.readyState}, reconnecting"
+          # it's not open so we'll reconnect and let the next pass pick up
+          # any messages
           @connect()
 
       send: (message) =>

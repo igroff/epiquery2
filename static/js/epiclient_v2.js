@@ -2494,23 +2494,21 @@ ReconnectingWebSocket = (function() {
     this.forceClose = false;
     this.messageBuffer = [];
     this.connect();
-    this.processMessageBufferInterval;
+    setInterval(this.processMessageBuffer, 512);
   }
 
   ReconnectingWebSocket.prototype.connect = function() {
-    var error, _ref, _ref1,
+    var _ref, _ref1,
       _this = this;
 
-    try {
-      if ((_ref = this.ws) != null) {
-        _ref.onmessage = null;
-      }
-      if ((_ref1 = this.ws) != null) {
-        _ref1.close();
-      }
-    } catch (_error) {
-      error = _error;
-      log.error("unexpected error cleaning up old socket " + error);
+    if (this.forceClose) {
+      return;
+    }
+    if ((_ref = this.ws) != null) {
+      _ref.onclose = null;
+    }
+    if ((_ref1 = this.ws) != null) {
+      _ref1.onerror = null;
     }
     this.ws = new WebSocket(this.url);
     this.ws.onclose = function(event) {
@@ -2522,7 +2520,7 @@ ReconnectingWebSocket = (function() {
       return _this.onmessage(event);
     };
     this.ws.onerror = function(event) {
-      return _this.onerror(event);
+      return _this.connect();
     };
     return this.ws.onopen = function(event) {
       _this.onopen(event);
@@ -2533,25 +2531,28 @@ ReconnectingWebSocket = (function() {
   ReconnectingWebSocket.prototype.processMessageBuffer = function() {
     var error, message, _results;
 
-    if (!this.processMessageBufferInterval) {
-      this.processMessageBufferInterval = setInterval(this.processMessageBuffer, 128);
+    if (this.messageBuffer.length === 0) {
       return;
     }
     if (this.ws.readyState === 1) {
       _results = [];
       while (message = this.messageBuffer.shift()) {
         try {
-          _results.push(this.ws.send(message));
+          this.ws.send(message);
+          _results.push(log.info("message away"));
         } catch (_error) {
           error = _error;
-          log.debug("unable to send message, putting it back on the q");
+          log.error("unable to send message, putting it back on the q");
           this.messageBuffer.push(message);
           this.connect();
           break;
         }
       }
       return _results;
+    } else if (this.ws.readyState === 0) {
+      log.error("connecting, waiting");
     } else {
+      log.error("unexpected ready state " + this.ws.readyState + ", reconnecting");
       return this.connect();
     }
   };
