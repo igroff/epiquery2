@@ -1,0 +1,174 @@
+<!DOCTYPE HTML>
+<meta charset="UTF-8">
+
+<html lang="en" ng-app='theApp'>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title></title>
+  <script type="text/javascript">
+    function MakeWebSocketReconnecting(){
+      var OriginalWebSocket = WebSocket;
+      function ReconnectingWebSocket(url, protocols){
+
+        // WS Event Methods
+        this.onopen    = function () {};
+        this.onerror   = function () {};
+        this.onclose   = function () {};
+        this.onmessage = function () {};
+       
+        // WS Interface Elements
+        this.readyState = OriginalWebSocket.CONNECTING;
+        this.url        = url;
+        this.protocols  = protocols || [];
+        this.extensions = "";
+        this.binaryType = null;
+        this.bufferedAmount = 0;
+
+        // this event will be called in the case that a send fails and
+        // the socket must reconnect, the argument will be the data that
+        // failed to send
+        this.onsendfailed = function () {};
+
+        var _me                  = this;
+        var _underlyingWs        = null;
+        var _reconnectOnClose    = true;
+        var _reconnectMeNextTime = false;
+        var _dataTriedToSend     = null;
+
+        _me.connect = function() {
+          if ( _me.underlyingWs != null ){
+            _me.underlyingWs.onerror = null;
+            _me.underlyingWs.onmessage = null;
+            _me.underlyingWs.onclose = null;
+            // we don't need to do anything with onopen because it wouldn't
+            // fire again anyway, and shouldn't keep the socket from getting
+            // GCd
+          }
+          newWs = new OriginalWebSocket(_me.url, _me.protocols);
+          _me.binaryType = newWs.binaryType;
+          _me.extensions = newWs.extensions;
+          _me.bufferedAmount = newWs.bufferedAmount;
+          newWs.onopen  = function(evt){
+            _me.readyState = OriginalWebSocket.OPEN;
+            _me.onopen(evt);
+          }; 
+          // onclose, unless told to close by having our close() method called
+          // we'll ignore the close, and reconnect
+          newWs.onclose = function(evt){
+            if (_me._reconnectOnClose){
+              _me.connect(url);
+            } else {
+              _me.readyState = OriginalWebSocket.CLOSED;
+              _me.onclose(evt);
+            }
+          };
+          newWs.onerror = function(evt) { 
+            _reconnectMeNextTime = true;
+            _me.onerror(evt);
+            // if we get here and we have something we need to tell our 
+            // caller
+            if ( _me._dataTriedToSend != null ){
+              _me.onsendfailed(_me._dataTriedToSend);
+              _me._dataTriedToSend = null;
+            }
+          }
+          newWs.onmessage = _me.onmessage;
+          _me._underlyingWs = newWs;
+        };
+
+
+        _me.send = function(data){
+          // keep track of the data were trying to send so we can, if we
+          // end up in onerror without it having sent, tell the caller
+          _me._dataTriedToSend = data;
+          // if the socket isn't open, we'll just reconnect and let the
+          // caller try again, while telling them what failed to send via
+          // onsendfailed
+          if (_me._underlyingWs.readyState != OriginalWebSocket.OPEN){
+            _me.connect();
+            _me.onsendfailed(data);
+          } else {
+            // otherwise we try to send, and if we have a failure
+            // we'll go ahead and reconnect, telling our caller
+            // all about how we failed via onsendfailed
+            try {
+              _me._underlyingWs.send(data);
+              _me.bufferedAmount = _me._underlyingWs.bufferedAmount;
+            } catch (error) {
+              _me.connect();
+              _me.onsendfailed(data);
+            }
+          }
+          // if we've made it to here we've already either
+          // sent the data, or raised onsendfailed with the data
+          _me._dataTriedToSend = null;
+        };
+
+        _me.close = function () {
+          _me._reconnectOnClose = false;
+          _me._underlyingWs.close();
+        }
+        _me.connect();
+      }
+      // WS Constants the the 'class' Level
+      ReconnectingWebSocket.CONNECTING = OriginalWebSocket.CONNECTING;
+      ReconnectingWebSocket.OPEN       = OriginalWebSocket.OPEN;
+      ReconnectingWebSocket.CLOSING    = OriginalWebSocket.CLOSING;
+      ReconnectingWebSocket.CLOSED     = OriginalWebSocket.CLOSED;
+
+      WebSocket = ReconnectingWebSocket; 
+      UnMakeWebSocketReconnecting = function(){
+        WebSocket = OriginalWebSocket;
+        UnMakeWebSocketReconnecting = null;
+      }
+    }
+    MakeWebSocketReconnecting();
+  </script>
+  <script src="/static/js/angular.min.js"></script>
+  <script type="text/javascript">
+    function show(message){
+      console.log(message);
+      var container = document.createElement('p');
+      if (typeof(message) === 'object'){
+        message = JSON.stringify(message);
+      }
+      container.innerHTML = message;
+      body = document.getElementsByTagName('body')[0];
+      body.appendChild(container);
+    }
+    // this is only global for testing purposes
+    // the significant change here (from v1) is that the client takes
+    // an array of urls to connect to
+    var ws = new WebSocket("ws://localhost:8080/sockjs/websocket");
+    var dataThatWasntSent = null;
+    ws.onmessage = function (m) { show(m); }
+    ws.onerror = function (e) { show("Error: " + e); }
+    ws.onopen = function(e) {
+      show("socket has opened");
+      if ( dataThatWasntSent != null ){
+        ws.send(dataThatWasntSent);
+        dataThatWasntSent = null;
+      }
+    };
+    ws.onsendfailed = function (data) {
+      dataThatWasntSent = data;
+    };
+    ws.onclose = function () { show("socket has closed"); } 
+
+    angular.module('theApp', []).controller(
+      'ConfigController',
+      function($http, $scope){
+        $scope.ws = ws;
+        $scope.ping = function() { ws.send("ping"); };
+        $scope.die = function() { ws.send("close"); };
+      }
+    );
+  </script>
+</head>
+<body>
+  <div ng-controller="ConfigController">
+    <button ng-click="ping()">Send Ping</button>
+    <button ng-click="die()">Die!</button>
+  </div>
+</body>
+</html>
