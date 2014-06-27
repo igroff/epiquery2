@@ -32,7 +32,6 @@
         var _me                  = this;
         var _underlyingWs        = null;
         var _reconnectOnClose    = true;
-        var _reconnectMeNextTime = false;
         var _dataTriedToSend     = null;
 
         _me.connect = function() {
@@ -63,7 +62,6 @@
             }
           };
           newWs.onerror = function(evt) { 
-            _reconnectMeNextTime = true;
             _me.onerror(evt);
             // if we get here and we have something we need to tell our 
             // caller
