@@ -18,7 +18,6 @@
 
         var _underlyingWs        = null;
         var _reconnectOnClose    = true;
-        var _dataTriedToSend     = null;
         var _reconnectAttempts   = 0;
 
         Object.defineProperty( this, 'url',
@@ -44,6 +43,7 @@
         }
 
         function connect() {
+          // an attempt to avoid get extraneous events
           if ( _underlyingWs != null ){
             _underlyingWs.onerror = null;
             _underlyingWs.onmessage = null;
