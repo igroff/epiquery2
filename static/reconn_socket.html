@@ -38,6 +38,7 @@
         );
 
         function reconnect() {
+          // exponential backoff on delay, capped at a wait of 1024 ms
           var delay = _reconnectAttempts++ > 9 ? 1024 : Math.pow(2, _reconnectAttempts);
           setTimeout(connect, delay);
         }
