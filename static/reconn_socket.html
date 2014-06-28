@@ -15,98 +15,89 @@
         this.onerror   = function () {};
         this.onclose   = function () {};
         this.onmessage = function () {};
-       
-        // WS Interface Elements
-        this.readyState = OriginalWebSocket.CONNECTING;
-        this.url        = url;
-        this.protocols  = protocols || [];
-        this.extensions = "";
-        this.binaryType = null;
-        this.bufferedAmount = 0;
 
-        // this event will be called in the case that a send fails and
-        // the socket must reconnect, the argument will be the data that
-        // failed to send
-        this.onsendfailed = function () {};
-
-        var _me                  = this;
         var _underlyingWs        = null;
         var _reconnectOnClose    = true;
         var _dataTriedToSend     = null;
+        var _reconnectAttempts   = 0;
 
-        _me.connect = function() {
-          if ( _me.underlyingWs != null ){
-            _me.underlyingWs.onerror = null;
-            _me.underlyingWs.onmessage = null;
-            _me.underlyingWs.onclose = null;
+        Object.defineProperty( this, 'url',
+          { get: function(){ return _underlyingWs.url; }}
+        );
+        Object.defineProperty( this, 'readyState',
+          { get: function(){ return _underlyingWs.readyState; }}
+        );
+        Object.defineProperty( this, 'binaryType',
+          { get: function(){ return _underlyingWs.binaryType; }}
+        );
+        Object.defineProperty( this, 'extensions',
+          { get: function(){ return _underlyingWs.extensions; }}
+        );
+        Object.defineProperty( this, 'bufferedAmount',
+          { get: function(){ return _underlyingWs.bufferedAmount; }}
+        );
+
+        function reconnect() {
+          var delay = _reconnectAttempts++ > 9 ? 1024 : Math.pow(2, _reconnectAttempts);
+          setTimeout(connect, delay);
+        }
+
+        function connect() {
+          if ( _underlyingWs != null ){
+            _underlyingWs.onerror = null;
+            _underlyingWs.onmessage = null;
+            _underlyingWs.onclose = null;
             // we don't need to do anything with onopen because it wouldn't
             // fire again anyway, and shouldn't keep the socket from getting
             // GCd
           }
-          newWs = new OriginalWebSocket(_me.url, _me.protocols);
-          _me.binaryType = newWs.binaryType;
-          _me.extensions = newWs.extensions;
-          _me.bufferedAmount = newWs.bufferedAmount;
+          newWs = new OriginalWebSocket(url, protocols || []);
           newWs.onopen  = function(evt){
-            _me.readyState = OriginalWebSocket.OPEN;
-            _me.onopen(evt);
-          }; 
+            this.onopen(evt);
+            _reconnectAttempts = 0; // reset
+          }.bind(this); 
+
           // onclose, unless told to close by having our close() method called
           // we'll ignore the close, and reconnect
           newWs.onclose = function(evt){
-            if (_me._reconnectOnClose){
-              _me.connect(url);
+            if (_reconnectOnClose){
+              reconnect();
             } else {
-              _me.readyState = OriginalWebSocket.CLOSED;
-              _me.onclose(evt);
+              this.onclose(evt);
             }
-          };
-          newWs.onerror = function(evt) { 
-            _me.onerror(evt);
-            // if we get here and we have something we need to tell our 
-            // caller
-            if ( _me._dataTriedToSend != null ){
-              _me.onsendfailed(_me._dataTriedToSend);
-              _me._dataTriedToSend = null;
-            }
-          }
-          newWs.onmessage = _me.onmessage;
-          _me._underlyingWs = newWs;
+          }.bind(this);
+
+          newWs.onerror = function(evt) { this.onerror(evt); }.bind(this);
+
+          newWs.onmessage = this.onmessage;
+          _underlyingWs = newWs;
         };
+        connect = connect.bind(this);
 
 
-        _me.send = function(data){
-          // keep track of the data were trying to send so we can, if we
-          // end up in onerror without it having sent, tell the caller
-          _me._dataTriedToSend = data;
+       this.send = function (data){
           // if the socket isn't open, we'll just reconnect and let the
-          // caller try again, while telling them what failed to send via
-          // onsendfailed
-          if (_me._underlyingWs.readyState != OriginalWebSocket.OPEN){
-            _me.connect();
-            _me.onsendfailed(data);
+          // caller try again
+          if (_underlyingWs.readyState != OriginalWebSocket.OPEN){
+            reconnect();
           } else {
             // otherwise we try to send, and if we have a failure
             // we'll go ahead and reconnect, telling our caller
             // all about how we failed via onsendfailed
             try {
-              _me._underlyingWs.send(data);
-              _me.bufferedAmount = _me._underlyingWs.bufferedAmount;
+              _underlyingWs.send(data);
             } catch (error) {
-              _me.connect();
-              _me.onsendfailed(data);
+              reconnect();
             }
           }
-          // if we've made it to here we've already either
-          // sent the data, or raised onsendfailed with the data
-          _me._dataTriedToSend = null;
-        };
+        }.bind(this);
 
-        _me.close = function () {
-          _me._reconnectOnClose = false;
-          _me._underlyingWs.close();
-        }
-        _me.connect();
+        this.close = function () {
+          _reconnectOnClose = false;
+          _underlyingWs.close();
+        }.bind(this)
+
+        setTimeout(connect, 0);
       }
       // WS Constants the the 'class' Level
       ReconnectingWebSocket.CONNECTING = OriginalWebSocket.CONNECTING;
@@ -115,7 +106,7 @@
       ReconnectingWebSocket.CLOSED     = OriginalWebSocket.CLOSED;
 
       WebSocket = ReconnectingWebSocket; 
-      UnMakeWebSocketReconnecting = function(){
+      window.UnMakeWebSocketReconnecting = function(){
         WebSocket = OriginalWebSocket;
         UnMakeWebSocketReconnecting = null;
       }
@@ -138,14 +129,17 @@
     // the significant change here (from v1) is that the client takes
     // an array of urls to connect to
     var ws = new WebSocket("ws://localhost:8080/sockjs/websocket");
+    window.Ian = ws;
     var dataThatWasntSent = null;
     ws.onmessage = function (m) { show(m); }
-    ws.onerror = function (e) { show("Error: " + e); }
+    ws.onerror = function (e) { show("Error: " + e); console.log(e); }
     ws.onopen = function(e) {
-      show("socket has opened");
       if ( dataThatWasntSent != null ){
+        show("socket has opened with data: " + dataThatWasntSent);
         ws.send(dataThatWasntSent);
         dataThatWasntSent = null;
+      } else {
+        show("socket has opened");
       }
     };
     ws.onsendfailed = function (data) {
