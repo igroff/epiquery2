@@ -9,93 +9,111 @@
     function MakeWebSocketReconnecting(){
       var OriginalWebSocket = WebSocket;
       function ReconnectingWebSocket(url, protocols){
-
-        // WS Event Methods
+        RECONNECTING = 99;
+        ERRORED = 100;
+        // WS Events
         this.onopen    = function () {};
         this.onerror   = function () {};
         this.onclose   = function () {};
         this.onmessage = function () {};
 
-        var _underlyingWs        = null;
-        var _reconnectOnClose    = true;
-        var _reconnectAttempts   = 0;
+        var underlyingWs        = null;
+        var reconnectOnClose    = true;
+        var reconnectAttempts   = 0;
+        var readyState         = -1;
+
+        this.ondatanotsent = function() {};
 
         Object.defineProperty( this, 'url',
-          { get: function(){ return _underlyingWs.url; }}
+          { get: function(){ return underlyingWs.url; }}
         );
         Object.defineProperty( this, 'readyState',
-          { get: function(){ return _underlyingWs.readyState; }}
+          { get: function(){ return readyState; }}
         );
         Object.defineProperty( this, 'binaryType',
-          { get: function(){ return _underlyingWs.binaryType; }}
+          { get: function(){ return underlyingWs.binaryType; }}
         );
         Object.defineProperty( this, 'extensions',
-          { get: function(){ return _underlyingWs.extensions; }}
+          { get: function(){ return underlyingWs.extensions; }}
         );
         Object.defineProperty( this, 'bufferedAmount',
-          { get: function(){ return _underlyingWs.bufferedAmount; }}
+          { get: function(){ return underlyingWs.bufferedAmount; }}
         );
 
         function reconnect() {
+          if ( readyState === OriginalWebSocket.CONNECTING ||
+               readyState === RECONNECTING || 
+               underlyingWs.readyState === OriginalWebSocket.CONNECTING ){
+            return; }
           // exponential backoff on delay, capped at a wait of 1024 ms
-          var delay = _reconnectAttempts++ > 9 ? 1024 : Math.pow(2, _reconnectAttempts);
+          var delay = reconnectAttempts++ > 9 ? 1024 : Math.pow(2, reconnectAttempts);
+          readyState = RECONNECTING;
           setTimeout(connect, delay);
         }
 
         function connect() {
+          readyState = OriginalWebSocket.CONNECTING;
           // an attempt to avoid get extraneous events
-          if ( _underlyingWs != null ){
-            _underlyingWs.onerror = null;
-            _underlyingWs.onmessage = null;
-            _underlyingWs.onclose = null;
+          if ( underlyingWs != null ){
+            underlyingWs.onerror = null;
+            underlyingWs.onmessage = null;
+            underlyingWs.onclose = null;
             // we don't need to do anything with onopen because it wouldn't
             // fire again anyway, and shouldn't keep the socket from getting
             // GCd
           }
           newWs = new OriginalWebSocket(url, protocols || []);
           newWs.onopen  = function(evt){
+            readyState = OriginalWebSocket.OPEN;
             this.onopen(evt);
-            _reconnectAttempts = 0; // reset
+            reconnectAttempts = 0; // reset
           }.bind(this); 
 
           // onclose, unless told to close by having our close() method called
           // we'll ignore the close, and reconnect
           newWs.onclose = function(evt){
-            if (_reconnectOnClose){
+            readyState = OriginalWebSocket.CLOSED;
+            if (reconnectOnClose){
               reconnect();
             } else {
               this.onclose(evt);
             }
           }.bind(this);
 
-          newWs.onerror = function(evt) { this.onerror(evt); }.bind(this);
+          newWs.onerror = function(evt) {
+            readyState = ERRORED;
+            this.onerror(evt);
+          }.bind(this);
 
           newWs.onmessage = this.onmessage;
-          _underlyingWs = newWs;
+          underlyingWs = newWs;
         };
         connect = connect.bind(this);
 
 
        this.send = function (data){
           // if the socket isn't open, we'll just reconnect and let the
-          // caller try again
-          if (_underlyingWs.readyState != OriginalWebSocket.OPEN){
+          // caller try again cause we know this raises an uncatchable
+          // error
+          if (underlyingWs.readyState != OriginalWebSocket.OPEN){
             reconnect();
+            this.ondatanotsent(data);
           } else {
             // otherwise we try to send, and if we have a failure
             // we'll go ahead and reconnect, telling our caller
             // all about how we failed via onsendfailed
             try {
-              _underlyingWs.send(data);
+              underlyingWs.send(data);
             } catch (error) {
               reconnect();
+              this.ondatanotsent(data);
             }
           }
         }.bind(this);
 
         this.close = function () {
-          _reconnectOnClose = false;
-          _underlyingWs.close();
+          reconnectOnClose = false;
+          underlyingWs.close();
         }.bind(this)
 
         setTimeout(connect, 0);
@@ -134,6 +152,7 @@
     var dataThatWasntSent = null;
     ws.onmessage = function (m) { show(m); }
     ws.onerror = function (e) { show("Error: " + e); console.log(e); }
+    ws.onclose = function () { show("socket has closed"); } 
     ws.onopen = function(e) {
       if ( dataThatWasntSent != null ){
         show("socket has opened with data: " + dataThatWasntSent);
@@ -143,10 +162,9 @@
         show("socket has opened");
       }
     };
-    ws.onsendfailed = function (data) {
+    ws.ondatanotsent = function (data) {
       dataThatWasntSent = data;
     };
-    ws.onclose = function () { show("socket has closed"); } 
 
     angular.module('theApp', []).controller(
       'ConfigController',
