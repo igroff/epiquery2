@@ -50,6 +50,8 @@
           readyState = RECONNECTING;
           setTimeout(connect, delay);
         }
+        // make it 'public' too
+        this.reconnect = reconnect;
 
         function connect() {
           readyState = OriginalWebSocket.CONNECTING;
