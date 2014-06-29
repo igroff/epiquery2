@@ -62,8 +62,8 @@
             // fire again anyway, and shouldn't keep the socket from getting
             // GCd
           }
-          newWs = new OriginalWebSocket(url, protocols || []);
-          newWs.onopen  = function(evt){
+          underlyingWs = new OriginalWebSocket(url, protocols || []);
+          underlyingWs.onopen  = function(evt){
             readyState = OriginalWebSocket.OPEN;
             this.onopen(evt);
             reconnectAttempts = 0; // reset
@@ -71,7 +71,7 @@
 
           // onclose, unless told to close by having our close() method called
           // we'll ignore the close, and reconnect
-          newWs.onclose = function(evt){
+          underlyingWs.onclose = function(evt){
             readyState = OriginalWebSocket.CLOSED;
             if (reconnectOnClose){
               reconnect();
@@ -80,13 +80,12 @@
             }
           }.bind(this);
 
-          newWs.onerror = function(evt) {
+          underlyingWs.onerror = function(evt) {
             readyState = ERRORED;
             this.onerror(evt);
           }.bind(this);
 
-          newWs.onmessage = this.onmessage;
-          underlyingWs = newWs;
+          underlyingWs.onmessage = this.onmessage;
         };
         connect = connect.bind(this);
 
