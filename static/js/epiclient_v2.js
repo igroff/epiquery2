@@ -2313,7 +2313,7 @@ function ws(uri, protocols, opts) {
 if (WebSocket) ws.prototype = WebSocket.prototype;
 
 },{}],9:[function(require,module,exports){
-var EpiBufferingClient, EpiClient, EventEmitter, WebSocket, log, _,
+var EpiBufferingClient, EpiClient, EventEmitter, log, _,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -2324,7 +2324,7 @@ _ = require('underscore');
 
 log = require('simplog');
 
-WebSocket = require('./reconnecting-websocket.litcoffee');
+require("./reconnecting-websocket.js")();
 
 EpiClient = (function(_super) {
   __extends(EpiClient, _super);
@@ -2356,8 +2356,9 @@ EpiClient = (function(_super) {
     this.queryId = 0;
     this.ws.onmessage = this.onMessage;
     this.ws.onclose = this.onClose;
-    this.ws.onopen = function() {
-      return log.debug("Epiclient connection opened");
+    this.ws.onopen = function(evt) {
+      log.debug("Epiclient connection opened");
+      return _this.emit('open', evt);
     };
     return this.ws.onerror = function(err) {
       return log.error("EpiClient socket error: ", err);
@@ -2462,7 +2463,7 @@ module.exports.EpiClient = EpiClient;
 module.exports.EpiBufferingClient = EpiBufferingClient;
 
 
-},{"./reconnecting-websocket.litcoffee":11,"events":1,"simplog":6,"underscore":7}],10:[function(require,module,exports){
+},{"./reconnecting-websocket.js":11,"events":1,"simplog":6,"underscore":7}],10:[function(require,module,exports){
 var clients;
 
 clients = require('./EpiClient.coffee');
@@ -2478,108 +2479,136 @@ if (typeof window !== "undefined" && window !== null) {
 
 
 },{"./EpiClient.coffee":9}],11:[function(require,module,exports){
-var ReconnectingWebSocket, WebSocket, log,
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-
-log = require("simplog");
-
-WebSocket = WebSocket || require('ws');
-
-ReconnectingWebSocket = (function() {
-  function ReconnectingWebSocket(url) {
-    this.url = url;
-    this.send = __bind(this.send, this);
-    this.processMessageBuffer = __bind(this.processMessageBuffer, this);
-    this.connect = __bind(this.connect, this);
-    this.forceClose = false;
-    this.messageBuffer = [];
-    this.connect();
-    setInterval(this.processMessageBuffer, 512);
+function MakeWebSocketReconnecting(){
+  var OriginalWebSocket = null;
+  if ( typeof(WebSocket) === "undefined" ){
+    OriginalWebSocket = require("ws");
+  } else {
+    OriginalWebSocket = WebSocket;
   }
+  function ReconnectingWebSocket(url, protocols){
+    RECONNECTING = 99;
+    ERRORED = 100;
+    // WS Events
+    this.onopen    = function () {};
+    this.onerror   = function () {};
+    this.onclose   = function () {};
+    this.onmessage = function () {};
 
-  ReconnectingWebSocket.prototype.connect = function() {
-    var _ref, _ref1,
-      _this = this;
+    var underlyingWs        = null;
+    var reconnectOnClose    = true;
+    var reconnectAttempts   = 0;
+    var readyState         = -1;
 
-    if (this.forceClose) {
-      return;
+    this.ondatanotsent = function() {};
+
+    Object.defineProperty( this, 'url',
+      { get: function(){ return underlyingWs.url; }}
+    );
+    Object.defineProperty( this, 'readyState',
+      { get: function(){ return readyState; }}
+    );
+    Object.defineProperty( this, 'binaryType',
+      { get: function(){ return underlyingWs.binaryType; }}
+    );
+    Object.defineProperty( this, 'extensions',
+      { get: function(){ return underlyingWs.extensions; }}
+    );
+    Object.defineProperty( this, 'bufferedAmount',
+      { get: function(){ return underlyingWs.bufferedAmount; }}
+    );
+
+    function reconnect() {
+      if ( readyState === OriginalWebSocket.CONNECTING ||
+           readyState === RECONNECTING || 
+           underlyingWs.readyState === OriginalWebSocket.CONNECTING ){
+        return; }
+      // exponential backoff on delay, capped at a wait of 1024 ms
+      var delay = reconnectAttempts++ > 9 ? 1024 : Math.pow(2, reconnectAttempts);
+      readyState = RECONNECTING;
+      setTimeout(connect, delay);
     }
-    if ((_ref = this.ws) != null) {
-      _ref.onclose = null;
-    }
-    if ((_ref1 = this.ws) != null) {
-      _ref1.onerror = null;
-    }
-    this.ws = new WebSocket(this.url);
-    this.ws.onclose = function(event) {
-      if (_this.forceClose) {
-        return _this.onclose(event);
+    // make it 'public' too
+    this.reconnect = reconnect;
+
+    function connect() {
+      readyState = OriginalWebSocket.CONNECTING;
+      // an attempt to avoid get extraneous events
+      if ( underlyingWs !== null ){
+        underlyingWs.onerror = null;
+        underlyingWs.onmessage = null;
+        underlyingWs.onclose = null;
+        // we don't need to do anything with onopen because it wouldn't
+        // fire again anyway, and shouldn't keep the socket from getting
+        // GCd
       }
-    };
-    this.ws.onmessage = function(event) {
-      return _this.onmessage(event);
-    };
-    this.ws.onerror = function(event) {
-      return _this.connect();
-    };
-    return this.ws.onopen = function(event) {
-      _this.onopen(event);
-      return _this.processMessageBuffer();
-    };
-  };
+      underlyingWs = new OriginalWebSocket(url, protocols || []);
+      underlyingWs.onopen  = function(evt){
+        readyState = OriginalWebSocket.OPEN;
+        this.onopen(evt);
+        reconnectAttempts = 0; // reset
+      }.bind(this); 
 
-  ReconnectingWebSocket.prototype.processMessageBuffer = function() {
-    var error, message, _results;
+      // onclose, unless told to close by having our close() method called
+      // we'll ignore the close, and reconnect
+      underlyingWs.onclose = function(evt){
+        readyState = OriginalWebSocket.CLOSED;
+        if (reconnectOnClose){
+          reconnect();
+        } else {
+          this.onclose(evt);
+        }
+      }.bind(this);
 
-    if (this.messageBuffer.length === 0) {
-      return;
+      underlyingWs.onerror = function(evt) {
+        readyState = ERRORED;
+        this.onerror(evt);
+      }.bind(this);
+
+      underlyingWs.onmessage = this.onmessage;
     }
-    if (this.ws.readyState === 1) {
-      _results = [];
-      while (message = this.messageBuffer.shift()) {
+
+
+   this.send = function (data){
+      // if the socket isn't open, we'll just reconnect and let the
+      // caller try again cause we know this raises an uncatchable
+      // error
+      if (underlyingWs.readyState != OriginalWebSocket.OPEN){
+        reconnect();
+        this.ondatanotsent(data);
+      } else {
+        // otherwise we try to send, and if we have a failure
+        // we'll go ahead and reconnect, telling our caller
+        // all about how we failed via onsendfailed
         try {
-          this.ws.send(message);
-          _results.push(log.info("message away"));
-        } catch (_error) {
-          error = _error;
-          log.error("unable to send message, putting it back on the q");
-          this.messageBuffer.push(message);
-          this.connect();
-          break;
+          underlyingWs.send(data);
+        } catch (error) {
+          reconnect();
+          this.ondatanotsent(data);
         }
       }
-      return _results;
-    } else if (this.ws.readyState === 0) {
-      log.error("connecting, waiting");
-    } else {
-      log.error("unexpected ready state " + this.ws.readyState + ", reconnecting");
-      return this.connect();
-    }
+    }.bind(this);
+
+    this.close = function () {
+      reconnectOnClose = false;
+      underlyingWs.close();
+    }.bind(this);
+
+    setTimeout(connect.bind(this), 0);
+  }
+  // WS Constants the the 'class' Level
+  ReconnectingWebSocket.CONNECTING = OriginalWebSocket.CONNECTING;
+  ReconnectingWebSocket.OPEN       = OriginalWebSocket.OPEN;
+  ReconnectingWebSocket.CLOSING    = OriginalWebSocket.CLOSING;
+  ReconnectingWebSocket.CLOSED     = OriginalWebSocket.CLOSED;
+
+  WebSocket = ReconnectingWebSocket; 
+  UnMakeWebSocketReconnecting = function(){
+    WebSocket = OriginalWebSocket;
+    UnMakeWebSocketReconnecting = null;
   };
+}
 
-  ReconnectingWebSocket.prototype.send = function(message) {
-    this.messageBuffer.push(message);
-    return this.processMessageBuffer();
-  };
+module.exports = MakeWebSocketReconnecting;
 
-  ReconnectingWebSocket.prototype.close = function() {
-    this.forceClose = true;
-    return this.ws.close();
-  };
-
-  ReconnectingWebSocket.prototype.onopen = function(event) {};
-
-  ReconnectingWebSocket.prototype.onmessage = function(event) {};
-
-  ReconnectingWebSocket.prototype.onclose = function(event) {};
-
-  ReconnectingWebSocket.prototype.onerror = function(event) {};
-
-  return ReconnectingWebSocket;
-
-})();
-
-module.exports = ReconnectingWebSocket;
-
-
-},{"simplog":6,"ws":8}]},{},[10])
+},{"ws":8}]},{},[10])

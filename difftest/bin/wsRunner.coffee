@@ -32,8 +32,9 @@ bc.on 'endquery', (msg) ->
   if msg.queryId is "morePants"
     this.output.push('resultSet'+ JSON.stringify(bc.results["morePants"].resultSets))
     morePantsDone.resolve()
-bc.query connectionName, template, data, "pants"
-bc.query connectionName, template, data, "morePants"
+bc.on 'open', () ->
+  bc.query connectionName, template, data, "pants"
+  bc.query connectionName, template, data, "morePants"
 res = {}
 
 
@@ -49,8 +50,8 @@ c.on 'endquery', (msg) ->
 c.on 'row', (msg) ->
   c.rowOutput.push 'row' + JSON.stringify msg
 c.on 'error', (msg) -> console.log(msg)
-
-c.query connectionName, template, data, "nonBufferingClientQueryId"
+c.on 'open', () ->
+  c.query connectionName, template, data, "nonBufferingClientQueryId"
 
 dumpOutput = () ->
   for entry in bc.output

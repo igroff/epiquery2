@@ -52,10 +52,11 @@ c.on 'endquery', (msg) ->
 c.on 'error', (msg) ->
   c.errorOutput.push 'error' + JSON.stringify msg
 
-if repeatCount is 1
-  c.query(connectionName, template, data, "basicSocketQueryId")
-else
-  c.query(connectionName, template, data, "basicSocketQueryId#{num}") for num in [1..repeatCount]
+c.on 'open', (evt) ->
+  if repeatCount is 1
+    c.query(connectionName, template, data, "basicSocketQueryId")
+  else
+    c.query(connectionName, template, data, "basicSocketQueryId#{num}") for num in [1..repeatCount]
 
 timedOut = ->
   console.log "timed out!"

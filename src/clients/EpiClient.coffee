@@ -1,7 +1,10 @@
 EventEmitter      = require('events').EventEmitter
 _                 = require 'underscore'
 log               = require 'simplog'
-WebSocket         = require './reconnecting-websocket.litcoffee'
+
+# this either makes our existing websocket reconnecting or creates a
+# websocket for us (using ws) that is reconnecting
+require("./reconnecting-websocket.js")()
 
 
 
@@ -19,8 +22,9 @@ class EpiClient extends EventEmitter
     @queryId = 0
     @ws.onmessage = @onMessage
     @ws.onclose = @onClose
-    @ws.onopen = () =>
+    @ws.onopen = (evt) =>
       log.debug "Epiclient connection opened"
+      @emit 'open', evt
     @ws.onerror = (err) ->
       log.error "EpiClient socket error: ", err
 
@@ -41,7 +45,7 @@ class EpiClient extends EventEmitter
     handler = @['on' + message.message]
     if handler
       handler(message)
-  
+
   onClose: () =>
     @emit 'close'
 
