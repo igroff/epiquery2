@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -2268,52 +2268,242 @@ function hasOwnProperty(obj, prop) {
 }).call(this);
 
 },{}],8:[function(require,module,exports){
+module.exports.ReconnectingWebSocket = require("./src/reconnecting-websocket.litcoffee");
+module.exports.AwesomeWebSocket = require("./src/awesome-websocket.litcoffee");
 
-/**
- * Module dependencies.
- */
+},{"./src/awesome-websocket.litcoffee":9,"./src/reconnecting-websocket.litcoffee":10}],9:[function(require,module,exports){
+var AwesomeWebSocket, ReconnectingWebSocket, WebSocket, background;
 
-var global = (function() { return this; })();
+ReconnectingWebSocket = require('./reconnecting-websocket.litcoffee');
 
-/**
- * WebSocket constructor.
- */
+WebSocket = window.WebSocket;
 
-var WebSocket = global.WebSocket || global.MozWebSocket;
+background = window.requestAnimationFrame || setTimeout;
 
-/**
- * Module exports.
- */
-
-module.exports = WebSocket ? ws : null;
-
-/**
- * WebSocket constructor.
- *
- * The third `opts` options object gets ignored in web browsers, since it's
- * non-standard, and throws a TypeError if passed to the constructor.
- * See: https://github.com/einaros/ws/issues/227
- *
- * @param {String} uri
- * @param {Array} protocols (optional)
- * @param {Object) opts (optional)
- * @api public
- */
-
-function ws(uri, protocols, opts) {
-  var instance;
-  if (protocols) {
-    instance = new WebSocket(uri, protocols);
-  } else {
-    instance = new WebSocket(uri);
+AwesomeWebSocket = (function() {
+  function AwesomeWebSocket(urls) {
+    var openAtAll, sendloop, socket, url, _i, _len, _ref;
+    this.urls = urls;
+    openAtAll = false;
+    this.lastSocket = void 0;
+    this.sockets = [];
+    this.messageQueue = [];
+    if (typeof this.urls === "string") {
+      this.urls = [this.urls];
+    }
+    _ref = this.urls;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      url = _ref[_i];
+      socket = new ReconnectingWebSocket(url);
+      this.sockets.push(socket);
+      socket.onmessage = (function(_this) {
+        return function(evt) {
+          return _this.onmessage(evt);
+        };
+      })(this);
+      socket.onerror = (function(_this) {
+        return function(err) {
+          return _this.onerror(err);
+        };
+      })(this);
+      socket.onopen = (function(_this) {
+        return function(evt) {
+          if (!openAtAll) {
+            openAtAll = true;
+            return _this.onopen(evt);
+          }
+        };
+      })(this);
+    }
+    this.forceclose = false;
+    sendloop = (function(_this) {
+      return function() {
+        var data, trySocket;
+        background(sendloop);
+        if (_this.messageQueue.length) {
+          if (_this.lastSocket) {
+            trySocket = _this.lastSocket;
+            _this.lastSocket = null;
+          } else {
+            trySocket = _this.sockets.pop();
+            _this.sockets.unshift(trySocket);
+          }
+          if (trySocket.readyState === WebSocket.OPEN) {
+            data = _this.messageQueue[_this.messageQueue.length - 1];
+            trySocket.send(data);
+            _this.lastSocket = trySocket;
+            return _this.messageQueue.pop();
+          }
+        }
+      };
+    })(this);
+    background(sendloop);
   }
-  return instance;
-}
 
-if (WebSocket) ws.prototype = WebSocket.prototype;
+  AwesomeWebSocket.prototype.send = function(data) {
+    return this.messageQueue.unshift(data);
+  };
 
-},{}],9:[function(require,module,exports){
-var EpiBufferingClient, EpiClient, EventEmitter, WebSocket, log, _,
+  AwesomeWebSocket.prototype.keepAlive = function(timeoutMs, message) {
+    var socket, _i, _len, _ref, _results;
+    _ref = this.sockets;
+    _results = [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      socket = _ref[_i];
+      _results.push(socket.keepAlive(timeoutMs, message));
+    }
+    return _results;
+  };
+
+  AwesomeWebSocket.prototype.close = function() {
+    var socket, _i, _len, _ref;
+    _ref = this.sockets;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      socket = _ref[_i];
+      socket.close();
+    }
+    return this.onclose();
+  };
+
+  AwesomeWebSocket.prototype.onopen = function(event) {};
+
+  AwesomeWebSocket.prototype.onclose = function(event) {};
+
+  AwesomeWebSocket.prototype.onmessage = function(event) {};
+
+  AwesomeWebSocket.prototype.onerror = function(event) {};
+
+  return AwesomeWebSocket;
+
+})();
+
+module.exports = AwesomeWebSocket;
+
+
+},{"./reconnecting-websocket.litcoffee":10}],10:[function(require,module,exports){
+var ReconnectingWebSocket, WebSocket, background;
+
+WebSocket = window.WebSocket;
+
+background = window.requestAnimationFrame || setTimeout;
+
+ReconnectingWebSocket = (function() {
+  function ReconnectingWebSocket(url) {
+    this.url = url;
+    this.couldBeBusted = true;
+    this.forceclose = false;
+    this.allowReconnect = false;
+    this.wasConnected = false;
+    this.connect();
+    this.reconnect();
+  }
+
+  ReconnectingWebSocket.prototype.reconnect = function() {
+    return background((function(_this) {
+      return function() {
+        if (!_this.forceclose) {
+          _this.reconnect();
+          if (_this.readyState !== WebSocket.OPEN) {
+            if (Date.now() > _this.reconnectAfter) {
+              return _this.connect();
+            }
+          }
+        }
+      };
+    })(this));
+  };
+
+  ReconnectingWebSocket.prototype.connect = function() {
+    this.reconnectAfter = Date.now() + 200;
+    this.readyState = WebSocket.CONNECTING;
+    this.ws = new WebSocket(this.url);
+    this.ws.onopen = (function(_this) {
+      return function(event) {
+        _this.wasConnected = true;
+        _this.readyState = WebSocket.OPEN;
+        _this.reconnectAfter = Date.now() * 2;
+        return _this.onopen(event);
+      };
+    })(this);
+    this.ws.onclose = (function(_this) {
+      return function(event) {
+        if (_this.wasConnected) {
+          _this.ondisconnect(new Event('disconnected', {
+            data: {
+              forceClose: _this.forceclose
+            }
+          }));
+        }
+        _this.reconnectAfter = 0;
+        if (_this.forceclose) {
+          _this.readyState = WebSocket.CLOSED;
+          return _this.onclose(event);
+        } else {
+          return _this.readyState = WebSocket.CONNECTING;
+        }
+      };
+    })(this);
+    this.ws.onmessage = (function(_this) {
+      return function(event) {
+        return _this.onmessage(event);
+      };
+    })(this);
+    return this.ws.onerror = (function(_this) {
+      return function(event) {
+        _this.reconnectAfter = 0;
+        return _this.onerror(event);
+      };
+    })(this);
+  };
+
+  ReconnectingWebSocket.prototype.send = function(data) {
+    var state;
+    state = this.readyState;
+    this.readyState = WebSocket.CLOSING;
+    if (typeof data === "object") {
+      this.ws.send(JSON.stringify(data));
+    } else {
+      this.ws.send(data);
+    }
+    return this.readyState = state;
+  };
+
+  ReconnectingWebSocket.prototype.close = function() {
+    this.forceclose = true;
+    return this.ws.close();
+  };
+
+  ReconnectingWebSocket.prototype.keepAlive = function(timeoutMs, message) {
+    var sendMessage;
+    sendMessage = (function(_this) {
+      return function() {
+        return _this.send(message);
+      };
+    })(this);
+    return setInterval(sendMessage, timeoutMs);
+  };
+
+  ReconnectingWebSocket.prototype.onopen = function(event) {};
+
+  ReconnectingWebSocket.prototype.onclose = function(event) {};
+
+  ReconnectingWebSocket.prototype.onmessage = function(event) {};
+
+  ReconnectingWebSocket.prototype.onerror = function(event) {};
+
+  ReconnectingWebSocket.prototype.ondisconnect = function(event) {};
+
+  return ReconnectingWebSocket;
+
+})();
+
+module.exports = ReconnectingWebSocket;
+
+
+},{}],"epi-client":[function(require,module,exports){
+module.exports=require('wmdlj8');
+},{}],"wmdlj8":[function(require,module,exports){
+var AwesomeWebSocket, EpiBufferingClient, EpiClient, EventEmitter, log, _,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -2324,7 +2514,7 @@ _ = require('underscore');
 
 log = require('simplog');
 
-WebSocket = require('./reconnecting-websocket.litcoffee');
+AwesomeWebSocket = require('ws-additions').AwesomeWebSocket;
 
 EpiClient = (function(_super) {
   __extends(EpiClient, _super);
@@ -2346,20 +2536,15 @@ EpiClient = (function(_super) {
   }
 
   EpiClient.prototype.connect = function() {
-    var _this = this;
-
-    if (WebSocket.name === "HuntingWebsocket") {
-      if (!_.isArray(this.url)) {
-        this.url = [this.url];
-      }
-    }
-    this.ws = new WebSocket(this.url);
+    this.ws = new AwesomeWebSocket(this.url);
     this.queryId = 0;
     this.ws.onmessage = this.onMessage;
     this.ws.onclose = this.onClose;
-    this.ws.onopen = function() {
-      return log.debug("Epiclient connection opened");
-    };
+    this.ws.onopen = (function(_this) {
+      return function() {
+        return log.debug("Epiclient connection opened");
+      };
+    })(this);
     this.ws.onerror = function(err) {
       return log.error("EpiClient socket error: ", err);
     };
@@ -2368,7 +2553,6 @@ EpiClient = (function(_super) {
 
   EpiClient.prototype.query = function(connectionName, template, data, queryId) {
     var req;
-
     if (queryId == null) {
       queryId = null;
     }
@@ -2388,7 +2572,6 @@ EpiClient = (function(_super) {
 
   EpiClient.prototype.onMessage = function(message) {
     var handler;
-
     if ((message.type != null) && (message.type = 'message')) {
       message = message.data;
     }
@@ -2454,7 +2637,6 @@ EpiBufferingClient = (function(_super) {
 
   EpiBufferingClient.prototype.onbeginrowset = function(msg) {
     var newResultSet, _base, _name;
-
     newResultSet = [];
     (_base = this.results)[_name = msg.queryId] || (_base[_name] = {
       resultSets: []
@@ -2472,123 +2654,4 @@ module.exports.EpiClient = EpiClient;
 module.exports.EpiBufferingClient = EpiBufferingClient;
 
 
-},{"./reconnecting-websocket.litcoffee":11,"events":1,"simplog":6,"underscore":7}],10:[function(require,module,exports){
-var clients;
-
-clients = require('./EpiClient.coffee');
-
-module.exports.EpiClient = clients.EpiClient;
-
-module.exports.EpiBufferingClient = clients.EpiBufferingClient;
-
-if (typeof window !== "undefined" && window !== null) {
-  window.EpiClient = clients.EpiClient;
-  window.EpiBufferingClient = clients.EpiBufferingClient;
-}
-
-
-},{"./EpiClient.coffee":9}],11:[function(require,module,exports){
-var ReconnectingWebSocket, WebSocket, log,
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-
-log = require("simplog");
-
-WebSocket = WebSocket || require('ws');
-
-ReconnectingWebSocket = (function() {
-  function ReconnectingWebSocket(url) {
-    this.url = url;
-    this.send = __bind(this.send, this);
-    this.processMessageBuffer = __bind(this.processMessageBuffer, this);
-    this.connect = __bind(this.connect, this);
-    this.forceClose = false;
-    this.messageBuffer = [];
-    this.connect();
-    this.processMessageBufferInterval;
-  }
-
-  ReconnectingWebSocket.prototype.connect = function() {
-    var error, _ref, _ref1,
-      _this = this;
-
-    try {
-      if ((_ref = this.ws) != null) {
-        _ref.onmessage = null;
-      }
-      if ((_ref1 = this.ws) != null) {
-        _ref1.close();
-      }
-    } catch (_error) {
-      error = _error;
-      log.error("unexpected error cleaning up old socket " + error);
-    }
-    this.ws = new WebSocket(this.url);
-    this.ws.onclose = function(event) {
-      if (_this.forceClose) {
-        return _this.onclose(event);
-      }
-    };
-    this.ws.onmessage = function(event) {
-      return _this.onmessage(event);
-    };
-    this.ws.onerror = function(event) {
-      return _this.onerror(event);
-    };
-    return this.ws.onopen = function(event) {
-      _this.onopen(event);
-      return _this.processMessageBuffer();
-    };
-  };
-
-  ReconnectingWebSocket.prototype.processMessageBuffer = function() {
-    var error, message, _results;
-
-    if (!this.processMessageBufferInterval) {
-      this.processMessageBufferInterval = setInterval(this.processMessageBuffer, 128);
-      return;
-    }
-    if (this.ws.readyState === 1) {
-      _results = [];
-      while (message = this.messageBuffer.shift()) {
-        try {
-          _results.push(this.ws.send(message));
-        } catch (_error) {
-          error = _error;
-          log.debug("unable to send message, putting it back on the q");
-          this.messageBuffer.push(message);
-          this.connect();
-          break;
-        }
-      }
-      return _results;
-    } else {
-      return this.connect();
-    }
-  };
-
-  ReconnectingWebSocket.prototype.send = function(message) {
-    this.messageBuffer.push(message);
-    return this.processMessageBuffer();
-  };
-
-  ReconnectingWebSocket.prototype.close = function() {
-    this.forceClose = true;
-    return this.ws.close();
-  };
-
-  ReconnectingWebSocket.prototype.onopen = function(event) {};
-
-  ReconnectingWebSocket.prototype.onmessage = function(event) {};
-
-  ReconnectingWebSocket.prototype.onclose = function(event) {};
-
-  ReconnectingWebSocket.prototype.onerror = function(event) {};
-
-  return ReconnectingWebSocket;
-
-})();
-
-module.exports = ReconnectingWebSocket;
-
-
-},{"simplog":6,"ws":8}]},{},[10])
+},{"events":1,"simplog":6,"underscore":7,"ws-additions":8}]},{},[])

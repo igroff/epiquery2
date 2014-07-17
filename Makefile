@@ -1,8 +1,11 @@
 SHELL=/bin/bash
 .PHONY: watch test pass lint clean
 
-watch: static/js/epiclient_v2.js
-	DEBUG=true supervisor --ignore "./test"  -e ".litcoffee|.coffee|.js" --exec bash ./ar-start
+watch:
+	DEBUG=true supervisor --ignore "./test"  -e ".litcoffee|.coffee|.js" --exec make run-server
+
+run-server: static/js/epiclient_v2.js
+	exec ./ar-start
 
 difftest/templates:
 	cd difftest/ && git clone https://github.com/igroff/epiquery-templates.git \
@@ -21,8 +24,8 @@ lint:
 static/js/sockjstest.js: static/js/src/wstest.coffee
 	browserify -t coffeeify static/js/src/wstest.coffee > static/js/sockjstest.js
 
-static/js/epiclient_v2.js: src/clients/hunting-websocket.litcoffee src/clients/reconnecting-websocket.litcoffee src/clients/browserclient.coffee src/clients/EpiClient.coffee
-	browserify -t coffeeify src/clients/browserclient.coffee --outfile $@
+static/js/epiclient_v2.js: src/clients/browserclient.coffee src/clients/EpiClient.coffee
+	browserify -t coffeeify -r ./src/clients/EpiClient.coffee:epi-client --outfile $@
 
 static/js/hunting-websocket.js: src/clients/hunting-websocket.litcoffee
 	browserify -t coffeeify src/clients/hunting-websocket.litcoffee --outfile $@

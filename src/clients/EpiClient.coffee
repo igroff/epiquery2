@@ -1,7 +1,7 @@
 EventEmitter      = require('events').EventEmitter
 _                 = require 'underscore'
 log               = require 'simplog'
-WebSocket         = require './reconnecting-websocket.litcoffee'
+AwesomeWebSocket  = require('ws-additions').AwesomeWebSocket
 
 
 
@@ -12,10 +12,7 @@ class EpiClient extends EventEmitter
   connect: =>
     # we have a couple possible implementations here, HuntingWebsocket
     # expects an array of urls, so we make that if needed
-    if WebSocket.name is "HuntingWebsocket"
-      if not _.isArray(@url)
-        @url = [@url]
-    @ws = new WebSocket(@url)
+    @ws = new AwesomeWebSocket(@url)
     @queryId = 0
     @ws.onmessage = @onMessage
     @ws.onclose = @onClose
