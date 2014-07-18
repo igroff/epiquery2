@@ -24,7 +24,7 @@ lint:
 static/js/sockjstest.js: static/js/src/wstest.coffee
 	browserify -t coffeeify static/js/src/wstest.coffee > static/js/sockjstest.js
 
-static/js/epiclient_v2.js: src/clients/browserclient.coffee src/clients/EpiClient.coffee
+static/js/epiclient_v2.js: src/clients/EpiClient.coffee
 	browserify -t coffeeify -r ./src/clients/EpiClient.coffee:epi-client --outfile $@
 
 static/js/hunting-websocket.js: src/clients/hunting-websocket.litcoffee
