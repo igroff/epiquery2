@@ -32,7 +32,6 @@ class MSSQLDriver extends events.EventEmitter
         # we use this event to split up multipe result sets as each result set
         # is preceeded by a columnMetadata event
         request.on 'columnMetadata', () =>
-          console.log "what the shit #{@rowSetStarted}"
           this.emit('endrowset') if @rowSetStarted
           this.emit 'beginrowset'
           @rowSetStarted = true

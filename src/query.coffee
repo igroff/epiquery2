@@ -19,7 +19,6 @@ execute = (driver, context, cb) ->
   driverInstance.on 'beginrowset', () ->
     context.emit 'beginrowset', {queryId: queryId}
   driverInstance.on 'endrowset', (d) ->
-    console.log "more shits"
     context.emit 'endrowset', {queryId: queryId}
   driverInstance.on 'row', (row) ->
     context.emit 'row', {queryId: queryId, columns: row}
