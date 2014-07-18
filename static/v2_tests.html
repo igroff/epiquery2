@@ -45,7 +45,7 @@
       var mssqlDone = Q.defer();
       // query: (connectionName, template, data, queryId=null) =>
       collectResponses('mssql', 'test/servername', null, function(d) { mssqlData = d; mssqlDone.resolve(); });
-      collectResponses('mysql', 'test/mysql_servername', null, function(d) { mysqlData = d; mysqlDone.resolve()});
+      collectResponses('mysql_v2', 'test/mysql_servername', null, function(d) { mysqlData = d; mysqlDone.resolve()});
       Q.all([mysqlDone.promise, mssqlDone.promise]).then(function(){
         assert.strictEqual(mysqlData.length, mssqlData.length, "same number of events");
         console.log("mysql");

@@ -26,12 +26,12 @@ selectConnection = (context, callback) ->
     # no config, need to find one
     if not context.connectionName
       context.emit "no connection specified"
-      callback 'no connection specified'
+      return callback 'no connection specified'
     context.connection = config.connections[context.connectionName]
     if not context.connection
       msg = "unable to find connection '#{context.connectionName}'"
       context.emit 'error', msg
-      callback msg
+      return callback msg
   else
     context.connection = connectionConfig
   context.Stats.connectionName = context.connection.name
