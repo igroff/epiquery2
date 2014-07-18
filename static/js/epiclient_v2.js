@@ -2522,6 +2522,7 @@ EpiClient = (function(_super) {
   function EpiClient(url) {
     this.url = url;
     this.onsend = __bind(this.onsend, this);
+    this.onendrowset = __bind(this.onendrowset, this);
     this.onbeginrowset = __bind(this.onbeginrowset, this);
     this.onerror = __bind(this.onerror, this);
     this.onendquery = __bind(this.onendquery, this);
@@ -2610,6 +2611,10 @@ EpiClient = (function(_super) {
 
   EpiClient.prototype.onbeginrowset = function(msg) {
     return this.emit('beginrowset', msg);
+  };
+
+  EpiClient.prototype.onendrowset = function(msg) {
+    return this.emit('endrowset', msg);
   };
 
   EpiClient.prototype.onsend = function(msg) {

@@ -10,6 +10,7 @@ class MySQLDriver extends events.EventEmitter
     @config = _.clone @config
     connect_deferred = Q.defer()
     @config.multipleStatements = true
+    haveEmittedRowset = false
 
     conn = mysql.createConnection @config
     conn.connect connect_deferred.makeNodeResolver()
@@ -19,8 +20,14 @@ class MySQLDriver extends events.EventEmitter
       query = conn.query @query
       query.on 'result', (row) => this.emit 'row', row
       query.on 'error',  (error) => this.emit 'error', error
-      query.on 'fields', (fields) => this.emit 'beginrowset', fields
-      query.on 'end',    () => this.emit 'endquery'
+      query.on 'fields', (fields) =>
+        if haveEmittedRowset
+          this.emit 'endrowset'
+        this.emit 'beginrowset', fields
+        haveEmittedRowset = true
+      query.on 'end',    () =>
+        this.emit 'endrowset'
+        this.emit 'endquery'
     ).fail( (error) => this.emit 'error', error
     ).finally( () -> conn.end() )
 
