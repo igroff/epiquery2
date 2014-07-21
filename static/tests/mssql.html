@@ -28,19 +28,23 @@
       client.on('beginrowset', function(row) { assert.ok(true, 'beginrowset'); });
       client.on('row', function(row) { assert.ok(row, 'row'); });
       client.on('endrowset', function(row) { assert.ok(true, 'endrowset'); });
-      client.on('endquery', function(){ assert.ok(true, 'enquery'); QUnit.start(); });
+      client.on('endquery', function(){ assert.ok(true, 'endquery'); QUnit.start(); });
     });
 
     // test query: select @@servername as [servername]
     QUnit.asyncTest("if there are a lot of rows we get 'em all", function(assert){
+      expect(1);
       var client = new EpiClient("ws://localhost:8080/sockjs/websocket");
       client.query('mssql', 'test/1000_rows', null, 'mqid');
       var rows = [];
       client.on('row', function(row){
-        
+        rows.push(row);  
       });
       client.on('error', function(e){ assert.ok(false, 'busted'); console.log(e); });
-      client.on('endquery', function(){ assert.ok(true, 'enquery'); QUnit.start(); });
+      client.on('endquery', function(){
+        assert.strictEqual(rows.length, 1000, 'row count'); 
+        QUnit.start();
+      });
     });
 
     // test query: select @@servername as [servername]
