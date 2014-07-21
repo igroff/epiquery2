@@ -39,6 +39,7 @@
       client.on('row', function(row){
         
       });
+      client.on('error', function(e){ assert.ok(false, 'busted'); console.log(e); });
       client.on('endquery', function(){ assert.ok(true, 'enquery'); QUnit.start(); });
     });
 
@@ -51,7 +52,7 @@
         assert.ok(row.columns[0].hasOwnProperty('name'), 'name');
         assert.ok(row.columns[0].hasOwnProperty('value'), 'value');
       });
-      client.on('error', function(e){ console.log(e); });
+      client.on('error', function(e){ assert.ok(false, 'busted'); console.log(e); });
       client.on('endquery', function(){ QUnit.start(); });
     });
   </script>
