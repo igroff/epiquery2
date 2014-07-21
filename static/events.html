@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<meta charset="UTF-8">
+
+<html lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" href="css/qunit.css">
+  <title></title>
+  <script src="js/epiclient_v2.js"></script>
+  <script src="js/lib.js"></script>
+  <script src="js/qunit.js"></script>
+  <script type="text/javascript">
+    var EpiClient = require('epi-client').EpiClient
+    var client = new EpiClient("ws://localhost:8080/sockjs/websocket");
+    var queryId = Date.now()
+   
+    function stringHasValue(s){
+      return s !== null && s !== undefined && typeof(s) === "string" &&
+        s !== "";
+    }
+
+    // test query: select @@servername as [servername]
+    QUnit.asyncTest("row event contains data", function(assert){
+      expect(2);
+      var client = new EpiClient("ws://localhost:8080/sockjs/websocket");
+      client.query('mssql', 'test/servername', null, 'mqid');
+      client.on('row', function(row) {
+        console.log(row.columns[0]);
+        // we should have something called name and value, name should be
+        // 'servername' and value should be something valid for the current 
+        // configuration so we'll assume anything that isn't nullish or
+        // an empty string as valid
+        assert.strictEqual(row.columns[0].name, 'servername', 'expected \'servernam\'');
+        assert.ok(stringHasValue(row.columns[0].value), 'invalid name');
+      });
+      client.on('error', function(e){ console.log(e); });
+      client.on('endquery', function(){ QUnit.start(); });
+    });
+
+    // When we ask for a rendered version of our template, we should get the 
+    // contents back in the data event
+    QUnit.asyncTest("data event contains template", function(assert){
+      expect(1);
+      var client = new EpiClient("ws://localhost:8080/sockjs/websocket");
+      client.query('render', 'test/servername', null, 'mqid');
+      client.on('data', function(data) {
+        assert.strictEqual(data.data, 'select @@servername as [servername]\n', 'template contents');
+      });
+      client.on('error', function(e){ console.log(e); });
+      client.on('endquery', function(){ QUnit.start(); });
+    });
+
+  </script>
+</head>
+<body>
+  <div id="qunit"></div>
+  <div id="qunit-fixture"></div>
+</body>
+</html>
