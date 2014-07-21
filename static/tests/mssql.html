@@ -1,0 +1,63 @@
+<!DOCTYPE HTML>
+<meta charset="UTF-8">
+
+<html lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" href="../css/qunit.css">
+  <title></title>
+  <script src="js/epiclient_v2.js"></script>
+  <script src="js/lib.js"></script>
+  <script src="js/qunit.js"></script>
+  <script type="text/javascript">
+    var EpiClient = require('epi-client').EpiClient
+    var client = new EpiClient("ws://localhost:8080/sockjs/websocket");
+    var queryId = Date.now()
+   
+    function stringHasValue(s){
+      return s !== null && s !== undefined && typeof(s) === "string" &&
+        s !== "";
+    }
+
+    // test query: select @@servername as [servername]
+    QUnit.asyncTest("standard sql events are raised", function(assert){
+      expect(5);
+      var client = new EpiClient("ws://localhost:8080/sockjs/websocket");
+      client.query('mssql', 'test/servername', null, 'mqid');
+      client.on('beginquery', function(row) { assert.ok(row, 'beginquery'); });
+      client.on('beginrowset', function(row) { assert.ok(true, 'beginrowset'); });
+      client.on('row', function(row) { assert.ok(row, 'row'); });
+      client.on('endrowset', function(row) { assert.ok(true, 'endrowset'); });
+      client.on('endquery', function(){ assert.ok(true, 'enquery'); QUnit.start(); });
+    });
+
+    // test query: select @@servername as [servername]
+    QUnit.asyncTest("if there are a lot of rows we get 'em all", function(assert){
+      var client = new EpiClient("ws://localhost:8080/sockjs/websocket");
+      client.query('mssql', 'test/1000_rows', null, 'mqid');
+      var rows = [];
+      client.on('row', function(row){
+        
+      });
+      client.on('endquery', function(){ assert.ok(true, 'enquery'); QUnit.start(); });
+    });
+
+    // test query: select @@servername as [servername]
+    QUnit.asyncTest("v1 returns key value objects for columns", function(assert){
+      expect(2);
+      var client = new EpiClient("ws://localhost:8080/sockjs/websocket");
+      client.query('mssql', 'test/servername', null, 'mqid');
+      client.on('row', function(row) {
+        assert.ok(row.columns[0].hasOwnProperty('name'), 'name');
+        assert.ok(row.columns[0].hasOwnProperty('value'), 'value');
+      });
+      client.on('error', function(e){ console.log(e); });
+      client.on('endquery', function(){ QUnit.start(); });
+    });
+  </script>
+</head>
+<body>
+  <div id="qunit"></div>
+  <div id="qunit-fixture"></div>
+</body>
+</html>
