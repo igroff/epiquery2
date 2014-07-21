@@ -59,6 +59,20 @@
       client.on('error', function(e){ assert.ok(false, 'busted'); console.log(e); });
       client.on('endquery', function(){ QUnit.start(); });
     });
+
+    // test query: select @@servername as [servername]
+    QUnit.asyncTest("'o' driver returns a single columns object", function(assert){
+      expect(3);
+      var client = new EpiClient("ws://localhost:8080/sockjs/websocket");
+      client.query('mssql_o', 'test/mssql_single_row_multi_column', null, 'mqid');
+      client.on('row', function(row) {
+        assert.strictEqual(typeof(row.columns), "object", "it's an object");
+        assert.ok(row.columns.hasOwnProperty('one_col'), 'first col name');
+        assert.ok(row.columns.hasOwnProperty('two_col'), 'second col name');
+      });
+      client.on('error', function(e){ assert.ok(false, 'busted'); console.log(e); });
+      client.on('endquery', function(){ QUnit.start(); });
+    });
   </script>
 </head>
 <body>
