@@ -23,7 +23,7 @@ attachResponder = (context, conn) ->
   context.on 'error', (err, msg) ->
     # if there's no .message it's gonna need to be a string
     response =
-      queryId: msg?.queryId
+      queryId: context.queryId
       error: err.message || err
       message: 'error'
     log.error "sockjs error: #{response.error}"
