@@ -33,7 +33,7 @@
     "ws-additions": "0.0.13",
     "coffeeify": "^0.6.0",
     "install": "^0.1.7",
-    "lodash-contrib": "^241.4.14",
+    "lodash-contrib": "241.4.14",
     "npm": "^1.4.25"
   },
   "bin": {
