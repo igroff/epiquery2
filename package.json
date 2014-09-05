@@ -31,7 +31,8 @@
     "sockjs": "0.3.8",
     "hunting-websocket": "git+https://github.com/wballard/hunting-websocket",
     "ws-additions": "0.0.13",
-    "coffeeify": "^0.6.0"
+    "coffeeify": "^0.6.0",
+    "lodash-contrib": "^241.4.14"
   },
   "bin": {
     "update_repo_dir": "bin/update_or_clone_repo"
