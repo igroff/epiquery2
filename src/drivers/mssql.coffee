@@ -2,11 +2,15 @@ events      = require 'events'
 tedious     = require 'tedious'
 Q           = require 'q'
 log         = require 'simplog'
-_           = require 'underscore'
+_           = require 'lodash-contrib'
 
 class MSSQLDriver extends events.EventEmitter
   constructor: (@query, @config) ->
   
+  escape: (context) ->  
+    _.walk.preorder context, (value, key, parent) ->
+      parent[key] = value.replace(/'/g, "''") if _.isString(value)    
+
   execute: () =>
     @rowSetStarted = false
     connect_deferred           = Q.defer()

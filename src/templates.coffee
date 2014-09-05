@@ -6,24 +6,6 @@ fs        = require 'fs'
 path      = require 'path'
 _         = require 'underscore'
 
-# regex to replace MS special charactes, these are characters that are known to
-# cause issues in storage and retrieval so we're going to switch 'em wherever
-# we find 'em
-special_characters = {
-  "8220": regex: new RegExp(String.fromCharCode(8220), "gi"), "replace": '"'
-  "8221": regex: new RegExp(String.fromCharCode(8221), "gi"), "replace": '"'
-  "8216": regex:  new RegExp(String.fromCharCode(8216), "gi"), "replace": "'"
-  "8217": regex: new RegExp(String.fromCharCode(8217), "gi"), "replace": "'"
-  "8211": regex: new RegExp(String.fromCharCode(8211), "gi"), "replace": "-"
-  "8212": regex: new RegExp(String.fromCharCode(8212), "gi"), "replace": "--"
-  "189": regex: new RegExp(String.fromCharCode(189), "gi"), "replace": "1/2"
-  "188": regex: new RegExp(String.fromCharCode(188), "gi"), "replace": "1/4"
-  "190": regex: new RegExp(String.fromCharCode(190), "gi"), "replace": "3/4"
-  "169": regex: new RegExp(String.fromCharCode(169), "gi"), "replace": "(C)"
-  "174": regex: new RegExp(String.fromCharCode(174), "gi"), "replace": "(R)"
-  "8230": regex: new RegExp(String.fromCharCode(8230), "gi"), "replace": "..."
-}
-
 # whitespace is important, we don't want to strip it
 dot.templateSettings.strip = false
 
