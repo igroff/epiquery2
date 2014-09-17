@@ -63,7 +63,7 @@ class EpiBufferingClient extends EpiClient
     @results = {}
 
   onrow: (msg) =>
-    @results[msg.queryId].currentResultSet.push(msg.columns)
+    @results[msg.queryId]?.currentResultSet?.push(msg.columns)
   
   onbeginrowset: (msg) =>
     newResultSet = []
