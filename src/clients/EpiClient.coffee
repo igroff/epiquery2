@@ -3,11 +3,22 @@ _                 = require 'underscore'
 log               = require 'simplog'
 AwesomeWebSocket  = require('ws-additions').AwesomeWebSocket
 
+guid = ->
+    s4 = ->
+      return Math.floor((1 + Math.random()) * 0x10000)
+                 .toString(16)
+                 .substring(1)
 
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+      s4() + '-' + s4() + s4() + s4()
 
 class EpiClient extends EventEmitter
-  constructor: (@url) ->
+  constructor: (@url, @writeUrl, @sqlReplicaConnection, @sqlMasterConnection) ->
     @connect()
+    @last_write_time = null
+    @write_counter = 0
+    @write_queryId = null
+    @pending_queries = {}
 
   connect: =>
     # we have a couple possible implementations here, HuntingWebsocket
@@ -22,19 +33,43 @@ class EpiClient extends EventEmitter
       log.error "EpiClient socket error: ", err
     @ws.onsend = @onsend
 
+    if @writeUrl
+      @ws_w = new AwesomeWebSocket(@writeUrl)
+      @ws_w.onmessage = @onMessage
+      @ws_w.onclose = @onClose
+      @ws_w.onopen = () =>
+        log.debug "Epiclient connection opened (write)"
+      @ws_w.onerror = (err) ->
+        log.error "EpiClient socket error (write): ", err
+      @ws_w.onsend = @onsend
+
   query: (connectionName, template, data, queryId=null) =>
     req =
       templateName: template
       connectionName: connectionName
       data: data
-    req.queryId = null || queryId
+
+    req.queryId = queryId || guid()
     req.closeOnEnd = data.closeOnEnd if data
-    # if someone has asked us to close on end, we want our fancy
-    # underlying reconnectint sockets to not reconnect
-    @ws.forceClose = req.closeOnEnd
-    
-    log.debug "executing query: #{template} data:#{JSON.stringify(data)}"
-    @ws.send JSON.stringify(req)
+
+    @pending_queries[req.queryId] = JSON.parse(JSON.stringify(req)) # crappy copy...
+
+    #switched to write. use the socket to Austin instead unless checking replication time
+    if @last_write_time and @ws_w and queryId != 'replica_replication_time'
+      # if someone has asked us to close on end, we want our fancy
+      # underlying reconnectint sockets to not reconnect
+      @ws_w.forceClose = req.closeOnEnd
+      
+      log.debug "executing query: #{template} data:#{JSON.stringify(data)}"
+      req.connectionName = @sqlMasterConnection
+      @ws_w.send JSON.stringify(req)
+    else 
+      # if someone has asked us to close on end, we want our fancy
+      # underlying reconnectint sockets to not reconnect
+      @ws.forceClose = req.closeOnEnd
+      
+      log.debug "executing query: #{template} data:#{JSON.stringify(data)}"
+      @ws.send @pending_queries[req.queryId]
 
   onMessage: (message) =>
     # if the browser has wrapped this for use, we'll be interested in its
@@ -48,22 +83,83 @@ class EpiClient extends EventEmitter
   onClose: () =>
     @emit 'close'
 
-  onrow: (msg) => @emit 'row', msg
+  onrow: (msg) => 
+    if msg.queryId == 'replica_replication_time'
+      log.info 'replica is timestamped at', msg.columns[0].value
+      replica_timestamp = new Date(msg.columns[0].value)
+      unlabeled_pending_queries = _.filter @pending_queries, (query) -> query.is_write != undefined and query.is_read != undefined
+      if replica_timestamp > @last_write_time and not unlabeled_pending_queries.length > 0
+        log.info 'replica has recovered'
+        @last_write_time = null
+        @write_counter = 0
+      else
+        setTimeout => 
+          @query(@sqlReplicaConnection, 'get_replication_time.mustache', null, 'replica_replication_time')
+        , 1000
+    else if msg.queryId == @write_queryId
+      log.info 'write is timestamped at', msg.columns[0].value
+      @last_write_time = new Date(msg.columns[0].value)
+      if @write_counter == 1
+        @query(@sqlReplicaConnection, 'get_replication_time.mustache', null, 'replica_replication_time')
+    else
+      @emit 'row', msg
   ondata: (msg) => @emit 'data', msg
-  onbeginquery: (msg) => @emit 'beginquery', msg
-  onendquery: (msg) => @emit 'endquery', msg
-  onerror: (msg) => @emit 'error', msg
+  onbeginquery: (msg) => 
+    if @pending_queries[msg.queryId] and not @pending_queries[msg.queryId].is_write
+      @pending_queries[msg.queryId].is_read = true
+    @emit 'beginquery', msg
+  onendquery: (msg) => 
+    if @pending_queries[msg.queryId]
+      if @pending_queries[msg.queryId].is_write
+        @write_counter += 1
+        @write_queryId = 'write_replication_time' + @write_counter
+        @query(@sqlMasterConnection, 'get_replication_time.mustache', null, @write_queryId)
+      delete @pending_queries[msg.queryId]
+    @emit 'endquery', msg
+  onerror: (msg) =>
+    if msg.error == 'replicawrite'
+      log.info 'eating error...nom nom'
+    else
+      @emit 'error', msg
   onbeginrowset: (msg) => @emit 'beginrowset', msg
   onendrowset: (msg) => @emit 'endrowset', msg
   onsend: (msg) => @emit 'send', msg
+  onreplicawrite: (msg) =>
+    @pending_queries[msg.queryId].is_write = true
+    @last_write_time = new Date(2050, 0)
+    log.info 'replica write.  switching to master'
+    @query(@sqlMasterConnection, @pending_queries[msg.queryId].templateName, @pending_queries[msg.queryId].data, msg.queryId)
+  onreplicamasterwrite: (msg) =>
+    query_data = @pending_queries[msg.queryId]
+    query_data.is_write = true
+    @pending_queries[msg.queryId] = query_data
+    log.info "Master write detected. Increasing timestamp on endquery."
 
 class EpiBufferingClient extends EpiClient
-  constructor: (@url) ->
-    super(@url)
+  constructor: (@url, @writeUrl, @sqlReplicaConnection, @sqlMasterConnection) ->
+    super(@url, @writeUrl, @sqlReplicaConnection, @sqlMasterConnection)
     @results = {}
 
   onrow: (msg) =>
-    @results[msg.queryId]?.currentResultSet?.push(msg.columns)
+    if msg.queryId == 'replica_replication_time'
+      log.info 'replica is timestamped at', msg.columns[0].value
+      replica_timestamp = new Date(msg.columns[0].value)
+      unlabeled_pending_queries = _.filter @pending_queries, (query) -> query.is_write != undefined and query.is_read != undefined
+      if replica_timestamp > @last_write_time and not unlabeled_pending_queries.length > 0
+        log.info 'replica has recovered'
+        @last_write_time = null
+        @write_counter = 0
+      else
+        setTimeout => 
+          @query(@sqlReplicaConnection, 'get_replication_time.mustache', null, 'replica_replication_time')
+        , 1000
+    else if msg.queryId == @write_queryId
+      log.info 'write is timestamped at', msg.columns[0].value
+      @last_write_time = new Date(msg.columns[0].value)
+      if @write_counter == 1
+        @query(@sqlReplicaConnection, 'get_replication_time.mustache', null, 'replica_replication_time')
+    else
+      @results[msg.queryId]?.currentResultSet?.push(msg.columns)
   
   onbeginrowset: (msg) =>
     newResultSet = []

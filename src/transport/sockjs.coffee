@@ -14,6 +14,16 @@ attachResponder = (context, conn) ->
   context.on 'beginrowset', (data) ->
     data.message = 'beginrowset'
     conn.jwrite data
+  context.on 'replicamasterwrite', (queryId) ->
+    response =
+      message: 'replicamasterwrite'
+      queryId: queryId
+    conn.jwrite response
+  context.on 'replicawrite', (queryId) ->
+    response =
+      message: 'replicawrite'
+      queryId: queryId
+    conn.jwrite response
   context.on 'endrowset', (data) ->
     data.message = 'endrowset'
     conn.jwrite data
