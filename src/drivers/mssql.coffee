@@ -9,7 +9,8 @@ class MSSQLDriver extends events.EventEmitter
   
   escape: (context) ->  
     _.walk.preorder context, (value, key, parent) ->
-      parent[key] = value.replace(/'/g, "''") if _.isString(value)    
+      if parent
+        parent[key] = value.replace(/'/g, "''") if _.isString(value)    
 
   execute: () =>
     @rowSetStarted = false
