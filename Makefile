@@ -22,13 +22,13 @@ lint:
 	find ./src -name '*.js' | xargs ./node_modules/.bin/jshint 
 
 static/js/sockjstest.js: static/js/src/wstest.coffee
-	browserify -t coffeeify static/js/src/wstest.coffee > static/js/sockjstest.js
+	./node_modules/.bin/browserify -t coffeeify static/js/src/wstest.coffee > static/js/sockjstest.js
 
 static/js/epiclient_v3.js: src/clients/EpiClient.coffee
-	browserify -t coffeeify -r ./src/clients/EpiClient.coffee:epi-client --outfile $@
+	./node_modules/.bin/browserify -t coffeeify -r ./src/clients/EpiClient.coffee:epi-client --outfile $@
 
 static/js/hunting-websocket.js: src/clients/hunting-websocket.litcoffee
-	browserify -t coffeeify src/clients/hunting-websocket.litcoffee --outfile $@
+	./node_modules/.bin/browserify -t coffeeify src/clients/hunting-websocket.litcoffee --outfile $@
 
 debug: static/js/sockjstest.js
 	DEBUG=true PORT=8080 exec ./ar-start
