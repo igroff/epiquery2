@@ -57,32 +57,6 @@
       client.on('error', function(e){ console.log(e); });
       client.on('endquery', function(){ QUnit.start(); });
     });
-    /*
-    QUnit.asyncTest("some tests 'n' shit", function (assert){
-      expect(1);
-      var mysqlData, mssqlData;
-      var Q = require('q');
-      var mysqlDone = Q.defer();
-      var mssqlDone = Q.defer();
-      // query: (connectionName, template, data, queryId=null) =>
-      collectResponses('mssql', 'test/servername', null, function(d) { mssqlData = d; mssqlDone.resolve(); });
-      collectResponses('mysql_v2', 'test/mysql_servername', null, function(d) { mysqlData = d; mysqlDone.resolve()});
-      Q.all([mysqlDone.promise, mssqlDone.promise]).then(function(){
-        assert.strictEqual(mysqlData.length, mssqlData.length, "same number of events");
-        console.log("mysql");
-        console.log(mysqlData);
-        for (var i=0;i<mysqlData.length;i++){
-          console.log(mysqlData[i].message);
-        }
-        console.log("mssql");
-        console.log(mssqlData);
-        for (var i=0;i<mssqlData.length;i++){
-          console.log(mssqlData[i].message);
-        }
-        QUnit.start();
-      });
-    });
-    */
   </script>
 </head>
 <body>
