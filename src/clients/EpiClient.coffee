@@ -119,21 +119,24 @@ class EpiClient extends EventEmitter
   onerror: (msg) =>
     if msg.error == 'replicawrite'
       log.info 'eating error...nom nom'
+      @last_write_time = new Date(2050, 0)
+      query_data = @pending_queries[msg.queryId]
+      query_data.is_write = true
+      log.info 'replica write.  switching to master'
+      @query(@sqlMasterConnection, query_data.templateName, query_data.data, msg.queryId)
     else
       @emit 'error', msg
   onbeginrowset: (msg) => @emit 'beginrowset', msg
   onendrowset: (msg) => @emit 'endrowset', msg
   onsend: (msg) => @emit 'send', msg
-  onreplicawrite: (msg) =>
-    @pending_queries[msg.queryId].is_write = true
-    @last_write_time = new Date(2050, 0)
-    log.info 'replica write.  switching to master'
-    @query(@sqlMasterConnection, @pending_queries[msg.queryId].templateName, @pending_queries[msg.queryId].data, msg.queryId)
   onreplicamasterwrite: (msg) =>
     query_data = @pending_queries[msg.queryId]
     query_data.is_write = true
     @pending_queries[msg.queryId] = query_data
-    log.info "Master write detected. Increasing timestamp on endquery."
+    if @write_counter == 0
+      log.info "Master write detected.  Initial write, setting timestamp on endquery."
+    else
+      log.info "Master write detected. Increasing timestamp on endquery."
 
 class EpiBufferingClient extends EpiClient
   constructor: (@url, @writeUrl, @sqlReplicaConnection, @sqlMasterConnection) ->

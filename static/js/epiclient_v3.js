@@ -2490,9 +2490,7 @@ ReconnectingWebSocket = (function() {
 module.exports = ReconnectingWebSocket;
 
 
-},{}],"epi-client":[function(require,module,exports){
-module.exports=require('FlVzcq');
-},{}],"FlVzcq":[function(require,module,exports){
+},{}],"zpq5u4":[function(require,module,exports){
 var AwesomeWebSocket, EpiBufferingClient, EpiClient, EventEmitter, guid, log, _,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
@@ -2524,7 +2522,6 @@ EpiClient = (function(_super) {
     this.sqlReplicaConnection = sqlReplicaConnection;
     this.sqlMasterConnection = sqlMasterConnection;
     this.onreplicamasterwrite = __bind(this.onreplicamasterwrite, this);
-    this.onreplicawrite = __bind(this.onreplicawrite, this);
     this.onsend = __bind(this.onsend, this);
     this.onendrowset = __bind(this.onendrowset, this);
     this.onbeginrowset = __bind(this.onbeginrowset, this);
@@ -2673,8 +2670,15 @@ EpiClient = (function(_super) {
   };
 
   EpiClient.prototype.onerror = function(msg) {
+    var query_data;
+
     if (msg.error === 'replicawrite') {
-      return log.info('eating error...nom nom');
+      log.info('eating error...nom nom');
+      this.last_write_time = new Date(2050, 0);
+      query_data = this.pending_queries[msg.queryId];
+      query_data.is_write = true;
+      log.info('replica write.  switching to master');
+      return this.query(this.sqlMasterConnection, query_data.templateName, query_data.data, msg.queryId);
     } else {
       return this.emit('error', msg);
     }
@@ -2692,20 +2696,17 @@ EpiClient = (function(_super) {
     return this.emit('send', msg);
   };
 
-  EpiClient.prototype.onreplicawrite = function(msg) {
-    this.pending_queries[msg.queryId].is_write = true;
-    this.last_write_time = new Date(2050, 0);
-    log.info('replica write.  switching to master');
-    return this.query(this.sqlMasterConnection, this.pending_queries[msg.queryId].templateName, this.pending_queries[msg.queryId].data, msg.queryId);
-  };
-
   EpiClient.prototype.onreplicamasterwrite = function(msg) {
     var query_data;
 
     query_data = this.pending_queries[msg.queryId];
     query_data.is_write = true;
     this.pending_queries[msg.queryId] = query_data;
-    return log.info("Master write detected. Increasing timestamp on endquery.");
+    if (this.write_counter === 0) {
+      return log.info("Master write detected.  Initial write, setting timestamp on endquery.");
+    } else {
+      return log.info("Master write detected. Increasing timestamp on endquery.");
+    }
   };
 
   return EpiClient;
@@ -2776,4 +2777,6 @@ module.exports.EpiClient = EpiClient;
 module.exports.EpiBufferingClient = EpiBufferingClient;
 
 
-},{"events":1,"simplog":6,"underscore":7,"ws-additions":8}]},{},[])
+},{"events":1,"simplog":6,"underscore":7,"ws-additions":8}],"epi-client":[function(require,module,exports){
+module.exports=require('zpq5u4');
+},{}]},{},[])

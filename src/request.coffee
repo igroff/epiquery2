@@ -66,8 +66,7 @@ selectConnection = (context, callback) ->
         else
           log.info "query to replica is a write. switching host"
           log.info 'hostswitch template:', context.templatePath
-          context.emit 'replicawrite', context.queryId
-          return callback 'replicawrite', context.queryId
+          return callback 'replicawrite', context
 
   context.Stats.connectionName = context.connection.name
   callback null, context
