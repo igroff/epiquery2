@@ -1,6 +1,8 @@
 #! /usr/bin/env coffee
 
 WebSocket     = require 'ws'
+global.WebSocket = WebSocket
+global.window = {}
 EventEmitter  = require('events').EventEmitter
 _             = require 'underscore'
 clients       = require '../../src/clients/EpiClient.coffee'

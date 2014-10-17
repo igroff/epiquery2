@@ -1,6 +1,14 @@
 #! /usr/bin/env coffee
 
+# so, it used to be that the client supported both browser and server (node)
+# side usage.  This is no longer the case, but with some tweaking we can
+# make it work at all and thus leverage the old (server side) tests
+# that's what we're doing with the assignments to global
+#
+global.window = {}
+
 WebSocket     = require 'ws'
+global.WebSocket = WebSocket
 EventEmitter  = require('events').EventEmitter
 _             = require 'underscore'
 clients       = require '../../src/clients/EpiClient.coffee'
