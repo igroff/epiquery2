@@ -1,30 +1,29 @@
 ## I don't care, how do I use it.
 
-Epiquery2 provides a client you can use to connect, there's a couple versions 
-and the client simplifies your interaction with epiquery2 as well as providing
-reconnection and other valuable features.
+Epiquery2 provides a client you can use to connect which simplifies your
+interaction with epiquery2 as well as providing reconnection and other
+valuable features.
 
-There are currently two versions of the client:
-##### client version 1
+There are currently three versions of the client, the original ( without `_v*` )
+and `_v2` should not be used by any new applications and are only there for
+legacy apps so they don't have to unwillingly take new functionality.
 
-      http://some.epiquery2.server/static/js/epiclient.js
-    
-      // v1 takes a single url
-      var client = new EpiClient("ws://some.epiquery2.server/sockjs/websocket");
+##### Simple Client Example
 
-##### client version 2
-
-      http://some.epiquery.server/static/js/epiclient_v2.js
-    
-      //with v2 an array of urls is required
+      <script src="http://some.epiquery.server/static/js/epiclient_v3.js"></script>
+      <script type="text/javascript">   
+      //an array of urls is required
       client = new EpiClient([
         "ws://some.epiquery2.server/sockjs/websocket",
         "ws://another.epiquery2.server/sockjs/websocket"
       ]);
+      .... some code to use it
+      </script>
 
-Both of the clients support automatic reconnection, the v2 client supports
-the specification of multiple epiquery2 servers for which it will handle automatic
-failover in the case of errors contacting the epiquery2 server.
+
+The client supports automatic reconnection and the specification of multiple
+epiquery2 servers for which it will handle failover in the case of errors
+in the connection.
 
 There are examples of usage in `static/js/clienttest.html` and `static/js/clienttest_v2.html`
 
