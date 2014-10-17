@@ -53,7 +53,7 @@ results to epiquery.
 
 * Named Connection - a connection to a single data source accessed by epiquery.
 
-* epiquery - this application described within the repository hosting this README
+* epiquery - the application described within the repository hosting this README
 
 
 ## Supported data sources
@@ -161,6 +161,10 @@ very concise and simple, it should support a robust handling of that functionali
 
 ##### Provided Drivers
 * mssql - based on tedious, used to query an MS SQL Server instance
+* mssql_o - based on tedious, used to query an MS SQL Server instance, this 
+  driver returns the results as an object instead of an array of key/value pairs
+  this has some limitations (like not handling duplicate column names) but in
+  many cases it's simpler to use.
 * mysql - uses the mysql npm package
 * file - Expects that the result of a template render will be a valid path.  
   Given the result of the rendered template, it attempts to open the file
