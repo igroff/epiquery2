@@ -51,6 +51,23 @@ selectConnection = (context, callback) ->
       return callback msg
   else
     context.connection = connectionConfig
+
+  # Replica check here...
+  log.info "context.connection.name", context.connection.name
+  if context.connection.replica_of or context.connection.replica_master
+    log.info "query is using replica setup"
+    if context.rawTemplate.match(/\s(update|insert|exec|delete)\s/i)
+      log.info 'rawTemplate', context.rawTemplate
+      if context.rawTemplate.indexOf('replicasafe') != -1
+        log.info "query to replica flagged as replicasafe"
+      else
+        if context.connection.replica_master
+          context.emit 'replicamasterwrite', context.queryId
+        else
+          log.info "query to replica is a write. switching host"
+          log.info 'hostswitch template:', context.templatePath
+          return callback 'replicawrite', context
+
   context.Stats.connectionName = context.connection.name
   callback null, context
 
@@ -126,10 +143,10 @@ queryRequestHandler = (context) ->
     setupContext,
     logTemplateContext,
     getTemplatePath,
+    renderTemplate,
     selectConnection,
     escapeInput,
     sanitizeInput,
-    renderTemplate,
     executeQuery,
     collectStats
   ],
