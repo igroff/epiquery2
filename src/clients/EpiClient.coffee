@@ -1,7 +1,7 @@
 EventEmitter      = require('events').EventEmitter
 _                 = require 'underscore'
 log               = require 'simplog'
-AwesomeWebSocket  = require('ws-additions').AwesomeWebSocket
+AwesomeWebSocket  = require('awesome-websocket').AwesomeWebSocket
 
 guid = ->
     s4 = ->
