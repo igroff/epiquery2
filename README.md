@@ -25,7 +25,8 @@ The client supports automatic reconnection and the specification of multiple
 epiquery2 servers for which it will handle failover in the case of errors
 in the connection.
 
-There are examples of usage in `static/js/clienttest.html` and `static/js/clienttest_v2.html`
+You can see actual usage examples in the test code, which is linked from
+http://your.epiquery.server/static/test.html
 
 ## Definitions
 
