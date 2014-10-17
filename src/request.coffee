@@ -56,7 +56,7 @@ selectConnection = (context, callback) ->
   log.info "context.connection.name", context.connection.name
   if context.connection.replica_of or context.connection.replica_master
     log.info "query is using replica setup"
-    if context.rawTemplate.match(/\s(update|insert|exec|delete)\s/i)
+    if context.rawTemplate.match(/(^|\W)(update|insert|exec|delete)\W/i)
       log.info 'rawTemplate', context.rawTemplate
       if context.rawTemplate.indexOf('replicasafe') != -1
         log.info "query to replica flagged as replicasafe"
