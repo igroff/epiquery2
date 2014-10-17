@@ -123,6 +123,7 @@ class EpiClient extends EventEmitter
       query_data = @pending_queries[msg.queryId]
       query_data.is_write = true
       log.info 'replica write.  switching to master'
+      @emit 'replicawrite', msg
       @query(@sqlMasterConnection, query_data.templateName, query_data.data, msg.queryId)
     else
       @emit 'error', msg
