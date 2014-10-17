@@ -117,21 +117,21 @@ collectStats = (context, callback) ->
     stats.executionTimeInMillis
   )
 
-sanitizeInput = (context, callback) ->  
+sanitizeInput = (context, callback) ->
   _.walk.preorder context, (value, key, parent) ->
     if _.isString value
       _.each Object.keys(special_characters), (keyCode) ->
         def = special_characters[keyCode]
         parent[key] = value.replace def.regex, def.replace
-  
+
   callback null, context
 
 escapeInput = (context, callback) ->
-  driver = core.selectDriver context.connection  
+  driver = core.selectDriver context.connection
   driverInstance = new driver.class()
   driverInstance.escape?(context.templateContext)
   console.log context
-  callback null, context 
+  callback null, context
 
 queryRequestHandler = (context) ->
   async.waterfall [

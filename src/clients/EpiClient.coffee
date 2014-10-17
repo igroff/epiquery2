@@ -4,10 +4,10 @@ log               = require 'simplog'
 AwesomeWebSocket  = require('awesome-websocket').AwesomeWebSocket
 
 guid = ->
-    s4 = ->
-      return Math.floor((1 + Math.random()) * 0x10000)
-                 .toString(16)
-                 .substring(1)
+  s4 = ->
+    return Math.floor((1 + Math.random()) * 0x10000)
+               .toString(16)
+               .substring(1)
 
     return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
       s4() + '-' + s4() + s4() + s4()
@@ -63,7 +63,7 @@ class EpiClient extends EventEmitter
       log.debug "executing query: #{template} data:#{JSON.stringify(data)}"
       req.connectionName = @sqlMasterConnection
       @ws_w.send JSON.stringify(req)
-    else 
+    else
       # if someone has asked us to close on end, we want our fancy
       # underlying reconnectint sockets to not reconnect
       @ws.forceClose = req.closeOnEnd
@@ -83,7 +83,7 @@ class EpiClient extends EventEmitter
   onClose: () =>
     @emit 'close'
 
-  onrow: (msg) => 
+  onrow: (msg) =>
     if msg.queryId == 'replica_replication_time'
       log.info 'replica is timestamped at', msg.columns[0].value
       replica_timestamp = new Date(msg.columns[0].value)
@@ -93,7 +93,7 @@ class EpiClient extends EventEmitter
         @last_write_time = null
         @write_counter = 0
       else
-        setTimeout => 
+        setTimeout =>
           @query(@sqlReplicaConnection, 'get_replication_time.mustache', null, 'replica_replication_time')
         , 1000
     else if msg.queryId == @write_queryId
@@ -104,11 +104,11 @@ class EpiClient extends EventEmitter
     else
       @emit 'row', msg
   ondata: (msg) => @emit 'data', msg
-  onbeginquery: (msg) => 
+  onbeginquery: (msg) =>
     if @pending_queries[msg.queryId] and not @pending_queries[msg.queryId].is_write
       @pending_queries[msg.queryId].is_read = true
     @emit 'beginquery', msg
-  onendquery: (msg) => 
+  onendquery: (msg) =>
     if @pending_queries[msg.queryId]
       if @pending_queries[msg.queryId].is_write
         @write_counter += 1
@@ -154,7 +154,7 @@ class EpiBufferingClient extends EpiClient
         @last_write_time = null
         @write_counter = 0
       else
-        setTimeout => 
+        setTimeout =>
           @query(@sqlReplicaConnection, 'get_replication_time.mustache', null, 'replica_replication_time')
         , 1000
     else if msg.queryId == @write_queryId
