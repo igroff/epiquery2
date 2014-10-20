@@ -29,6 +29,7 @@ class EpiClient extends EventEmitter
     @ws.onclose = @onClose
     @ws.onopen = () =>
       log.debug "Epiclient connection opened"
+      @ws.keepAlive(60 * 1000, 'ping');
     @ws.onerror = (err) ->
       log.error "EpiClient socket error: ", err
     @ws.onsend = @onsend
@@ -39,6 +40,7 @@ class EpiClient extends EventEmitter
       @ws_w.onclose = @onClose
       @ws_w.onopen = () =>
         log.debug "Epiclient connection opened (write)"
+        @ws_w.keepAlive(60 * 1000, 'ping');
       @ws_w.onerror = (err) ->
         log.error "EpiClient socket error (write): ", err
       @ws_w.onsend = @onsend
@@ -74,6 +76,8 @@ class EpiClient extends EventEmitter
   onMessage: (message) =>
     # if the browser has wrapped this for use, we'll be interested in its
     # 'data' element
+    if message.data == 'pong'
+      return
     message = message.data if message.type? and message.type = 'message'
     message = JSON.parse(message) if typeof message is 'string'
     handler = @['on' + message.message]

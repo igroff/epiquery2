@@ -68,6 +68,9 @@ socketServer.on 'connection', (conn) ->
   log.debug "we got a client"
   conn.on 'data', (message) ->
     log.debug "inbound message #{message}"
+    if message == 'ping'
+      conn.write 'pong'
+      return
     message = JSON.parse(message)
     ctxParms =
       templateName: message.templateName
