@@ -22,6 +22,7 @@ app.use '/static', express.static(path.join(__dirname, 'static'))
 app.use app.router
 app.use express.errorHandler()
 
+api_key = process.env.EPISTREAM_API_KEY
 
 socketServer = sockjs.createServer(app)
 
@@ -67,6 +68,11 @@ httpRequestHandler = (req, res) ->
 socketServer.on 'connection', (conn) ->
   log.debug "we got a client"
   conn.on 'data', (message) ->
+
+    if !~ conn.url.indexOf api_key
+      conn.close()
+      return
+
     log.debug "inbound message #{message}"
     if message == 'ping'
       conn.write 'pong'
