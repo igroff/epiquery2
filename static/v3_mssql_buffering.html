@@ -1,0 +1,78 @@
+<!DOCTYPE HTML>
+<meta charset="UTF-8">
+
+<html lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" href="css/qunit.css">
+  <title>Epiquery 2 BUFFERING MS SQL tests</title>
+  <script src="js/epiclient_v3.js"></script>
+  <script src="js/lib.js"></script>
+  <script src="js/qunit.js"></script>
+  <script type="text/javascript">
+    var EpiBufferingClient = require('epi-client').EpiBufferingClient
+    var client = new EpiBufferingClient("ws://localhost:8080/sockjs/websocket");
+    var queryId = Date.now()
+   
+    function stringHasValue(s){
+      return s !== null && s !== undefined && typeof(s) === "string" &&
+        s !== "";
+    }
+
+    // test query: select @@servername as [servername]
+    QUnit.asyncTest("if there are a lot of rows we get 'em all", function(assert){
+      expect(3);
+      var client = new EpiBufferingClient("ws://localhost:8080/sockjs/websocket");
+      client.query('mssql', 'test/1000_rows', null, 'mqid');
+      client.on('error', function(e){ assert.ok(false, 'busted'); console.log(e); });
+      client.on('endquery', function(){
+        assert.ok(client.results.mqid, 'should have results for our query id');
+        assert.strictEqual(client.results['mqid'].resultSets.length, 1, 'should have one result set'); 
+        assert.strictEqual(client.results['mqid'].resultSets[0].length, 1000, 'row count'); 
+        QUnit.start();
+      });
+    });
+
+    // test query: select @@servername as [servername]
+    QUnit.asyncTest("v1 returns key value objects for columns", function(assert){
+      expect(4);
+      var client = new EpiBufferingClient("ws://localhost:8080/sockjs/websocket");
+      client.query('mssql', 'test/servername', null, 'mqid');
+      client.on('error', function(e){ assert.ok(false, 'busted'); console.log(e); });
+      client.on('endquery', function(){
+        assert.ok(client.results.mqid.currentResultSet[0][0].hasOwnProperty('name'), 'current result set name');
+        assert.ok(client.results.mqid.currentResultSet[0][0].hasOwnProperty('value'), 'current result set value');
+        assert.ok(client.results.mqid.resultSets[0][0][0].hasOwnProperty('name'), 'name');
+        assert.ok(client.results.mqid.resultSets[0][0][0].hasOwnProperty('value'), 'value');
+        QUnit.start();
+      });
+    });
+
+    // test query: select @@servername as [servername]
+    QUnit.asyncTest("'o' driver returns a single columns object", function(assert){
+      expect(6);
+      var client = new EpiBufferingClient("ws://localhost:8080/sockjs/websocket");
+      client.query('mssql_o', 'test/mssql_single_row_multi_column', null, 'mqid');
+      client.on('row', function(row) {
+        assert.strictEqual(typeof(row.columns), "object", "it's an object");
+        assert.ok(row.columns.hasOwnProperty('one_col'), 'first col name');
+        assert.ok(row.columns.hasOwnProperty('two_col'), 'second col name');
+      });
+      client.on('error', function(e){ assert.ok(false, 'busted'); console.log(e); });
+      client.on('endquery', function(){
+        assert.ok(client.results.mqid.currentResultSet[0].hasOwnProperty('one_col'), 'current result set one_col');
+        assert.ok(client.results.mqid.currentResultSet[0].hasOwnProperty('two_col'), 'current result set two_col');
+        assert.ok(client.results.mqid.resultSets[0][0].hasOwnProperty('one_col'), 'one_col');
+        assert.ok(client.results.mqid.resultSets[0][0].hasOwnProperty('two_col'), 'two_col');
+        assert.strictEqual(client.results.mqid.resultSets[0][0].one_col, 'one');
+        assert.strictEqual(client.results.mqid.resultSets[0][0].two_col, 'two');
+        QUnit.start();
+      });
+    });
+  </script>
+</head>
+<body>
+  <div id="qunit"></div>
+  <div id="qunit-fixture"></div>
+</body>
+</html>

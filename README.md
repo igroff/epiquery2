@@ -1,32 +1,32 @@
 ## I don't care, how do I use it.
 
-Epiquery2 provides a client you can use to connect, there's a couple versions 
-and the client simplifies your interaction with epiquery2 as well as providing
-reconnection and other valuable features.
+Epiquery2 provides a client you can use to connect which simplifies your
+interaction with epiquery2 as well as providing reconnection and other
+valuable features.
 
-There are currently two versions of the client:
-##### client version 1
+There are currently three versions of the client, the original ( without `_v*` )
+and `_v2` should not be used by any new applications and are only there for
+legacy apps so they don't have to unwillingly take new functionality.
 
-      http://some.epiquery2.server/static/js/epiclient.js
-    
-      // v1 takes a single url
-      var client = new EpiClient("ws://some.epiquery2.server/sockjs/websocket");
+##### Simple Client Example
 
-##### client version 2
-
-      http://some.epiquery.server/static/js/epiclient_v2.js
-    
-      //with v2 an array of urls is required
+      <script src="http://some.epiquery.server/static/js/epiclient_v3.js"></script>
+      <script type="text/javascript">   
+      //an array of urls is required
       client = new EpiClient([
         "ws://some.epiquery2.server/sockjs/websocket",
         "ws://another.epiquery2.server/sockjs/websocket"
       ]);
+      .... some code to use it
+      </script>
 
-Both of the clients support automatic reconnection, the v2 client supports
-the specification of multiple epiquery2 servers for which it will handle automatic
-failover in the case of errors contacting the epiquery2 server.
 
-There are examples of usage in `static/js/clienttest.html` and `static/js/clienttest_v2.html`
+The client supports automatic reconnection and the specification of multiple
+epiquery2 servers for which it will handle failover in the case of errors
+in the connection.
+
+You can see actual usage examples in the test code, which is linked from
+http://your.epiquery.server/static/test.html
 
 ## Definitions
 
@@ -53,7 +53,7 @@ results to epiquery.
 
 * Named Connection - a connection to a single data source accessed by epiquery.
 
-* epiquery - this application described within the repository hosting this README
+* epiquery - the application described within the repository hosting this README
 
 
 ## Supported data sources
@@ -161,6 +161,10 @@ very concise and simple, it should support a robust handling of that functionali
 
 ##### Provided Drivers
 * mssql - based on tedious, used to query an MS SQL Server instance
+* mssql_o - based on tedious, used to query an MS SQL Server instance, this 
+  driver returns the results as an object instead of an array of key/value pairs
+  this has some limitations (like not handling duplicate column names) but in
+  many cases it's simpler to use.
 * mysql - uses the mysql npm package
 * file - Expects that the result of a template render will be a valid path.  
   Given the result of the rendered template, it attempts to open the file

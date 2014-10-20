@@ -1,0 +1,135 @@
+<!DOCTYPE HTML>
+<meta charset="UTF-8">
+
+<html lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" href="css/qunit.css">
+  <title></title>
+  <script src="js/epiclient_v3.js"></script>
+  <script src="js/lib.js"></script>
+  <script src="js/qunit.js"></script>
+  <script type="text/javascript">
+    var EpiClient = require('epi-client').EpiClient
+    var client = new EpiClient("ws://localhost:8080/sockjs/websocket");
+    var queryId = Date.now()
+   
+    function collectResponses(connectionName, template, data, callback){
+      var responses = []
+      var myQueryId = ++queryId;
+      client.query(connectionName, template, data, myQueryId);
+      function collect(data){
+        if (data.queryId === myQueryId){
+          responses.push(data);
+        }
+        return responses;
+      }
+      client.on('row', collect);
+      client.on('close', collect);
+      client.on('beginquery', collect);
+      client.on('data', collect);
+      client.on('beginrowset', collect);
+      client.on('endrowset',  collect);
+      client.on('endquery', function(data){
+        if ( data.queryId === myQueryId ){
+          callback(collect(data));
+        }
+      });
+    }
+    function stringHasValue(s){
+      return s !== null && s !== undefined && typeof(s) === "string" &&
+        s !== "";
+    }
+    /*
+    QUnit.asyncTest("row event contains data", function(assert){
+      expect(2);
+      var client = new EpiClient("ws://localhost:8080/sockjs/websocket");
+      client.query('mssql', 'test/servername', null, 'mqid');
+      client.on('row', function(row) {
+        console.log(row.columns[0]);
+        // we should have something called name and value, name should be
+        // 'servername' and value should be something valid for the current 
+        // configuration so we'll assume anything that isn't nullish or
+        // an empty string as valid
+        assert.strictEqual(row.columns[0].name, 'servername', 'column name should be \'servernam\'');
+        assert.ok(stringHasValue(row.columns[0].value), 'invalid name');
+      });
+      client.on('error', function(e){ console.log(e); });
+      client.on('endquery', function(){ QUnit.start(); });
+    });
+    */
+    QUnit.asyncTest("write to replica raises error, fake_insert_no_space", function(assert){
+      expect(2);
+      var client = new EpiClient(
+        "ws://localhost:8080/sockjs/websocket", 
+        "ws://localhost:8080/sockjs/websocket",
+        "mssql_replica",
+        "mssql"
+      );
+      client.query('mssql_replica', 'test/fake_insert_no_space', null, 'mqid_2');
+      client.on('replicawrite', function(m){ assert.ok('received replica write'); });
+      client.on('error', function(e){
+        // our query is invalid, we're just testing that it's trigginering a 
+        // replicawrite event correctly so we expect this error
+        assert.equal(e.error, "Incorrect syntax near 'something'.");
+        QUnit.start(); 
+      });
+    });
+    QUnit.asyncTest("write to replica raises error, fake_insert", function(assert){
+      expect(2);
+      var client = new EpiClient(
+        "ws://localhost:8080/sockjs/websocket", 
+        "ws://localhost:8080/sockjs/websocket",
+        "mssql_replica",
+        "mssql"
+      );
+      client.query('mssql_replica', 'test/fake_insert', null, 'mqid_2');
+      client.on('replicawrite', function(m){ assert.ok('received replica write'); });
+      client.on('error', function(e){
+        // our query is invalid, we're just testing that it's trigginering a 
+        // replicawrite event correctly so we expect this error
+        assert.equal(e.error, "Incorrect syntax near 'something'.");
+        QUnit.start(); 
+      });
+    });
+    QUnit.asyncTest("write to replica raises error, fake_delete", function(assert){
+      expect(2);
+      var client = new EpiClient(
+        "ws://localhost:8080/sockjs/websocket", 
+        "ws://localhost:8080/sockjs/websocket",
+        "mssql_replica",
+        "mssql"
+      );
+      client.query('mssql_replica', 'test/fake_delete', null, 'mqid_2');
+      client.on('replicawrite', function(m){ assert.ok('received replica write'); });
+      client.on('error', function(e){
+        // our query is invalid, we're just testing that it's trigginering a 
+        // replicawrite event correctly so we expect this error
+        assert.equal(e.error, "Invalid object name 'something'.");
+        QUnit.start(); 
+      });
+    });
+    QUnit.asyncTest("write to replica raises error, fake_update", function(assert){
+      expect(2);
+      var client = new EpiClient(
+        "ws://localhost:8080/sockjs/websocket", 
+        "ws://localhost:8080/sockjs/websocket",
+        "mssql_replica",
+        "mssql"
+      );
+      client.query('mssql_replica', 'test/fake_update', null, 'mqid_2');
+      client.on('replicawrite', function(m){ assert.ok('received replica write'); });
+      client.on('error', function(e){
+        // our query is invalid, we're just testing that it's trigginering a 
+        // replicawrite event correctly so we expect this error
+        assert.equal(e.error, "Incorrect syntax near 'something'.");
+        QUnit.start(); 
+      });
+    });
+  </script>
+</head>
+<body>
+  <div id="qunit"></div>
+  <div id="qunit-fixture"></div>
+</body>
+</html>

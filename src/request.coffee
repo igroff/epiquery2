@@ -51,6 +51,23 @@ selectConnection = (context, callback) ->
       return callback msg
   else
     context.connection = connectionConfig
+
+  # Replica check here...
+  log.info "context.connection.name", context.connection.name
+  if context.connection.replica_of or context.connection.replica_master
+    log.info "query is using replica setup"
+    if context.rawTemplate.match(/(^|\W)(update|insert|exec|delete)\W/i)
+      log.info 'rawTemplate', context.rawTemplate
+      if context.rawTemplate.indexOf('replicasafe') != -1
+        log.info "query to replica flagged as replicasafe"
+      else
+        if context.connection.replica_master
+          context.emit 'replicamasterwrite', context.queryId
+        else
+          log.info "query to replica is a write. switching host"
+          log.info 'hostswitch template:', context.templatePath
+          return callback 'replicawrite', context
+
   context.Stats.connectionName = context.connection.name
   callback null, context
 
@@ -100,21 +117,21 @@ collectStats = (context, callback) ->
     stats.executionTimeInMillis
   )
 
-sanitizeInput = (context, callback) ->  
+sanitizeInput = (context, callback) ->
   _.walk.preorder context, (value, key, parent) ->
     if _.isString value
       _.each Object.keys(special_characters), (keyCode) ->
         def = special_characters[keyCode]
         parent[key] = value.replace def.regex, def.replace
-  
+
   callback null, context
 
 escapeInput = (context, callback) ->
-  driver = core.selectDriver context.connection  
+  driver = core.selectDriver context.connection
   driverInstance = new driver.class()
   driverInstance.escape?(context.templateContext)
   console.log context
-  callback null, context 
+  callback null, context
 
 queryRequestHandler = (context) ->
   async.waterfall [
@@ -126,10 +143,10 @@ queryRequestHandler = (context) ->
     setupContext,
     logTemplateContext,
     getTemplatePath,
+    renderTemplate,
     selectConnection,
     escapeInput,
     sanitizeInput,
-    renderTemplate,
     executeQuery,
     collectStats
   ],

@@ -2,9 +2,12 @@
   "message": "ok",
   "connections": [
     "mssql",
+    "mssql_replica",
     "file",
     "mysql",
     "render",
-    "mdx"
+    "mdx",
+    "mysql_o",
+    "mssql_o"
   ]
 }
