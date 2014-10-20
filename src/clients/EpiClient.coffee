@@ -45,7 +45,7 @@ class EpiClient extends EventEmitter
         log.error "EpiClient socket error (write): ", err
       @ws_w.onsend = @onsend
 
-  query: (connectionName, template, data, queryId=null) =>
+  query: (connectionName, template, data, queryId=null, force_write=false) =>
     req =
       templateName: template
       connectionName: connectionName
@@ -53,6 +53,10 @@ class EpiClient extends EventEmitter
 
     req.queryId = queryId || guid()
     req.closeOnEnd = data.closeOnEnd if data
+
+    if force_write and !@last_write_time
+      @last_write_time = new Date(2050, 0)
+      req.is_write = true
 
     @pending_queries[req.queryId] = JSON.parse(JSON.stringify(req)) # crappy copy...
 
