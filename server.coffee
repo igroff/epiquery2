@@ -1,6 +1,7 @@
 #! /usr/bin/env ./node_modules/.bin/coffee
 # vim:ft=coffee
- 
+
+cluster   = require 'cluster'
 express   = require 'express'
 _         = require 'underscore'
 path      = require 'path'
@@ -13,6 +14,16 @@ config    = require './src/config.coffee'
 sockjsClient        = require './src/transport/sockjs.coffee'
 httpClient          = require './src/transport/http.coffee'
 queryRequestHandler = require('./src/request.coffee').queryRequestHandler
+
+
+# fork off child processes if master
+forks = parseInt process.env.FORKS || 4
+if cluster.isMaster
+  console.log "Initializing #{forks} worker processes"
+  cluster.fork() for [1..forks]
+  cluster.on 'exit', (worker,code,signal) ->
+    console.log "Worker #{worker.process.pid} died", code, signal
+  return
 
 app = express()
 app.use express.favicon()
@@ -87,7 +98,7 @@ socketServer.on 'connection', (conn) ->
 app.get /\/(.+)$/, httpRequestHandler
 app.post /\/(.+)$/, httpRequestHandler
   
-log.info "server starting with configuration"
+log.info "server worker process starting with configuration"
 log.info "%j", config
 server = http.createServer(app)
 socketServer.installHandlers(server, {prefix: '/sockjs'})
