@@ -118,7 +118,7 @@ collectStats = (context, callback) ->
   )
 
 sanitizeInput = (context, callback) ->
-  _.walk.preorder context, (value, key, parent) ->
+  _.walk.preorder context.templateContext, (value, key, parent) ->
     if _.isString value
       _.each Object.keys(special_characters), (keyCode) ->
         def = special_characters[keyCode]
@@ -127,10 +127,10 @@ sanitizeInput = (context, callback) ->
   callback null, context
 
 escapeInput = (context, callback) ->
-  driver = core.selectDriver context.connection
-  driverInstance = new driver.class()
-  driverInstance.escape?(context.templateContext)
-  console.log context
+  _.walk.preorder context.templateContext, (value, key, parent) ->
+      if parent
+        parent[key] = value.replace(/'/g, "''") if _.isString(value)
+
   callback null, context
 
 queryRequestHandler = (context) ->
@@ -142,11 +142,11 @@ queryRequestHandler = (context) ->
     ,
     setupContext,
     logTemplateContext,
-    getTemplatePath,
-    renderTemplate,
-    selectConnection,
+    getTemplatePath,    
     escapeInput,
     sanitizeInput,
+    renderTemplate,
+    selectConnection,
     executeQuery,
     collectStats
   ],

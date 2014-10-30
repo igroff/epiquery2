@@ -6,11 +6,6 @@ _           = require 'lodash-contrib'
 
 class MSSQLDriver extends events.EventEmitter
   constructor: (@query, @config) ->
-  
-  escape: (context) ->
-    _.walk.preorder context, (value, key, parent) ->
-      if parent
-        parent[key] = value.replace(/'/g, "''") if _.isString(value)
 
   execute: () =>
     @rowSetStarted = false
