@@ -5,7 +5,30 @@ log         = require 'simplog'
 _           = require 'lodash-contrib'
 
 class MSSQLDriver extends events.EventEmitter
-  constructor: (@query, @config) ->
+  constructor: (@query, @config, @context) ->
+  
+  escape: (context) ->
+    _.walk.preorder context, (value, key, parent) ->
+      if parent
+        parent[key] = value.replace(/'/g, "''") if _.isString(value)
+
+  parseQueryParameters: () ->    
+
+    lines = @query.match ///^--@.*$///mg    
+    
+    _.map lines, (line) =>
+      line = line.replace '--', ''
+      line = line.replace '=', ''
+
+      [varName,type,value] = line.split /\s+/
+      varName = varName.replace('@','')
+      type = type.replace /\(.*\)/
+
+      value = _.reduce value.split('.'), (doc,prop) ->
+        doc[prop]
+      , @context.templateContext
+
+      { varName, type, value }
 
   execute: () =>
     @rowSetStarted = false
@@ -17,6 +40,7 @@ class MSSQLDriver extends events.EventEmitter
     conn.on 'errorMessage', (infoMessage) -> log.error "te %j", infoMessage
     conn.on 'connect', connect_deferred.makeNodeResolver()
     conn.on 'end', () => connect_end_deferred.resolve()
+    conn.on 'debug', (message) => log.info message
 
     connect_deferred.promise.then(
       () =>
@@ -47,7 +71,14 @@ class MSSQLDriver extends events.EventEmitter
         # what we want here, all that fancy parameterization and 'stuff' is
         # done
         # in the template
-        conn.execSqlBatch request,
+
+        parameters = @parseQueryParameters()
+        unless _.isEmpty parameters
+          parameters.forEach (param) ->
+            request.addParameter(param.varName, tedious.TYPES[param.type], parseInt(param.value || 0))
+          return conn.execSql request
+
+        conn.execSqlBatch request
       (error) =>
         log.error "connect failed %j", error
         this.emit 'error', error
