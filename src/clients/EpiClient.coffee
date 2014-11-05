@@ -29,7 +29,7 @@ class EpiClient extends EventEmitter
     @ws.onclose = @onClose
     @ws.onopen = () =>
       log.debug "Epiclient connection opened"
-      @ws.keepAlive(60 * 1000, 'ping');
+      @ws.keepAlive(60 * 1000, 'ping')
     @ws.onerror = (err) ->
       log.error "EpiClient socket error: ", err
     @ws.onsend = @onsend
@@ -40,7 +40,7 @@ class EpiClient extends EventEmitter
       @ws_w.onclose = @onClose
       @ws_w.onopen = () =>
         log.debug "Epiclient connection opened (write)"
-        @ws_w.keepAlive(60 * 1000, 'ping');
+        @ws_w.keepAlive(60 * 1000, 'ping')
       @ws_w.onerror = (err) ->
         log.error "EpiClient socket error (write): ", err
       @ws_w.onsend = @onsend

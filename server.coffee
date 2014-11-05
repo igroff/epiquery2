@@ -16,14 +16,15 @@ httpClient          = require './src/transport/http.coffee'
 queryRequestHandler = require('./src/request.coffee').queryRequestHandler
 
 
-# fork off child processes if master
-forks = parseInt process.env.FORKS || 4
-if cluster.isMaster
-  console.log "Initializing #{forks} worker processes"
-  cluster.fork() for [1..forks]
-  cluster.on 'exit', (worker,code,signal) ->
-    console.log "Worker #{worker.process.pid} died", code, signal
-  return
+# fork off child processes if master and such behavior has been requested
+if process.env.FORKS
+  forks = parseInt process.env.FORKS
+  if cluster.isMaster
+    console.log "Initializing #{forks} worker processes"
+    cluster.fork() for [1..forks]
+    cluster.on 'exit', (worker,code,signal) ->
+      console.log "Worker #{worker.process.pid} died", code, signal
+    return
 
 app = express()
 app.use express.favicon()

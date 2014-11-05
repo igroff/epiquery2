@@ -1,0 +1,3 @@
+beginquery{"queryId":"basicSocketQueryId","message":"beginquery"}
+endquery{"queryId":"basicSocketQueryId","message":"endquery"}
+row{"queryId":"basicSocketQueryId","columns":[{"value":"doesn't break","name":"OhNoes"}],"message":"row"}

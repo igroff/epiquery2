@@ -2569,7 +2569,8 @@ EpiClient = (function(_super) {
     this.ws.onmessage = this.onMessage;
     this.ws.onclose = this.onClose;
     this.ws.onopen = function() {
-      return log.debug("Epiclient connection opened");
+      log.debug("Epiclient connection opened");
+      return _this.ws.keepAlive(60 * 1000, 'ping');
     };
     this.ws.onerror = function(err) {
       return log.error("EpiClient socket error: ", err);
@@ -2580,7 +2581,8 @@ EpiClient = (function(_super) {
       this.ws_w.onmessage = this.onMessage;
       this.ws_w.onclose = this.onClose;
       this.ws_w.onopen = function() {
-        return log.debug("Epiclient connection opened (write)");
+        log.debug("Epiclient connection opened (write)");
+        return _this.ws_w.keepAlive(60 * 1000, 'ping');
       };
       this.ws_w.onerror = function(err) {
         return log.error("EpiClient socket error (write): ", err);
@@ -2589,11 +2591,14 @@ EpiClient = (function(_super) {
     }
   };
 
-  EpiClient.prototype.query = function(connectionName, template, data, queryId) {
+  EpiClient.prototype.query = function(connectionName, template, data, queryId, force_write) {
     var req;
 
     if (queryId == null) {
       queryId = null;
+    }
+    if (force_write == null) {
+      force_write = false;
     }
     req = {
       templateName: template,
@@ -2603,6 +2608,10 @@ EpiClient = (function(_super) {
     req.queryId = queryId || guid();
     if (data) {
       req.closeOnEnd = data.closeOnEnd;
+    }
+    if (force_write && !this.last_write_time) {
+      this.last_write_time = new Date(2050, 0);
+      req.is_write = true;
     }
     this.pending_queries[req.queryId] = JSON.parse(JSON.stringify(req));
     if (this.last_write_time && this.ws_w && queryId !== 'replica_replication_time') {
@@ -2620,6 +2629,9 @@ EpiClient = (function(_super) {
   EpiClient.prototype.onMessage = function(message) {
     var handler;
 
+    if (message.data === 'pong') {
+      return;
+    }
     if ((message.type != null) && (message.type = 'message')) {
       message = message.data;
     }

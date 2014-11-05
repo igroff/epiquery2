@@ -12,9 +12,9 @@ class MSSQLDriver extends events.EventEmitter
       if parent
         parent[key] = value.replace(/'/g, "''") if _.isString(value)
 
-  parseQueryParameters: () ->    
+  parseQueryParameters: () ->
 
-    lines = @query.match ///^--@.*$///mg    
+    lines = @query.match ///^--@.*$///mg
     
     _.map lines, (line) =>
       line = line.replace '--', ''
