@@ -54,7 +54,7 @@ app.get '/templates', (req, res) ->
 
 app.get '/stats', (req, res) ->
   stats =
-    # execution time data is a object contiaining 
+    # execution time data is a object contiaining
     # "templateName": <CircularBuffer of recent exedution times>
     # properties
     recentExecutionTimes: _.map core.getQueryExecutionTimes, (v, k, l) ->
@@ -105,7 +105,7 @@ socketServer.on 'connection', (conn) ->
 
 app.get /\/(.+)$/, httpRequestHandler
 app.post /\/(.+)$/, httpRequestHandler
-  
+
 log.info "server worker process starting with configuration"
 log.info "%j", config
 server = http.createServer(app)

@@ -1,8 +1,0 @@
-.git*
-node_modules/
-build/
-css/
-js/
-model/
-samples/
-xslt/

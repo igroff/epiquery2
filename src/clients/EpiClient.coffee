@@ -65,7 +65,7 @@ class EpiClient extends EventEmitter
       # if someone has asked us to close on end, we want our fancy
       # underlying reconnectint sockets to not reconnect
       @ws_w.forceClose = req.closeOnEnd
-      
+
       log.debug "executing query: #{template} data:#{JSON.stringify(data)}"
       req.connectionName = @sqlMasterConnection
       @ws_w.send JSON.stringify(req)
@@ -73,7 +73,7 @@ class EpiClient extends EventEmitter
       # if someone has asked us to close on end, we want our fancy
       # underlying reconnectint sockets to not reconnect
       @ws.forceClose = req.closeOnEnd
-      
+
       log.debug "executing query: #{template} data:#{JSON.stringify(data)}"
       @ws.send @pending_queries[req.queryId]
 
@@ -87,7 +87,7 @@ class EpiClient extends EventEmitter
     handler = @['on' + message.message]
     if handler
       handler(message)
-  
+
   onClose: () =>
     @emit 'close'
 
@@ -172,7 +172,7 @@ class EpiBufferingClient extends EpiClient
         @query(@sqlReplicaConnection, 'get_replication_time.mustache', null, 'replica_replication_time')
     else
       @results[msg.queryId]?.currentResultSet?.push(msg.columns)
-  
+
   onbeginrowset: (msg) =>
     newResultSet = []
     @results[msg.queryId] ||= resultSets: []

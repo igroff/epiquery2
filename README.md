@@ -11,13 +11,16 @@ legacy apps so they don't have to unwillingly take new functionality.
 ##### Simple Client Example
 
       <script src="http://some.epiquery.server/static/js/epiclient_v3.js"></script>
-      <script type="text/javascript">   
+      <script type="text/javascript">
       //an array of urls is required
       client = new EpiClient([
         "ws://some.epiquery2.server/sockjs/websocket",
         "ws://another.epiquery2.server/sockjs/websocket"
       ]);
-      .... some code to use it
+      client.query('glglive', 'todo/list.mustache', null, {username: @username});
+      client.on('row', function(row){
+        console.log(row, 'your boat')    
+      })
       </script>
 
 
@@ -40,7 +43,7 @@ resulting in multiple result sets.
 processed by epiquery.  This time is specifically that which is bounded by
 Query Begin and Query Complete messages.
 
-* QueryRequest - An inbound request for epiquery to render and execute a 
+* QueryRequest - An inbound request for epiquery to render and execute a
 template against a specific connection.
 
 * Data Source - A server from which epiquery is capable of retrieving data for
@@ -57,15 +60,15 @@ results to epiquery.
 
 
 ## Supported data sources
-* Microsoft SQL Server 
+* Microsoft SQL Server
 * MySQL
 * Microsoft SQL Server Analysis Services (MDX)
 * File system
 
-## Configuration 
+## Configuration
 
 Configuration of epiquery is done entirely through environment variables, this
-is done to simplify the deployment specifically within 
+is done to simplify the deployment specifically within
 [Starphleet](https://github.com/wballard/starphleet).  The configuration can
 be done solely through environment variables or, as a convenience, epiquery
 will source a file `~/.epiquery2/config` in which the variables can be specified.
@@ -121,11 +124,11 @@ associated with the containing result set.
     {"message":"row", "queryId":"", "columns":{"col_name": "col_value"}}
 
 ##### beginrowset
-Used to indicate that a result set has begun.  Some providers, given a particular query, 
+Used to indicate that a result set has begun.  Some providers, given a particular query,
 can return multiple result sets, this message indicates the start of a new result set from the
 execution of a given query.  Individual query processing is synchronous, so while there is no
 in built way to tie a particular section of a Query to a result set directly, each query contained
-within the QueryRequest sent to the provider can result in a distinct result set, and thus the 
+within the QueryRequest sent to the provider can result in a distinct result set, and thus the
 emission of a 'beginrowset' message.
 
     {"message":"beginrowset", "queryId":""}
@@ -143,7 +146,7 @@ be raised.
     {"message":"beginquery", "queryId":""}
 
 ##### endquery
-Indicates that a particular query has completed, all of it's data having been returned.  Indicates the 
+Indicates that a particular query has completed, all of it's data having been returned.  Indicates the
 final stage of an Active Query, once this event is raised the associated Query is no longer considered
 active.
 
@@ -161,7 +164,7 @@ very concise and simple, it should support a robust handling of that functionali
 
 ##### Provided Drivers
 * mssql - based on tedious, used to query an MS SQL Server instance
-* mssql_o - based on tedious, used to query an MS SQL Server instance, this 
+* mssql_o - based on tedious, used to query an MS SQL Server instance, this
   driver returns the results as an object instead of an array of key/value pairs
   this has some limitations (like not handling duplicate column names) but in
   many cases it's simpler to use.
@@ -172,4 +175,3 @@ very concise and simple, it should support a robust handling of that functionali
   comes through as a 'row' event.
 * msmdx - allows for MDX querying of a Microsoft Analysis Server interface
 * render - simply renders the template requested and returns the result
-

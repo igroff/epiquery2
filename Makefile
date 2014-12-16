@@ -5,7 +5,7 @@ watch:
 	DEBUG=true supervisor --ignore "./test"  -e ".litcoffee|.coffee|.js" --exec make run-server
 
 run-server: static/js/epiclient_v2.js static/js/epiclient_v3.js
-	exec ./ar-start
+	npm start
 
 difftest/templates:
 	cd difftest/ && git clone https://github.com/igroff/epiquery-templates.git \
@@ -19,7 +19,7 @@ pass/%:
 
 lint:
 	find ./src -name '*.coffee' | xargs ./node_modules/.bin/coffeelint -f ./etc/coffeelint.conf
-	find ./src -name '*.js' | xargs ./node_modules/.bin/jshint 
+	find ./src -name '*.js' | xargs ./node_modules/.bin/jshint
 
 static/js/sockjstest.js: static/js/src/wstest.coffee
 	./node_modules/.bin/browserify -t coffeeify static/js/src/wstest.coffee > static/js/sockjstest.js
