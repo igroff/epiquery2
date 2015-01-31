@@ -43,7 +43,7 @@
   },
   "scripts": {
     "start": "./bin/npm-starter",
-    "postinstall": "./bin/post-install"
+    "postinstall": "./bin/post-install || true"
   },
   "repository": {
     "type": "git",
