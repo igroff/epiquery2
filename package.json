@@ -38,8 +38,9 @@
   "bin": {
     "update_repo_dir": "bin/update_or_clone_repo"
   },
-  "engine": {
-    "node": "0.10.3"
+  "engines": {
+    "node": "0.10.3",
+    "npm":  "2.5.1"
   },
   "scripts": {
     "start": "./bin/npm-starter",
