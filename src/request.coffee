@@ -127,11 +127,9 @@ sanitizeInput = (context, callback) ->
   callback null, context
 
 escapeInput = (context, callback) ->
-  console.log context.templateContext
   _.walk.preorder context.templateContext, (value, key, parent) ->
     if parent
       parent[key] = value.replace(/'/g, "''") if _.isString(value)
-  console.log context.templateContext
   callback null, context
 
 queryRequestHandler = (context) ->
