@@ -98,6 +98,7 @@ socketServer.on 'connection', (conn) ->
       queryId: message.queryId
       templateContext: message.data
     context = new Context(ctxParms)
+    log.info "[q:#{context.queryId}] starting processing"
     sockjsClient.attachResponder(context, conn)
     queryRequestHandler(context)
   conn.on 'close', () ->
