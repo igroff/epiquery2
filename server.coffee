@@ -36,7 +36,7 @@ app.use express.errorHandler()
 
 apiKey = process.env.EPISTREAM_API_KEY
 
-socketServer = sockjs.createServer(app)
+socketServer = sockjs.createServer(app, options: disconnect_delay: 900000)
 
 # initialize the core including driver loading, etc.
 core.init()
