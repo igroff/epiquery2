@@ -101,8 +101,13 @@ socketServer.on 'connection', (conn) ->
     log.info "[q:#{context.queryId}] starting processing"
     sockjsClient.attachResponder(context, conn)
     queryRequestHandler(context)
+  conn.on 'error', (e) ->
+    log.error "error on connection", e
   conn.on 'close', () ->
     log.debug "sockjs client disconnected"
+
+socketServer.on 'error', (e) ->
+  log.error "error on socketServer", e
 
 app.get /\/(.+)$/, httpRequestHandler
 app.post /\/(.+)$/, httpRequestHandler
