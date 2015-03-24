@@ -35,6 +35,7 @@ app.use app.router
 app.use express.errorHandler()
 
 apiKey = process.env.EPISTREAM_API_KEY
+urlBasedKey = process.env.URL_BASED_API_KEY # use second env var for backwards compatibility 
 
 socketServer = sockjs.createServer(app)
 
@@ -69,7 +70,15 @@ app.get '/stats', (req, res) ->
 httpRequestHandler = (req, res) ->
   clientId = req.param 'client_id'
   c = new Context()
-  _.extend c, httpClient.getQueryRequestInfo(req)
+  _.extend c, httpClient.getQueryRequestInfo(req, !!apiKey)
+  # Check that the client supplied key matches server key
+  if apiKey
+    if !(c.clientKey == apiKey)
+      log.error "Unauthorized HTTP Access Attempted from IP: #{req.connection.remoteAddress}"
+      log.error "Unauthorized Context: #{JSON.stringify(c.templateContext)}"
+      res.send error: "Unauthorized Access"
+      return
+
   if c.connectionName and not config.connections[c.connectionName]
     res.send error: "unable to find connection by name '#{c.connectionName}'"
     return
