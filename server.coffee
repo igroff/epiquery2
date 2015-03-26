@@ -78,7 +78,6 @@ httpRequestHandler = (req, res) ->
   queryRequestHandler(c)
 
 socketServer.on 'connection', (conn) ->
-  log.debug "we got a client"
   conn.on 'data', (message) ->
 
     if apiKey
@@ -114,6 +113,7 @@ app.post /\/(.+)$/, httpRequestHandler
   
 log.info "server worker process starting with configuration"
 log.info "%j", config
+log.info "node version", process.version
 server = http.createServer(app)
 socketServer.installHandlers(server, {prefix: '/sockjs'})
-server.listen(process.env.PORT || config.port)
+server.listen(config.port)
