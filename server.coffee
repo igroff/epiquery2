@@ -116,4 +116,4 @@ log.info "server worker process starting with configuration"
 log.info "%j", config
 server = http.createServer(app)
 socketServer.installHandlers(server, {prefix: '/sockjs'})
-server.listen(config.port)
+server.listen(process.env.PORT || config.port)
