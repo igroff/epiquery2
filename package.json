@@ -39,7 +39,7 @@
     "update_repo_dir": "bin/update_or_clone_repo"
   },
   "engines": {
-    "node": "0.12.0",
+    "node": "0.10.3",
     "npm":  "2.5.1"
   },
   "scripts": {

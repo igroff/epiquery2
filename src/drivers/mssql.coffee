@@ -37,7 +37,7 @@ class MSSQLDriver extends events.EventEmitter
     request_complete_deferred  = Q.defer()
 
     conn = new tedious.Connection @config
-    conn.on 'errorMessage', (infoMessage) -> log.error "[q:#{@context.queryId}] te %j", infoMessage
+    conn.on 'errorMessage', (infoMessage) -> log.error "[q:#{@context}] te %j", infoMessage
     conn.on 'connect', connect_deferred.makeNodeResolver()
     conn.on 'end', () => connect_end_deferred.resolve()
     conn.on 'debug', (message) => log.debug message
@@ -80,7 +80,7 @@ class MSSQLDriver extends events.EventEmitter
 
         conn.execSqlBatch request
       (error) =>
-        log.error "[q:#{@context.queryid}] connect failed %j", error
+        log.error "[q:#{@context}] connect failed %j", error
         this.emit 'error', error
     )
 
@@ -92,11 +92,11 @@ class MSSQLDriver extends events.EventEmitter
         # raised by the close of the connection which is done on the request
         # complete trigger and we should then be done anyway so this will simply
         # be redundant
-        log.event "[q:#{@context.queryId}] mssql driver connect_end"
+        log.event 'connect_end'
         if connect_deferred.promise.isPending()
-          connect_deferred.reject("[q:#{@context.queryId}] connection ended prior to sucessful connect")
+          connect_deferred.reject("[q:#{@context}] connection ended prior to sucessful connect")
       ,
-      (error) -> log.error "[q:#{@context.queryId}] connect end failed #{error}"
+      (error) -> log.error "[q:#{@context}] connect end failed #{error}"
     )
 
 

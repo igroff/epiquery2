@@ -20,10 +20,10 @@ queryRequestHandler = require('./src/request.coffee').queryRequestHandler
 if process.env.FORKS
   forks = parseInt process.env.FORKS
   if cluster.isMaster
-    log.info "Initializing #{forks} worker processes"
+    console.log "Initializing #{forks} worker processes"
     cluster.fork() for [1..forks]
     cluster.on 'exit', (worker,code,signal) ->
-      log.info "Worker #{worker.process.pid} died", code, signal
+      console.log "Worker #{worker.process.pid} died", code, signal
     return
 
 app = express()
@@ -36,7 +36,7 @@ app.use express.errorHandler()
 
 apiKey = process.env.EPISTREAM_API_KEY
 
-socketServer = sockjs.createServer(app, options: response_limit: 1)
+socketServer = sockjs.createServer(app, options: disconnect_delay: 900000)
 
 # initialize the core including driver loading, etc.
 core.init()
@@ -78,6 +78,7 @@ httpRequestHandler = (req, res) ->
   queryRequestHandler(c)
 
 socketServer.on 'connection', (conn) ->
+  log.debug "we got a client"
   conn.on 'data', (message) ->
 
     if apiKey
@@ -89,10 +90,7 @@ socketServer.on 'connection', (conn) ->
     if message == 'ping'
       conn.write 'pong'
       return
-    try
-      message = JSON.parse(message)
-    catch e
-      
+    message = JSON.parse(message)
     ctxParms =
       templateName: message.templateName
       closeOnEnd: message.closeOnEnd
@@ -100,16 +98,16 @@ socketServer.on 'connection', (conn) ->
       queryId: message.queryId
       templateContext: message.data
     context = new Context(ctxParms)
-    log.debug "[q:#{context.queryId}] starting processing #{message.templateName}"
+    log.info "[q:#{context.queryId}] starting processing"
     sockjsClient.attachResponder(context, conn)
     queryRequestHandler(context)
   conn.on 'error', (e) ->
-    log.error "connection error", e
+    log.error "error on connection", e
   conn.on 'close', () ->
-    log.debug "websocket client disconnected"
+    log.debug "sockjs client disconnected"
 
 socketServer.on 'error', (e) ->
-  log.error "socketServer error", e
+  log.error "error on socketServer", e
 
 app.get /\/(.+)$/, httpRequestHandler
 app.post /\/(.+)$/, httpRequestHandler
