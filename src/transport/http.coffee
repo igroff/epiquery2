@@ -56,9 +56,12 @@ attachResponder = (context, res) ->
 
   c.on 'completequeryexecution', completeResponse
 
-getQueryRequestInfo = (req) ->
+getQueryRequestInfo = (req, useSecure) ->
   templatePath = req.path.replace(/\.\./g, '').replace(/^\//, '')
   pathParts = templatePath.split('/')
+  # If we're using a key secured client, the key must be before the connection name
+  if useSecure
+    clientKey = pathParts.shift()
   connectionName = pathParts.shift()
   connection = null
   if connectionName is 'header'
@@ -72,6 +75,7 @@ getQueryRequestInfo = (req) ->
     connectionConfig: connection
     templateContext: params
     templateName: templatePath
+    clientKey: clientKey
 
 module.exports.attachResponder = attachResponder
 module.exports.getQueryRequestInfo = getQueryRequestInfo
