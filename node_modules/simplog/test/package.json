@@ -1,0 +1,12 @@
+{
+  "name": "simplog-install-test",
+  "version": "0.0.1",
+  "description": "",
+  "dependencies": {
+    "simplog": "git+https://github.com/intimonkey/node-simplog.git"
+  },
+  "engine": {
+    "node": "0.10.8"
+  },
+  "os": ["!win32"]
+}

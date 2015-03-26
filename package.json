@@ -27,7 +27,6 @@
     "optimist": "0.6.0",
     "async": "0.2.9",
     "line-by-line": "0.1.1",
-    "rbytes": "1.0.0",
     "sockjs": "0.3.8",
     "awesome-websocket": "0.0.25",
     "coffeeify": "^0.6.0",

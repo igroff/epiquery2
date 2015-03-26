@@ -1,0 +1,3 @@
+#! /usr/bin/env node
+log = require('simplog');
+log.warn("look ma, a warning");
