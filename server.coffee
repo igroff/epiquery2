@@ -130,6 +130,6 @@ server = http.createServer(app)
 # use key based prefix if key is in url
 prefix = {prefix: '/sockjs'}
 prefix.prefix = "/#{apiKey}/sockjs" if apiKey && urlBasedKey
-
 socketServer.installHandlers(server, prefix)
+server.emit 'error'
 server.listen(config.port)
