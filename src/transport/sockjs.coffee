@@ -31,7 +31,7 @@ attachResponder = (context, conn) ->
       queryId: msg?.queryId || context?.queryId
       error: err.message || err
       message: 'error'
-    log.error "sockjs error: #{response.error}"
+    log.error "[#{context.queryId}] sockjs transport error: #{response.error}"
     conn.jwrite response
   context.on 'endquery', (data) ->
     data.message = "endquery"

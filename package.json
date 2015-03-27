@@ -27,7 +27,6 @@
     "optimist": "0.6.0",
     "async": "0.2.9",
     "line-by-line": "0.1.1",
-    "rbytes": "1.0.0",
     "sockjs": "0.3.8",
     "awesome-websocket": "0.0.25",
     "coffeeify": "^0.6.0",
@@ -39,7 +38,7 @@
     "update_repo_dir": "bin/update_or_clone_repo"
   },
   "engines": {
-    "node": "0.10.3",
+    "node": "0.12.1",
     "npm":  "2.5.1"
   },
   "scripts": {
