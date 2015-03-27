@@ -37,7 +37,7 @@ app.use express.errorHandler()
 apiKey = process.env.EPISTREAM_API_KEY
 urlBasedKey = process.env.URL_BASED_API_KEY # use second env var for backwards compatibility 
 
-socketServer = sockjs.createServer(app, options: disconnect_delay: 900000)
+socketServer = sockjs.createServer(app)
 
 # initialize the core including driver loading, etc.
 core.init()
@@ -87,6 +87,7 @@ httpRequestHandler = (req, res) ->
   queryRequestHandler(c)
 
 socketServer.on 'connection', (conn) ->
+  log.debug "we got a client"
   conn.on 'data', (message) ->
 
     if apiKey
@@ -108,23 +109,16 @@ socketServer.on 'connection', (conn) ->
       queryId: message.queryId
       templateContext: message.data
     context = new Context(ctxParms)
-    log.info "[q:#{context.queryId}] starting processing"
     sockjsClient.attachResponder(context, conn)
     queryRequestHandler(context)
-  conn.on 'error', (e) ->
-    log.error "error on connection", e
   conn.on 'close', () ->
     log.debug "sockjs client disconnected"
-
-socketServer.on 'error', (e) ->
-  log.error "error on socketServer", e
 
 app.get /\/(.+)$/, httpRequestHandler
 app.post /\/(.+)$/, httpRequestHandler
   
 log.info "server worker process starting with configuration"
 log.info "%j", config
-log.info "node version", process.version
 server = http.createServer(app)
 
 # use key based prefix if key is in url

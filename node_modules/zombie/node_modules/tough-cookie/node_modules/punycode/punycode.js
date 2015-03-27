@@ -1,4 +1,4 @@
-/*! https://mths.be/punycode v1.3.2 by @mathias */
+/*! http://mths.be/punycode v1.3.1 by @mathias */
 ;(function(root) {
 
 	/** Detect free variables */
@@ -103,9 +103,7 @@
 			result = parts[0] + '@';
 			string = parts[1];
 		}
-		// Avoid `split(regex)` for IE8 compatibility. See #17.
-		string = string.replace(regexSeparators, '\x2E');
-		var labels = string.split('.');
+		var labels = string.split(regexSeparators);
 		var encoded = map(labels, fn).join('.');
 		return result + encoded;
 	}
@@ -117,7 +115,7 @@
 	 * UCS-2 exposes as separate characters) into a single code point,
 	 * matching UTF-16.
 	 * @see `punycode.ucs2.encode`
-	 * @see <https://mathiasbynens.be/notes/javascript-encoding>
+	 * @see <http://mathiasbynens.be/notes/javascript-encoding>
 	 * @memberOf punycode.ucs2
 	 * @name decode
 	 * @param {String} string The Unicode input string (UCS-2).
@@ -486,11 +484,11 @@
 		 * @memberOf punycode
 		 * @type String
 		 */
-		'version': '1.3.2',
+		'version': '1.3.1',
 		/**
 		 * An object of methods to convert from JavaScript's internal character
 		 * representation (UCS-2) to Unicode code points, and back.
-		 * @see <https://mathiasbynens.be/notes/javascript-encoding>
+		 * @see <http://mathiasbynens.be/notes/javascript-encoding>
 		 * @memberOf punycode
 		 * @type Object
 		 */

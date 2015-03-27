@@ -1,5 +1,6 @@
 *.swp
 *.bs
+node_modules/
 test/templates/
 test/results/*
 difftest/templates/
