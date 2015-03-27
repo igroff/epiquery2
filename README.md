@@ -1,5 +1,5 @@
 ## I don't care, how do I use it.
-
+ 
 Epiquery2 provides a client you can use to connect which simplifies your
 interaction with epiquery2 as well as providing reconnection and other
 valuable features.
