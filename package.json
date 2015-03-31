@@ -1,6 +1,6 @@
 {
   "name": "epiquery2",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "run templated queries from the http's using learnings from 1",
   "main": "server.coffee",
   "devDependencies": {
@@ -45,6 +45,8 @@
     "start": "./bin/npm-starter",
     "postinstall": "./bin/post-install || true"
   },
+  "browser": "src/clients/EpiClient.coffee",
+  "browserify": { "transform": [ "coffeeify" ] },
   "repository": {
     "type": "git",
     "url": "git://github.com/igroff/epiquery2.git"
