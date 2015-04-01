@@ -48,7 +48,7 @@ attachResponder = (context, res) ->
     writeEvent data
 
   c.on 'error', (err) ->
-    d = message: 'error'
+    d = message: 'error', errorDetail: err
     d.error = err.message if err.message
     log.error err
     writeEvent d
