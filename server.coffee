@@ -35,8 +35,9 @@ app.use app.router
 app.use express.errorHandler()
 
 apiKey = process.env.EPISTREAM_API_KEY
+urlBasedKey = process.env.URL_BASED_API_KEY # use second env var for backwards compatibility 
 
-socketServer = sockjs.createServer(app)
+socketServer = sockjs.createServer(app, options: disconnect_delay: 900000)
 
 # initialize the core including driver loading, etc.
 core.init()
@@ -69,7 +70,15 @@ app.get '/stats', (req, res) ->
 httpRequestHandler = (req, res) ->
   clientId = req.param 'client_id'
   c = new Context()
-  _.extend c, httpClient.getQueryRequestInfo(req)
+  _.extend c, httpClient.getQueryRequestInfo(req, !!apiKey)
+  # Check that the client supplied key matches server key
+  if apiKey
+    if !(c.clientKey == apiKey)
+      log.error "Unauthorized HTTP Access Attempted from IP: #{req.connection.remoteAddress}"
+      log.error "Unauthorized Context: #{JSON.stringify(c.templateContext)}"
+      res.send error: "Unauthorized Access"
+      return
+
   if c.connectionName and not config.connections[c.connectionName]
     res.send error: "unable to find connection by name '#{c.connectionName}'"
     return
@@ -78,12 +87,13 @@ httpRequestHandler = (req, res) ->
   queryRequestHandler(c)
 
 socketServer.on 'connection', (conn) ->
-  log.debug "we got a client"
   conn.on 'data', (message) ->
 
     if apiKey
       if !~ conn.url.indexOf apiKey
         conn.close()
+        log.error "Unauthorized Socket Access Attempted from IP: #{conn.remoteAddress}"
+        log.error "Unauthorized Context: #{JSON.stringify(message)}"
         return
 
     log.debug "inbound message #{message}"
@@ -98,16 +108,28 @@ socketServer.on 'connection', (conn) ->
       queryId: message.queryId
       templateContext: message.data
     context = new Context(ctxParms)
+    log.info "[q:#{context.queryId}] starting processing"
     sockjsClient.attachResponder(context, conn)
     queryRequestHandler(context)
+  conn.on 'error', (e) ->
+    log.error "error on connection", e
   conn.on 'close', () ->
     log.debug "sockjs client disconnected"
+
+socketServer.on 'error', (e) ->
+  log.error "error on socketServer", e
 
 app.get /\/(.+)$/, httpRequestHandler
 app.post /\/(.+)$/, httpRequestHandler
 
 log.info "server worker process starting with configuration"
 log.info "%j", config
+log.info "node version", process.version
 server = http.createServer(app)
-socketServer.installHandlers(server, {prefix: '/sockjs'})
+
+# use key based prefix if key is in url
+prefix = {prefix: '/sockjs'}
+prefix.prefix = "/#{apiKey}/sockjs" if apiKey && urlBasedKey
+
+socketServer.installHandlers(server, prefix)
 server.listen(config.port)

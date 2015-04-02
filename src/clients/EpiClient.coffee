@@ -107,7 +107,7 @@ class EpiClient extends EventEmitter
     else if msg.queryId == @write_queryId
       log.info 'write is timestamped at', msg.columns[0].value
       @last_write_time = new Date(msg.columns[0].value)
-      if @write_counter == 1
+      if @write_counter == 1 and @ws_w
         @query(@sqlReplicaConnection, 'get_replication_time.mustache', null, 'replica_replication_time')
     else
       @emit 'row', msg
@@ -118,7 +118,7 @@ class EpiClient extends EventEmitter
     @emit 'beginquery', msg
   onendquery: (msg) =>
     if @pending_queries[msg.queryId]
-      if @pending_queries[msg.queryId].is_write
+      if @pending_queries[msg.queryId].is_write and @ws_w
         @write_counter += 1
         @write_queryId = 'write_replication_time' + @write_counter
         @query(@sqlMasterConnection, 'get_replication_time.mustache', null, @write_queryId)
@@ -168,7 +168,7 @@ class EpiBufferingClient extends EpiClient
     else if msg.queryId == @write_queryId
       log.info 'write is timestamped at', msg.columns[0].value
       @last_write_time = new Date(msg.columns[0].value)
-      if @write_counter == 1
+      if @write_counter == 1 and @ws_w
         @query(@sqlReplicaConnection, 'get_replication_time.mustache', null, 'replica_replication_time')
     else
       @results[msg.queryId]?.currentResultSet?.push(msg.columns)

@@ -35,7 +35,7 @@ setupContext = (context, callback) ->
   callback null, context
 
 logTemplateContext = (context, callback) ->
-  log.info "template context: #{JSON.stringify context.templateContext}"
+  log.info "[q:#{context.queryId}] template context: #{JSON.stringify context.templateContext}"
   callback null, context
 
 selectConnection = (context, callback) ->
@@ -53,18 +53,18 @@ selectConnection = (context, callback) ->
     context.connection = connectionConfig
 
   # Replica check here...
-  log.info "context.connection.name", context.connection.name
+  log.info "[q:#{context.queryId}] context.connection.name", context.connection.name
   if context.connection.replica_of or context.connection.replica_master
-    log.info "query is using replica setup"
+    log.info "[q:#{context.queryId}] query is using replica setup"
     if context.rawTemplate.match(/(^|\W)(update|insert|exec|delete)\W/i)
-      log.info 'rawTemplate', context.rawTemplate
+      log.debug "[q:#{context.queryId}] Unable to implicitly determine query is replica safe", context.rawTemplate
       if context.rawTemplate.indexOf('replicasafe') != -1
         log.info "query to replica flagged as replicasafe"
       else
         if context.connection.replica_master
           context.emit 'replicamasterwrite', context.queryId
         else
-          log.info "query to replica is a write. switching host"
+          log.info "[q:#{context.queryId}] query to replica is a write. switching host"
           log.info 'hostswitch template:', context.templatePath
           return callback 'replicawrite', context
 
@@ -72,10 +72,10 @@ selectConnection = (context, callback) ->
   callback null, context
 
 getTemplatePath = (context, callback) ->
-  log.debug "getting template path for #{context.templateName}"
+  log.debug "[q:#{context.queryId}] getting template path for #{context.templateName}"
   context.templatePath = path.join(config.templateDirectory,
     context.templateName)
-  callback(new Error "no template path!") if not context.templatePath
+  callback(new Error "[q:#{context.queryId}] no template path!") if not context.templatePath
   callback null, context
 
 renderTemplate = (context, callback) ->
@@ -94,7 +94,7 @@ executeQuery = (context, callback) ->
   queryCompleteCallback = (err, data) ->
     context.Stats.endDate = new Date()
     if err
-      log.error "error executing query #{err}"
+      log.error "[q:#{context.queryId}] error executing query #{err}"
       context.emit 'error', err, data
 
     context.emit 'endquery', data
@@ -127,11 +127,9 @@ sanitizeInput = (context, callback) ->
   callback null, context
 
 escapeInput = (context, callback) ->
-  console.log context.templateContext
   _.walk.preorder context.templateContext, (value, key, parent) ->
     if parent
       parent[key] = value.replace(/'/g, "''") if _.isString(value)
-  console.log context.templateContext
   callback null, context
 
 queryRequestHandler = (context) ->
@@ -152,7 +150,7 @@ queryRequestHandler = (context) ->
     collectStats
   ],
   (err, results) ->
-    log.error "queryRequestHandler Error: #{err}"
+    log.error "[q:#{context.queryId}] queryRequestHandler Error: #{err}"
     context.emit 'error', err
 
 module.exports.queryRequestHandler = queryRequestHandler

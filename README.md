@@ -19,7 +19,7 @@ legacy apps so they don't have to unwillingly take new functionality.
       ]);
       client.query('glglive', 'todo/list.mustache', null, {username: @username});
       client.on('row', function(row){
-        console.log(row, 'your boat')    
+        console.log(row, 'your boat')
       })
       </script>
 
@@ -169,7 +169,7 @@ very concise and simple, it should support a robust handling of that functionali
   this has some limitations (like not handling duplicate column names) but in
   many cases it's simpler to use.
 * mysql - uses the mysql npm package
-* file - Expects that the result of a template render will be a valid path.  
+* file - Expects that the result of a template render will be a valid path.
   Given the result of the rendered template, it attempts to open the file
   indicated and stream the results line-at-a-time to the caller.  Each line
   comes through as a 'row' event.
