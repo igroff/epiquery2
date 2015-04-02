@@ -31,6 +31,7 @@
     "simplog": "*",
     "sockjs": "0.3.8",
     "tedious": "git+https://github.com/igroff/tedious.git",
+    "tedious-connection-pool": "^0.3.5",
     "underscore": "1.4.4",
     "xmla4js": "git+https://github.com/glg/xmla4js.git"
   },
