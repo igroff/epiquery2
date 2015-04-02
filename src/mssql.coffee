@@ -10,8 +10,8 @@ os              = require 'os'
 #buy a real computer
 POOL = null
 poolConfig =
-  min: os.cpus().length / 2
-  max: os.cpus().length * 2
+  min: 2
+  max: 4
   log: true
 
 class MSSQLDriver extends events.EventEmitter
