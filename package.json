@@ -32,6 +32,7 @@
     "install": "^0.1.7",
     "lodash-contrib": "241.4.14",
     "tedious": "git+https://github.com/igroff/tedious.git",
+    "tedious-connection-pool": "^0.3.5",
     "underscore": "1.4.4",
     "xmla4js": "git+https://github.com/glg/xmla4js.git"
   },

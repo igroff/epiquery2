@@ -2,6 +2,7 @@
   "message": "ok",
   "connections": [
     "mssql",
+    "mssql_pool",
     "mssql_replica",
     "file",
     "mysql",

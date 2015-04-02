@@ -2,6 +2,7 @@ log     = require 'simplog'
 
 queryRequestCounter = 0
 
+
 execute = (driver, context, cb) ->
   query = context.renderedTemplate
   config = context.connection
@@ -12,7 +13,9 @@ execute = (driver, context, cb) ->
     "using #{driver.name}, #{queryId} to execute query '#{query}', with connection %j",
     config
   )
+
   driverInstance = new driver.class(query, config.config, context)
+
   context.emit 'beginquery', queryId: queryId
   driverInstance.on 'endquery', () ->
     cb(null, {queryId: queryId})
