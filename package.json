@@ -12,8 +12,10 @@
   "dependencies": {
     "async": "0.2.9",
     "awesome-websocket": "0.0.25",
+    "browserify": "6.2.0",
     "coffee-script": "1.9.1",
-    "coffeeify": "1.0.0",
+    "coffeeify": "^0.6.0",
+    "difftest-runner": "0.0.3",
     "docopt": "0.4.0",
     "dot": "1.0.1",
     "express": "3.1.0",
@@ -26,12 +28,7 @@
     "q": "0.9.2",
     "simplog": "*",
     "sockjs": "0.3.8",
-    "awesome-websocket": "0.0.25",
-    "browserify": "6.2.0",
-    "coffeeify": "^0.6.0",
-    "install": "^0.1.7",
-    "lodash-contrib": "241.4.14",
-    "tedious": "git+https://github.com/igroff/tedious.git",
+    "tedious": "^1.11.0",
     "tedious-connection-pool": "^0.3.5",
     "underscore": "1.4.4",
     "xmla4js": "git+https://github.com/glg/xmla4js.git"
@@ -50,7 +47,11 @@
     "npm": "2.5.1"
   },
   "browser": "src/clients/EpiClient.coffee",
-  "browserify": { "transform": [ "coffeeify" ] },
+  "browserify": {
+    "transform": [
+      "coffeeify"
+    ]
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/igroff/epiquery2.git"

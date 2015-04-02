@@ -56,8 +56,8 @@ getInflightQueries = () ->
     inflightQueries[k] = v if v > 0
   return inflightQueries
 
-    
-  
+
+
 module.exports.init = init
 module.exports.loadDrivers = loadDrivers
 module.exports.selectDriver = selectDriver

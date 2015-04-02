@@ -6,3 +6,4 @@ difftest/templates/
 difftest/results/*
 templates/
 templates
+node_modules/
