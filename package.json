@@ -37,7 +37,7 @@
     "node": "0.10.3"
   },
   "scripts": {
-    "start": "coffee server.coffee"
+    "start": "./bin/npm-starter"
   },
   "bin": {
     "update_repo_dir": "bin/update_or_clone_repo"

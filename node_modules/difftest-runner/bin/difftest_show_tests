@@ -1,0 +1,13 @@
+#! /usr/bin/env bash
+# vi: ft=sh
+
+###
+###
+### difftest run
+###
+### Run the test found within the current working directory.  To set up the
+### current directory for testing use 'difftest init'
+###
+###
+
+find ${TEST_BIN_DIR} -type f -print | sed -e "s[${TEST_BIN_DIR}/[[g"
