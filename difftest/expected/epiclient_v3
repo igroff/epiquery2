@@ -2526,7 +2526,6 @@ AwesomeWebSocket = require('awesome-websocket').AwesomeWebSocket;
 
 guid = function() {
   var s4;
-
   return s4 = function() {
     return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
     return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
@@ -2562,16 +2561,16 @@ EpiClient = (function(_super) {
   }
 
   EpiClient.prototype.connect = function() {
-    var _this = this;
-
     this.ws = new AwesomeWebSocket(this.url);
     this.queryId = 0;
     this.ws.onmessage = this.onMessage;
     this.ws.onclose = this.onClose;
-    this.ws.onopen = function() {
-      log.debug("Epiclient connection opened");
-      return _this.ws.keepAlive(60 * 1000, 'ping');
-    };
+    this.ws.onopen = (function(_this) {
+      return function() {
+        log.debug("Epiclient connection opened");
+        return _this.ws.keepAlive(60 * 1000, 'ping');
+      };
+    })(this);
     this.ws.onerror = function(err) {
       return log.error("EpiClient socket error: ", err);
     };
@@ -2580,10 +2579,12 @@ EpiClient = (function(_super) {
       this.ws_w = new AwesomeWebSocket(this.writeUrl);
       this.ws_w.onmessage = this.onMessage;
       this.ws_w.onclose = this.onClose;
-      this.ws_w.onopen = function() {
-        log.debug("Epiclient connection opened (write)");
-        return _this.ws_w.keepAlive(60 * 1000, 'ping');
-      };
+      this.ws_w.onopen = (function(_this) {
+        return function() {
+          log.debug("Epiclient connection opened (write)");
+          return _this.ws_w.keepAlive(60 * 1000, 'ping');
+        };
+      })(this);
       this.ws_w.onerror = function(err) {
         return log.error("EpiClient socket error (write): ", err);
       };
@@ -2593,7 +2594,6 @@ EpiClient = (function(_super) {
 
   EpiClient.prototype.query = function(connectionName, template, data, queryId, force_write) {
     var req;
-
     if (queryId == null) {
       queryId = null;
     }
@@ -2628,7 +2628,6 @@ EpiClient = (function(_super) {
 
   EpiClient.prototype.onMessage = function(message) {
     var handler;
-
     if (message.data === 'pong') {
       return;
     }
@@ -2649,9 +2648,7 @@ EpiClient = (function(_super) {
   };
 
   EpiClient.prototype.onrow = function(msg) {
-    var replica_timestamp, unlabeled_pending_queries,
-      _this = this;
-
+    var replica_timestamp, unlabeled_pending_queries;
     if (msg.queryId === 'replica_replication_time') {
       log.info('replica is timestamped at', msg.columns[0].value);
       replica_timestamp = new Date(msg.columns[0].value);
@@ -2663,14 +2660,16 @@ EpiClient = (function(_super) {
         this.last_write_time = null;
         return this.write_counter = 0;
       } else {
-        return setTimeout(function() {
-          return _this.query(_this.sqlReplicaConnection, 'get_replication_time.mustache', null, 'replica_replication_time');
-        }, 1000);
+        return setTimeout((function(_this) {
+          return function() {
+            return _this.query(_this.sqlReplicaConnection, 'get_replication_time.mustache', null, 'replica_replication_time');
+          };
+        })(this), 1000);
       }
     } else if (msg.queryId === this.write_queryId) {
       log.info('write is timestamped at', msg.columns[0].value);
       this.last_write_time = new Date(msg.columns[0].value);
-      if (this.write_counter === 1) {
+      if (this.write_counter === 1 && this.ws_w) {
         return this.query(this.sqlReplicaConnection, 'get_replication_time.mustache', null, 'replica_replication_time');
       }
     } else {
@@ -2691,7 +2690,7 @@ EpiClient = (function(_super) {
 
   EpiClient.prototype.onendquery = function(msg) {
     if (this.pending_queries[msg.queryId]) {
-      if (this.pending_queries[msg.queryId].is_write) {
+      if (this.pending_queries[msg.queryId].is_write && this.ws_w) {
         this.write_counter += 1;
         this.write_queryId = 'write_replication_time' + this.write_counter;
         this.query(this.sqlMasterConnection, 'get_replication_time.mustache', null, this.write_queryId);
@@ -2703,7 +2702,6 @@ EpiClient = (function(_super) {
 
   EpiClient.prototype.onerror = function(msg) {
     var query_data;
-
     if (msg.error === 'replicawrite') {
       log.info('eating error...nom nom');
       this.last_write_time = new Date(2050, 0);
@@ -2731,7 +2729,6 @@ EpiClient = (function(_super) {
 
   EpiClient.prototype.onreplicamasterwrite = function(msg) {
     var query_data;
-
     query_data = this.pending_queries[msg.queryId];
     query_data.is_write = true;
     this.pending_queries[msg.queryId] = query_data;
@@ -2761,9 +2758,7 @@ EpiBufferingClient = (function(_super) {
   }
 
   EpiBufferingClient.prototype.onrow = function(msg) {
-    var replica_timestamp, unlabeled_pending_queries, _ref, _ref1,
-      _this = this;
-
+    var replica_timestamp, unlabeled_pending_queries, _ref, _ref1;
     if (msg.queryId === 'replica_replication_time') {
       log.info('replica is timestamped at', msg.columns[0].value);
       replica_timestamp = new Date(msg.columns[0].value);
@@ -2775,14 +2770,16 @@ EpiBufferingClient = (function(_super) {
         this.last_write_time = null;
         return this.write_counter = 0;
       } else {
-        return setTimeout(function() {
-          return _this.query(_this.sqlReplicaConnection, 'get_replication_time.mustache', null, 'replica_replication_time');
-        }, 1000);
+        return setTimeout((function(_this) {
+          return function() {
+            return _this.query(_this.sqlReplicaConnection, 'get_replication_time.mustache', null, 'replica_replication_time');
+          };
+        })(this), 1000);
       }
     } else if (msg.queryId === this.write_queryId) {
       log.info('write is timestamped at', msg.columns[0].value);
       this.last_write_time = new Date(msg.columns[0].value);
-      if (this.write_counter === 1) {
+      if (this.write_counter === 1 && this.ws_w) {
         return this.query(this.sqlReplicaConnection, 'get_replication_time.mustache', null, 'replica_replication_time');
       }
     } else {
@@ -2792,7 +2789,6 @@ EpiBufferingClient = (function(_super) {
 
   EpiBufferingClient.prototype.onbeginrowset = function(msg) {
     var newResultSet, _base, _name;
-
     newResultSet = [];
     (_base = this.results)[_name = msg.queryId] || (_base[_name] = {
       resultSets: []

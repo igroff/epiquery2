@@ -2,13 +2,10 @@
   "message": "ok",
   "connections": [
     "mssql",
-    "mssql_replica",
     "file",
     "mysql",
     "render",
-    "mdx",
-    "mysql_o",
-    "mssql_o",
+    "db250",
     "503a"
   ]
 }
