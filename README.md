@@ -62,6 +62,27 @@ results to epiquery.
 * Microsoft SQL Server Analysis Services (MDX)
 * File system
 
+## Local Development
+That is, _I do care, how do I get this to run locally?_
+
+1. Create a configuration file `~/.epiquery2/config` with the following
+   environment variables defined, replacing with appropriate
+   values.
+  ```
+  export TEMPLATE_REPO_URL=git@github.com:some_user/some_repo.git
+  export CONNECTIONS="some_conn_name"
+  export some_conn_name="{\"name\":\"some_db\",\"driver\":\"mssql\",\"config\":{\"userName\":\"some_user\",\"password\":\"some_password\",\"server\":\"host.of.some.server.com\",\"port\":\"some_port\"}}"
+  export PORT=some_other_port
+  ``` 
+1. Run the following commands in the root of this repo:
+  ```
+  npm install -g supervisor
+  npm install
+  make watch
+  ```
+1. Test to be sure everything works by hitting the following in a
+   browser: http://localhost:some_other_port/static/tests.html
+
 ## Configuration 
 
 Configuration of epiquery is done entirely through environment variables, this
