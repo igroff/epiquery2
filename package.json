@@ -3,6 +3,8 @@
   "version": "0.0.2",
   "description": "run templated queries from the http's using learnings from 1",
   "devDependencies": {
+    "browserify": "^10.1.2",
+    "coffeeify": "0.5.2",
     "coffeelint": "0.6.1",
     "jshint": "2.3.0",
     "zombie": "2.0.0-alpha24",
@@ -14,7 +16,7 @@
     "awesome-websocket": "0.0.25",
     "browserify": "6.2.0",
     "coffee-script": "1.9.1",
-    "coffeeify": "^0.6.0",
+    "coffeeify": "1.0.0",
     "difftest-runner": "0.0.3",
     "docopt": "0.4.0",
     "dot": "1.0.1",
