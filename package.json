@@ -1,16 +1,16 @@
 {
   "name": "epiquery2",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "run templated queries from the http's using learnings from 1",
   "main": "server.coffee",
   "devDependencies": {
+    "browserify": "^10.1.2",
+    "coffeeify": "0.5.2",
     "coffeelint": "0.6.1",
     "jshint": "2.3.0",
-    "zombie": "2.0.0-alpha24",
     "sockjs-client": "0.1.3",
-    "browserify": "3.24.1",
-    "coffeeify": "0.5.2",
-    "ws": "~0.4.31"
+    "ws": "~0.4.31",
+    "zombie": "2.0.0-alpha24"
   },
   "dependencies": {
     "async": "0.2.9",
@@ -34,9 +34,6 @@
     "underscore": "1.4.4",
     "xmla4js": "git+https://github.com/glg/xmla4js.git"
   },
-  "bin": {
-    "update_repo_dir": "bin/update_or_clone_repo"
-  },
   "engines": {
     "node": "0.12.1",
     "npm": "2.5.1"
@@ -44,6 +41,12 @@
   "scripts": {
     "start": "./bin/npm-starter",
     "postinstall": "./bin/post-install || true"
+  },
+  "browser": "src/clients/EpiClient.coffee",
+  "browserify": {
+    "transform": [
+      "coffeeify"
+    ]
   },
   "repository": {
     "type": "git",
