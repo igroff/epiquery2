@@ -40,9 +40,6 @@
   "scripts": {
     "start": "./bin/npm-starter"
   },
-  "bin": {
-    "update_repo_dir": "bin/update_or_clone_repo"
-  },
   "engines": {
     "node": "0.12.1",
     "npm": "2.5.1"
