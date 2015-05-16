@@ -35,7 +35,7 @@ class MSSQLDriver extends events.EventEmitter
 
     @conn.on 'debug', (message) => log.debug message
     @conn.on 'connect', => (err) ->
-      return @emit('error', message) if err
+      return @emit('error', err) if err
       cb(@)
     @conn.on 'errorMessage', (message) => @emit 'error', message
     @conn.on 'error', (message) => @emit 'error', message
