@@ -34,7 +34,7 @@ class MSSQLDriver extends events.EventEmitter
     @conn = new tedious.Connection @config
 
     @conn.on 'debug', (message) => log.debug message
-    @conn.on 'connect', => (err) ->
+    @conn.on 'connect', (err) =>
       return @emit('error', err) if err
       cb(@)
     @conn.on 'errorMessage', (message) => @emit 'error', message
