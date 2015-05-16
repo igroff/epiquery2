@@ -23,7 +23,6 @@ class SalesforceDriver extends events.EventEmitter
     @conn.login @config.userName, @config.password, (err) =>
       log.debug "got something #{@}"
       cb(err, @)
-      
 
   # do nothing, but we need this so we can be pooled
   disconnect: ->

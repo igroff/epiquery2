@@ -43,32 +43,52 @@ attachAndExecute = (driverInstance, driverName, context, cb) ->
   # this query identifier is used by the client to corellate events from
   # simultaneously executing query requests
   queryId = context.queryId || "#{process.pid}_#{queryRequestCounter++}"
-  log.debug(
-    "using #{driverName}, #{queryId} to execute query '#{query}', with connection %j",
-    context.connection
-  )
+  log.debug "using #{driverName}, #{queryId} to execute query '#{query}', with connection %j", context.connection
+
   context.emit 'beginquery', queryId: queryId
-  driverInstance.on 'endquery', () ->
+
+  endqueryHandler = ->
+    pool = DRIVER_POOL[context.connection.name]
+    pool.release(driverInstance) if pool
+
+    driverInstance
+      .removeListener('beginrowset', beginrowsetHandler)
+      .removeListener('endrowset', endrowsetHandler)
+      .removeListener('row', rowHandler)
+      .removeListener('data', dataHandler)
+      .removeListener('error', errorHandler)
+      .removeListener('endquery', endqueryHandler)
+
+    cb(null, {queryId: queryId})
+
+  beginrowsetHandler = ->
+    context.emit 'beginrowset', {queryId: queryId}
+
+  endrowsetHandler = ->
+    context.emit 'endrowset', {queryId: queryId}
+
+  rowHandler = (row) ->
+    context.emit 'row', {queryId: queryId, columns: row}
+
+  dataHandler = (data) ->
+    context.emit 'data', {queryId: queryId, data: data}
+
+  errorHandler = (err) ->
+    log.error "[q:#{context}] te %j", infoMessage
     pool = DRIVER_POOL[context.connection.name]
     if pool
+      driverInstance.disconnect()
       pool.release driverInstance
-    driverInstance.removeAllListeners 'beginquery'
-    driverInstance.removeAllListeners 'beginrowset'
-    driverInstance.removeAllListeners 'endrowset'
-    driverInstance.removeAllListeners 'row'
-    driverInstance.removeAllListeners 'data'
-    driverInstance.removeAllListeners 'error'
-    driverInstance.removeAllListeners 'endquery'
-    cb(null, {queryId: queryId})
-  driverInstance.on 'beginrowset', () ->
-    context.emit 'beginrowset', {queryId: queryId}
-  driverInstance.on 'endrowset', (d) ->
-    context.emit 'endrowset', {queryId: queryId}
-  driverInstance.on 'row', (row) ->
-    context.emit 'row', {queryId: queryId, columns: row}
-  driverInstance.on 'data', (data) ->
-    context.emit 'data', {queryId: queryId, data: data}
-  driverInstance.on 'error', (err) -> cb(err, {queryId: queryId})
+    cb(err, {queryId: queryId})
+
+  driverInstance
+    .on('beginrowset', beginrowsetHandler)
+    .on('endrowset', endrowsetHandler)
+    .on('row', rowHandler)
+    .on('data', dataHandler)
+    .on('error', errorHandler)
+    .on('endquery', endqueryHandler)
+
   driverInstance.execute(query, context)
 
 module.exports.execute = execute
