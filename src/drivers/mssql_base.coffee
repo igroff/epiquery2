@@ -36,36 +36,29 @@ class MSSQLDriver extends events.EventEmitter
 
     @conn.on 'debug', (message) => log.debug message
     @conn.on 'connect', => cb(@)
+    @conn.on 'errorMessage', (message) => @emit 'error', message
 
   disconnect: ->
     @conn.close()
 
   execute: (query, context) =>
-    console.log 'start', context.templateName
     rowSetStarted = false
     requestComplete  = Q.defer()
-
-    @conn.removeAllListeners('errorMessage')
-    @conn.on 'errorMessage', (infoMessage) =>
-      @emit 'error', infoMessage
 
     request = new tedious.Request query, requestComplete.makeNodeResolver()
 
     requestComplete.promise.then () =>
-      console.log 'end', context.templateName
       @emit('endrowset') if rowSetStarted
       @emit('endquery')
 
     # we use this event to split up multipe result sets as each result set
     # is preceeded by a columnMetadata event
     request.on 'columnMetadata', () =>
-
       @emit('endrowset') if rowSetStarted
       @emit('beginrowset')
       rowSetStarted = true
 
     request.on 'row', (columns) =>
-      console.log 'row', context.templateName
       @emit('beginrowset') if not rowSetStarted
       rowSetStarted = true
       c = _.map(columns, @mapper.bind({}))
