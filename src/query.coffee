@@ -14,7 +14,7 @@ getDriverInstance = (driver, connectionConfig, driverAquired) ->
     pool = Pool({
       name: connectionConfig.name,
       create: (cb) ->
-        log.debug "creating driver instance for connection #{connectionConfig.name}"
+        log.info "creating driver instance for connection #{connectionConfig.name}"
         d = new driver.class(connectionConfig.config)
         d.connect(cb)
       destroy: (driver) -> driver.disconnect()
@@ -35,7 +35,6 @@ execute = (driver, context, cb) ->
         log.error message, err
         context.emit 'error', message
       else
-        log.info "Using driver #{driver.num}"
         attachAndExecute driver, driver.name, context, cb
   else
     # otherwise we'll new up a driver for each request

@@ -1,15 +1,11 @@
 events          = require 'events'
-Q               = require 'q'
 log             = require 'simplog'
 _               = require 'lodash-contrib'
 tedious         = require 'tedious'
 os              = require 'os'
 
-num = 0
-
 class MSSQLDriver extends events.EventEmitter
   constructor: (@config) ->
-    @id = num+1
 
   escape: (context) ->
     _.walk.preorder context, (value, key, parent) ->
@@ -38,7 +34,9 @@ class MSSQLDriver extends events.EventEmitter
     @conn = new tedious.Connection @config
 
     @conn.on 'debug', (message) => log.debug message
-    @conn.on 'connect', => cb(@)
+    @conn.on 'connect', => (err) ->
+      return @emit('error', message) if err
+      cb(@)
     @conn.on 'errorMessage', (message) => @emit 'error', message
     @conn.on 'error', (message) => @emit 'error', message
 
@@ -47,11 +45,9 @@ class MSSQLDriver extends events.EventEmitter
 
   execute: (query, context) =>
     rowSetStarted = false
-    requestComplete  = Q.defer()
 
-    request = new tedious.Request query, requestComplete.makeNodeResolver()
-
-    requestComplete.promise.then () =>
+    request = new tedious.Request query, (err,rowCount) =>
+      return @emit('error', err) if err
       @emit('endrowset') if rowSetStarted
       @emit('endquery')
 
@@ -72,16 +68,11 @@ class MSSQLDriver extends events.EventEmitter
 
     if _.isEmpty parameters
       @conn.execSqlBatch request, (error) =>
-        log.error "[q:#{context}] connect failed %j", error
+        log.error "[q:#{context.queryId}] connect failed %j", error
         @emit 'error', error
     else
       parameters.forEach (param) =>
         request.addParameter(param.varName, tedious.TYPES[param.type], parseInt(param.value || 0))
       @conn.execSql request
-
-    requestComplete.promise
-      .fail (error) =>
-        @emit 'error', error
-      .done()
 
 module.exports.DriverClass = MSSQLDriver
