@@ -5,8 +5,11 @@ _               = require 'lodash-contrib'
 tedious         = require 'tedious'
 os              = require 'os'
 
+num = 0
+
 class MSSQLDriver extends events.EventEmitter
   constructor: (@config) ->
+    @id = num+1
 
   escape: (context) ->
     _.walk.preorder context, (value, key, parent) ->
