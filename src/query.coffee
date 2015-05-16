@@ -5,6 +5,9 @@ queryRequestCounter = 0
 
 DRIVER_POOL={}
 
+#https://github.com/pekim/tedious/issues/19
+#tedious and generic connection pooling is sort of crap
+
 getDriverInstance = (driver, connectionConfig, driverAquired) ->
   pool = DRIVER_POOL[connectionConfig.name]
   if not pool
@@ -15,7 +18,7 @@ getDriverInstance = (driver, connectionConfig, driverAquired) ->
         d = new driver.class(connectionConfig.config)
         d.connect(cb)
       destroy: (driver) -> driver.disconnect()
-      max: 1
+      max: 50
     })
     DRIVER_POOL[connectionConfig.name] = pool
   pool.acquire(driverAquired)
