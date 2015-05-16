@@ -37,6 +37,7 @@ class MSSQLDriver extends events.EventEmitter
     @conn.on 'debug', (message) => log.debug message
     @conn.on 'connect', => cb(@)
     @conn.on 'errorMessage', (message) => @emit 'error', message
+    @conn.on 'error', (message) => @emit 'error', message
 
   disconnect: ->
     @conn.close()
