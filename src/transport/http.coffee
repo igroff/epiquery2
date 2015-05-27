@@ -52,7 +52,6 @@ attachResponder = (context, res) ->
     d.error = err.message if err.message
     log.error err
     writeEvent d
-    completeResponse()
 
   c.on 'completequeryexecution', completeResponse
 
