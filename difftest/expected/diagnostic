@@ -1,11 +1,1 @@
-{
-  "message": "ok",
-  "connections": [
-    "mssql",
-    "file",
-    "mysql",
-    "render",
-    "db250",
-    "503a"
-  ]
-}
+200
