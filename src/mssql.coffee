@@ -70,7 +70,6 @@ class MSSQLDriver extends events.EventEmitter
         this.emit('beginrowset') if not @rowSetStarted
         @rowSetStarted = true
         c = @mapper columns
-        log.info "shitballs: %j", c
         this.emit 'row', c
 
       parameters = @parseQueryParameters()
