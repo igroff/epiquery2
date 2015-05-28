@@ -124,5 +124,5 @@ prefix.prefix = "/#{apiKey}/sockjs" if apiKey && urlBasedKey
 socketServer.installHandlers(server, prefix)
 
 Cluster = require 'cluster2'
-cluster = new Cluster(port: config.port, noWorkers: 2)
+cluster = new Cluster(port: config.port)
 cluster.listen (cb) -> cb(server)

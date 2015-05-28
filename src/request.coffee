@@ -98,7 +98,6 @@ executeQuery = (context, callback) ->
       context.emit 'error', err, data
 
     context.emit 'endquery', data
-    context.emit 'completequeryexecution'
     core.removeInflightQuery context.templateName
     callback null, context
   query.execute(driver,
@@ -116,6 +115,7 @@ collectStats = (context, callback) ->
     context.templateName
     stats.executionTimeInMillis
   )
+  callback null, context
 
 sanitizeInput = (context, callback) ->
   _.walk.preorder context.templateContext, (value, key, parent) ->
@@ -150,7 +150,9 @@ queryRequestHandler = (context) ->
     collectStats
   ],
   (err, results) ->
-    log.error "[q:#{context.queryId}] queryRequestHandler Error: #{err}"
-    context.emit 'error', err
+    if err
+      log.error "[q:#{context.queryId}] queryRequestHandler Error: #{err}"
+      context.emit 'error', err
+    context.emit 'completequeryexecution'
 
 module.exports.queryRequestHandler = queryRequestHandler

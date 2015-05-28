@@ -1,0 +1,5 @@
+{
+  "events":[
+  {"message":"error","errorDetail":{"errno":-2,"code":"ENOENT","path":"/Users/iangroff/Development/epiquery2/difftest/templates/test/my_manifest_this_dont_exist"},"error":"ENOENT, open '/Users/iangroff/Development/epiquery2/difftest/templates/test/my_manifest_this_dont_exist'"}
+  ]
+}

@@ -7,3 +7,4 @@ difftest/results/*
 templates/
 templates
 node_modules/
+pids/

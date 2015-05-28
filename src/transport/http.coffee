@@ -53,7 +53,7 @@ attachResponder = (context, res) ->
     log.error err
     writeEvent d
 
-  c.on 'completequeryexecution', completeResponse
+  c.once 'completequeryexecution', completeResponse
 
 getQueryRequestInfo = (req, useSecure) ->
   templatePath = req.path.replace(/\.\./g, '').replace(/^\//, '')
