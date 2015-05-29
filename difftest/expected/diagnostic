@@ -1,14 +1,1 @@
-{
-  "message": "ok",
-  "connections": [
-    "mssql",
-    "mssql_replica",
-    "file",
-    "mysql",
-    "render",
-    "mdx",
-    "mysql_o",
-    "mssql_o",
-    "503a"
-  ]
-}
+200
