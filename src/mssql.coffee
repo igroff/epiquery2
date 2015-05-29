@@ -8,7 +8,7 @@ os              = require 'os'
 
 #yes virginia, this won't work on single core machines
 #buy a real computer
-POOL = null
+POOL = {}
 poolConfig =
   min: 2
   max: 4
@@ -46,9 +46,9 @@ class MSSQLDriver extends events.EventEmitter
     request_complete_deferred  = Q.defer()
 
     #connect
-    if not POOL
-      POOL = new ConnectionPool(poolConfig, @config)
-    POOL.acquire connect_deferred.makeNodeResolver()
+    if not POOL[@config.name]
+      POOL[@config.name] = new ConnectionPool(poolConfig, @config)
+    POOL[@config.name].acquire connect_deferred.makeNodeResolver()
 
     connect_deferred.promise.then (conn) =>
       request = new tedious.Request @query,
