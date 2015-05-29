@@ -4,15 +4,14 @@ queryRequestCounter = 0
 
 execute = (driver, context, cb) ->
   query = context.renderedTemplate
-  config = context.connection
   # this query identifier is used by the client to corellate events from
   # simultaneously executing query requests
   queryId = context.queryId || "#{process.pid}_#{queryRequestCounter++}"
   log.debug(
     "using #{driver.name}, #{queryId} to execute query '#{query}', with connection %j",
-    config
+    context.connection
   )
-  driverInstance = new driver.class(query, config.config, context)
+  driverInstance = new driver.class(query, context.connection, context)
   context.emit 'beginquery', queryId: queryId
   driverInstance.on 'endquery', () ->
     cb(null, {queryId: queryId})
