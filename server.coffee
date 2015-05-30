@@ -98,7 +98,7 @@ socketServer.on 'connection', (conn) ->
       queryId: message.queryId
       templateContext: message.data
     context = new Context(ctxParms)
-    log.info "[q:#{context.queryId}] starting processing"
+    log.debug "[q:#{context.queryId}] starting processing"
     sockjsClient.attachResponder(context, conn)
     queryRequestHandler(context)
   conn.on 'error', (e) ->
@@ -112,9 +112,9 @@ socketServer.on 'error', (e) ->
 app.get /\/(.+)$/, httpRequestHandler
 app.post /\/(.+)$/, httpRequestHandler
   
-log.info "server worker process starting with configuration"
-log.info "%j", config
-log.info "node version", process.version
+log.debug "server worker process starting with configuration"
+log.debug "%j", config
+log.debug "node version", process.version
 server = http.createServer(app)
 
 # use key based prefix if key is in url

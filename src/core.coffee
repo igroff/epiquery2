@@ -11,7 +11,7 @@ QUERY_EXEC_TIME_STATS={}
 QUERIES_EXECUTED={}
 
 loadDrivers = (driverPath) ->
-  log.info "loading drivers from %s", driverPath
+  log.debug "loading drivers from %s", driverPath
   for file in fs.readdirSync(driverPath)
     # ignore hidden files
     continue if file[0] is '.'
@@ -23,7 +23,7 @@ loadDrivers = (driverPath) ->
         class: driverModule.DriverClass
         module: driverModule
         name: driverName
-      log.info "driver '#{driverName}' loaded"
+      log.debug "driver '#{driverName}' loaded"
     else
       log.error "Unable to find execute in module #{file}"
 

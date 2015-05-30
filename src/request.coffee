@@ -35,7 +35,7 @@ setupContext = (context, callback) ->
   callback null, context
 
 logTemplateContext = (context, callback) ->
-  log.info "[q:#{context.queryId}] template context: #{JSON.stringify context.templateContext}"
+  log.debug "[q:#{context.queryId}] template context: #{JSON.stringify context.templateContext}"
   callback null, context
 
 selectConnection = (context, callback) ->
@@ -53,19 +53,19 @@ selectConnection = (context, callback) ->
     context.connection = connectionConfig
 
   # Replica check here...
-  log.info "[q:#{context.queryId}] context.connection.name", context.connection.name
+  log.debug "[q:#{context.queryId}] context.connection.name", context.connection.name
   if context.connection.replica_of or context.connection.replica_master
-    log.info "[q:#{context.queryId}] query is using replica setup"
+    log.debug "[q:#{context.queryId}] query is using replica setup"
     if context.rawTemplate.match(/(^|\W)(update|insert|exec|delete)\W/i)
       log.debug "[q:#{context.queryId}] Unable to implicitly determine query is replica safe", context.rawTemplate
       if context.rawTemplate.indexOf('replicasafe') != -1
-        log.info "query to replica flagged as replicasafe"
+        log.debug "query to replica flagged as replicasafe"
       else
         if context.connection.replica_master
           context.emit 'replicamasterwrite', context.queryId
         else
-          log.info "[q:#{context.queryId}] query to replica is a write. switching host"
-          log.info 'hostswitch template:', context.templatePath
+          log.debug "[q:#{context.queryId}] query to replica is a write. switching host"
+          log.debug 'hostswitch template:', context.templatePath
           return callback 'replicawrite', context
 
   context.Stats.connectionName = context.connection.name
