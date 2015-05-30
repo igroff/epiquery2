@@ -1,7 +1,7 @@
 events      = require 'events'
 
 class RenderOnlyDriver extends events.EventEmitter
-  constructor: (@query, @config) ->
+  constructor: (@query, @connection) ->
   
   execute: () =>
     this.emit 'data', @query
