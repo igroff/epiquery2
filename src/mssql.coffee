@@ -12,7 +12,7 @@ POOL = {}
 poolConfig =
   min: 2
   max: 4
-  log: true
+  log: false
 
 class MSSQLDriver extends events.EventEmitter
   constructor: (@query, @connection, @context) ->

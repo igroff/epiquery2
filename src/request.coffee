@@ -115,6 +115,7 @@ collectStats = (context, callback) ->
     context.templateName
     stats.executionTimeInMillis
   )
+  log.info "[EXECUTION STATS] template: '#{context.templateName}', duration: #{stats.executionTimeInMillis}ms"
   callback null, context
 
 sanitizeInput = (context, callback) ->
