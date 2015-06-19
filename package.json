@@ -16,7 +16,7 @@
     "cluster2": "igroff/cluster2.git",
     "coffee-script": "1.9.1",
     "coffeeify": "^0.6.0",
-    "difftest-runner": "0.0.3",
+    "difftest-runner": "0.0.9",
     "docopt": "0.4.0",
     "dot": "1.0.1",
     "express": "3.1.0",

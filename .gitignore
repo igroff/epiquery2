@@ -4,7 +4,6 @@ test/templates/
 test/results/*
 difftest/templates/
 difftest/results/*
-templates/
-templates
+./templates/
 node_modules/
 pids/
