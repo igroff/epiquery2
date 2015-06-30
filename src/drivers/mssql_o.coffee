@@ -10,7 +10,13 @@ class MSSQLDriver extends BaseDriver
   # in the template
   mapper: (columns) =>
     r = {}
-    _.each(columns, (column) -> r[column.metadata.colName] = column.value)
+    _.each(columns, (column) ->
+      r[column.metadata.colName] = column.value
+      # coffee will return the last assignment result in
+      # a function, thus if you assign a value of false here
+      # lodash will early exit, that's never what we want so:
+      true
+    )
     r
     
 
