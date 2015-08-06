@@ -32,6 +32,20 @@ socketServer = sockjs.createServer(app, options: disconnect_delay: 900000)
 # initialize the core including driver loading, etc.
 core.init()
 
+if process.env.NODE_ENV == 'development'
+  set_cors_headers = (req, res, next) ->
+    res.header 'Access-Control-Allow-Origin', '*'
+    res.header 'Access-Control-Allow-Headers', 'Content-Type'
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    next()
+
+  app.use set_cors_headers
+
+  app.all '*', set_cors_headers
+
+  app.options '*', (req, res) ->
+    res.status(200).send()
+
 app.get '/diagnostic', (req, res) ->
   response =
     message: "ok"
