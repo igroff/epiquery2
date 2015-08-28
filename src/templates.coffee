@@ -35,7 +35,7 @@ getRendererForTemplate = (templatePath) ->
     return renderers[""]
 
 templateLoader = (templatePath, context, cb) ->
-  log.info "loading template %s", templatePath
+  log.debug "loading template %s", templatePath
   callbackWithData = (error, rawTemplate) ->
     cb error, templatePath, rawTemplate, context
   fs.readFile templatePath, {encoding: 'utf8'}, callbackWithData
