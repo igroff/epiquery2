@@ -18,7 +18,6 @@ queryRequestHandler = require('./src/request.coffee').queryRequestHandler
 
 app = express()
 app.use express.favicon()
-app.use express.logger('dev')
 app.use express.bodyParser()
 app.use '/static', express.static(path.join(__dirname, 'static'))
 app.use app.router
