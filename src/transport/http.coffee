@@ -2,7 +2,62 @@ _       = require 'underscore'
 log     = require 'simplog'
 path    = require 'path'
 
+
 attachResponder = (context, res) ->
+  if context.httpTransport is 'simple'
+    attachSimpleResponder(context, res)
+  else
+    attachStandardResponder(context, res)
+
+attachSimpleResponder = (context, res) ->
+  delim = ""
+  resultElementDelimiter = ""
+  responseObjectDelimiter = ""
+  stack = []
+
+  c = context
+  res.header 'Content-Type', 'application/javascript'
+  res.write "{\"results\":["
+  stack.unshift( () -> res.write "]}" )
+
+  completeResponse = () ->
+    item() while item = stack.shift()
+    res.end()
+
+  writeResultElement = (obj) ->
+    res.write "#{resultElementDelimiter}#{JSON.stringify obj}"
+    resultElementDelimiter = ","
+
+  writeResponseObjectElement = (str) ->
+    res.write "#{responseObjectDelimiter}#{str}"
+
+  c.on 'row', (row) ->
+    delete(row['queryId'])
+    columns = {}
+    _.map(row.columns, (e, i, l) -> columns[l[i].name || 'undefiend'] = l[i].value)
+    writeResultElement columns
+
+  c.on 'beginrowset', (d={}) ->
+    writeResponseObjectElement "["
+    responseObjectDelimiter = ""
+    resultElementDelimiter = ""
+
+  c.on 'endrowset', (d={}) ->
+    writeResponseObjectElement "]"
+    responseObjectDelimiter = ","
+
+  c.on 'data', (data) ->
+    writeResultElement data
+
+  c.on 'error', (err) ->
+    d = message: 'error', errorDetail: err
+    d.error = err.message if err.message
+    log.error err
+    writeResultElement d
+
+  c.once 'completequeryexecution', completeResponse
+
+attachStandardResponder = (context, res) ->
   delim = ""
   indent = ""
   stack = []
@@ -55,12 +110,18 @@ attachResponder = (context, res) ->
 
   c.once 'completequeryexecution', completeResponse
 
+
 getQueryRequestInfo = (req, useSecure) ->
   templatePath = req.path.replace(/\.\./g, '').replace(/^\//, '')
   pathParts = templatePath.split('/')
   # If we're using a key secured client, the key must be before the connection name
   if useSecure
     clientKey = pathParts.shift()
+  if pathParts[0] is 'simple_transport'
+    pathParts.shift()
+    transport = 'simple'
+  else
+    transport = 'standard'
   connectionName = pathParts.shift()
   connection = null
   if connectionName is 'header'
@@ -75,6 +136,7 @@ getQueryRequestInfo = (req, useSecure) ->
     templateContext: params
     templateName: templatePath
     clientKey: clientKey
+    httpTransport: transport
 
 module.exports.attachResponder = attachResponder
 module.exports.getQueryRequestInfo = getQueryRequestInfo
