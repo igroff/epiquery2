@@ -13,6 +13,8 @@ TEMPLATE_DIRECTORY=hack_tilde(process.env.TEMPLATE_DIRECTORY ||
 DRIVER_DIRECTORY=hack_tilde(process.env.DRIVER_DIRECTORY) || null
 PORT=process.env.PORT || 9090
 CONNECTIONS={}
+FORKS=process.env.FORKS || 8
+FORKS=2 unless FORKS > 1
 
 for conn_name in CONNECTION_VAR_NAMES.split(" ")
   try
@@ -28,5 +30,6 @@ config =
   templateDirectory: TEMPLATE_DIRECTORY
   driverDirectory: DRIVER_DIRECTORY
   connections: CONNECTIONS
+  forks: FORKS
 
 module.exports = config
