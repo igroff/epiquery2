@@ -10,52 +10,53 @@ attachResponder = (context, res) ->
     attachStandardResponder(context, res)
 
 attachSimpleResponder = (context, res) ->
-  delim = ""
+  status = 200
+  responseData = []
   resultElementDelimiter = ""
   responseObjectDelimiter = ""
   stack = []
-
-  c = context
-  res.header 'Content-Type', 'application/javascript'
-  res.write "{\"results\":["
-  stack.unshift( () -> res.write "]}" )
+  responseData.push "{\"results\":["
 
   completeResponse = () ->
-    item() while item = stack.shift()
-    res.end()
+    responseData.push "]}"
+    res
+      .status(status)
+      .header('Content-Type', 'application/javscript')
+      .end(responseData.join(''))
 
   writeResultElement = (obj) ->
-    res.write "#{resultElementDelimiter}#{JSON.stringify obj}"
+    responseData.push "#{resultElementDelimiter}#{JSON.stringify obj}"
     resultElementDelimiter = ","
 
   writeResponseObjectElement = (str) ->
-    res.write "#{responseObjectDelimiter}#{str}"
+    responseData.push "#{responseObjectDelimiter}#{str}"
 
-  c.on 'row', (row) ->
+  context.on 'row', (row) ->
     delete(row['queryId'])
     columns = {}
     _.map(row.columns, (e, i, l) -> columns[l[i].name || 'undefiend'] = l[i].value)
     writeResultElement columns
 
-  c.on 'beginrowset', (d={}) ->
+  context.on 'beginrowset', (d={}) ->
     writeResponseObjectElement "["
     responseObjectDelimiter = ""
     resultElementDelimiter = ""
 
-  c.on 'endrowset', (d={}) ->
+  context.on 'endrowset', (d={}) ->
     writeResponseObjectElement "]"
     responseObjectDelimiter = ","
 
-  c.on 'data', (data) ->
+  context.on 'data', (data) ->
     writeResultElement data
 
-  c.on 'error', (err) ->
+  context.on 'error', (err) ->
     d = message: 'error', errorDetail: err
     d.error = err.message if err.message
     log.error err
+    status = 500
     writeResultElement d
 
-  c.once 'completequeryexecution', completeResponse
+  context.once 'completequeryexecution', completeResponse
 
 attachStandardResponder = (context, res) ->
   delim = ""
