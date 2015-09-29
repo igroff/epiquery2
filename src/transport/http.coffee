@@ -4,11 +4,61 @@ path    = require 'path'
 
 
 attachResponder = (context, res) ->
-  if context.httpTransport is 'simple'
+  if context.responseFormat is 'resty'
     attachSimpleResponder(context, res)
+  else if context.responseFormat is 'epiquery1'
+    attachEpiqueryResponder(context, res)
   else
     attachStandardResponder(context, res)
 
+attachEpiqueryResponder = (context, res) ->
+  status = 200
+  responseData = []
+  resultElementDelimiter = ""
+  responseObjectDelimiter = ""
+  stack = []
+  responseData.push "["
+
+  completeResponse = () ->
+    responseData.push "]"
+    res
+      .status(status)
+      .header('Content-Type', 'application/javscript')
+      .end(responseData.join(''))
+
+  writeResultElement = (obj) ->
+    responseData.push "#{resultElementDelimiter}#{JSON.stringify obj}"
+    resultElementDelimiter = ","
+
+  writeResponseObjectElement = (str) ->
+    responseData.push "#{responseObjectDelimiter}#{str}"
+
+  context.on 'row', (row) ->
+    delete(row['queryId'])
+    columns = {}
+    _.map(row.columns, (e, i, l) -> columns[l[i].name || 'undefiend'] = l[i].value)
+    writeResultElement columns
+
+  context.on 'beginrowset', (d={}) ->
+    writeResponseObjectElement "["
+    responseObjectDelimiter = ""
+    resultElementDelimiter = ""
+
+  context.on 'endrowset', (d={}) ->
+    writeResponseObjectElement "]"
+    responseObjectDelimiter = ","
+
+  context.on 'data', (data) ->
+    writeResultElement data
+
+  context.on 'error', (err) ->
+    d = message: 'error', errorDetail: err
+    d.error = err.message if err.message
+    log.error err
+    status = 500
+    writeResultElement d
+
+  context.once 'completequeryexecution', completeResponse
 attachSimpleResponder = (context, res) ->
   status = 200
   responseData = []
@@ -118,11 +168,13 @@ getQueryRequestInfo = (req, useSecure) ->
   # If we're using a key secured client, the key must be before the connection name
   if useSecure
     clientKey = pathParts.shift()
-  if pathParts[0] is 'simple_transport'
-    pathParts.shift()
-    transport = 'simple'
+  if pathParts[0] is 'resty'
+    transport = pathParts.shift()
+  else if pathParts[0] is 'epiquery1'
+    transport = pathParts.shift()
   else
     transport = 'standard'
+
   connectionName = pathParts.shift()
   connection = null
   if connectionName is 'header'
@@ -137,7 +189,7 @@ getQueryRequestInfo = (req, useSecure) ->
     templateContext: params
     templateName: templatePath
     clientKey: clientKey
-    httpTransport: transport
+    responseFormat: transport
 
 module.exports.attachResponder = attachResponder
 module.exports.getQueryRequestInfo = getQueryRequestInfo
