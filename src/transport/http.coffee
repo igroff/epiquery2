@@ -71,7 +71,7 @@ attachSimpleResponder = (context, res) ->
     responseData.push "]}"
     res
       .status(status)
-      .header('Content-Type', 'application/javscript')
+      .header('Content-Type', 'application/javascript')
       .end(responseData.join(''))
 
   writeResultElement = (obj) ->
