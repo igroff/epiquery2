@@ -1,4 +1,156 @@
-## I don't care, how do I use it.
+## Websockets suck. I use 'normal' HTTP
+
+Ok, so websockets can kind of suck.  And lots of people are more comfortable
+with the request/response behavior of 'standard' HTTP as opposed to the asynch
+event based nature of websockets. To that end, we offer multiple transport
+formats for HTTP.
+
+First a little about HTTP requests to epiquery. 
+
+The general format is as follows:
+
+        http://epiquery.server.com/[optional format]/<required connection name>/template_path
+
+Epiquery 2 supports multiple named connections, so the _connection name_ portion of
+the url is required, as is the template path.  As an option you may provide a 
+format specifier, currently epiquery 2 supports two optional formats *simple* or *epiquery1*.
+
+So the following would execute the template */test/servername* against the connection named *pants*:
+
+        http://epiquery.server.com/pants/test/servername
+
+
+#### HTTP Response Format Examples
+
+In our examples we'll assume a epiquery instance running locally with a connection named 
+*pants* to a local MSSQL instance named *PANTSDB*.  The following examples may (or may not)
+use [jq](https://stedolan.github.io/jq/) to format the response JSON for reading.
+
+##### Standard
+
+First the 'standard' HTTP format, this format mirrors the websocket api and thus is fairly 
+chatty showing all the events as elements in an array.  You're probably not interested, so you'll have to look way down below to see more detail about those events.
+
+
+        $ curl http://localhost:8080/pants/test/servername
+        {
+          "events":[
+          {"queryId":"23303_0","message":"beginquery"},
+          {"queryId":"23303_0","message":"beginrowset"},
+          {"queryId":"23303_0","columns":[{"value":"PANTSDB","name":""}],"message":"row"},
+          {"queryId":"23303_0","message":"endrowset"},
+          {"queryId":"23303_0","message":"endquery"}
+          ]
+        }
+
+##### simple
+
+Next a slightly less obnoxious response format called *simple*.
+
+        $ curl http://localhost:8080/simple/pants/test/servername -s | jq .
+        {
+          "results": [
+            [
+              {
+                "undefined": "PANTSDB"
+              }
+            ]
+          ]
+        }
+
+The above format example ( the *simple* format ) returns an array of arrays of objects where the 'key' is the column name ( in the above example the column name is empty thus the string 'undefined' ) and the value is the column data.
+
+The *simple* response format will return a single array for each _result set_ in the query, and an object with properties (keys) matching the column names  for each row output by the query. The array of result sets will be assigned to the property 'results' of the response object. Below is an example of a result set with two rows having columns *id* and *name*.
+
+        $ curl http://localhost:8080/simple/pants/test/multiple_rows -s | jq .
+        {
+          "results": [
+            [
+              {
+                "id": 1,
+                "name": "jeans"
+              },
+              {
+                "id": 2,
+                "name": "slacks"
+              }
+            ]
+          ]
+        }
+
+##### epiquery1
+
+The final format is *epiquery1* and is intended to be the same as the response format used in epiquery 1.  Generally it's the same format as simple without the enclosing object, which is to say it retuns just the array named *results* from the simple format.
+
+        $ curl http://localhost:8080/epiquery1/pants/test/servername -s | jq .
+        [
+          [
+            {
+              "undefined": "PANTSDB"
+            }
+          ]
+        ]
+
+
+        $ curl http://localhost:8080/epiquery1/pants/test/multiple_rows -s | jq .
+        [
+          [
+            {
+              "id": 1,
+              "name": "jeans"
+            },
+            {
+              "id": 2,
+              "name": "slacks"
+            }
+          ]
+        ]
+
+##### Gotchas
+
+It's worth noting that only the *standard* format supports multiple columns having the same name, the other formats the last column encountered with a duplicate name will 'win'. For example, given the template */test/same_column_name* containing:
+
+        select 'one' [col1], 'two' [col1]
+
+You'll get the following responses:
+
+        $ curl http://localhost:8080/simple/pants/test/same_column_name -s | jq .
+        {
+          "results": [
+            [
+              {
+                "col1": "two"
+              }
+            ]
+          ]
+        }
+
+        $ curl http://localhost:8080/epiquery1/pants/test/same_column_name -s | jq .
+        [
+          [
+            {
+              "col1": "two"
+            }
+          ]
+        ]
+
+Whereas standard will provide:
+
+        $ curl http://localhost:8080/glglive/test/same_column_name -s
+        {
+          "events":[
+          {"queryId":"23752_3","message":"beginquery"},
+          {"queryId":"23752_3","message":"beginrowset"},
+          {"queryId":"23752_3","columns":[{"value":"one","name":"col1"},{"value":"two","name":"col1"}],"message":"row"},
+          {"queryId":"23752_3","message":"endrowset"},
+          {"queryId":"23752_3","message":"endquery"}
+          ]
+        }
+
+Notice the inclusion of both columns named *col1* only in the standard response.
+
+
+## Websockets: I don't care, how do I use it.
   
 Epiquery2 provides a client you can use to connect which simplifies your
 interaction with epiquery2 as well as providing reconnection and other
