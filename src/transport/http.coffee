@@ -4,9 +4,7 @@ path    = require 'path'
 
 
 attachResponder = (context, res) ->
-  if context.responseFormat is 'resty'
-    attachSimpleResponder(context, res)
-  else if context.responseFormat is 'simple'
+  if context.responseFormat is 'simple'
     attachSimpleResponder(context, res)
   else if context.responseFormat is 'epiquery1'
     attachEpiqueryResponder(context, res)
@@ -170,9 +168,7 @@ getQueryRequestInfo = (req, useSecure) ->
   # If we're using a key secured client, the key must be before the connection name
   if useSecure
     clientKey = pathParts.shift()
-  if pathParts[0] is 'resty'
-    transport = pathParts.shift()
-  else if pathParts[0] is 'epiquery1'
+  if pathParts[0] is 'epiquery1'
     transport = pathParts.shift()
   else if pathParts[0] is 'simple'
     transport = pathParts.shift()
