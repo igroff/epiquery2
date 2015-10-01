@@ -13,7 +13,7 @@ The general format is as follows:
 
 Epiquery 2 supports multiple named connections, so the _connection name_ portion of
 the url is required, as is the template path.  As an option you may provide a 
-format specifier, currently epiquery 2 supports two optional formats *simple* or *epiquery1*.
+format specifier, currently epiquery 2 supports two optional formats `simple` or `epiquery1`.
 
 So the following would execute the template */test/servername* against the connection named *pants*:
 
@@ -23,8 +23,7 @@ So the following would execute the template */test/servername* against the conne
 #### HTTP Response Format Examples
 
 In our examples we'll assume a epiquery instance running locally with a connection named 
-*pants* to a local MSSQL instance named *PANTSDB*.  The following examples may (or may not)
-use [jq](https://stedolan.github.io/jq/) to format the response JSON for reading.
+*pants* to a local MSSQL instance named *PANTSDB*.
 
 ##### Standard
 
@@ -45,7 +44,7 @@ chatty showing all the events as elements in an array.  You're probably not inte
 
 ##### simple
 
-Next a slightly less obnoxious response format called *simple*.
+Next a slightly less obnoxious response format called `simple`.
 
         $ curl http://localhost:8080/simple/pants/test/servername -s | jq .
         {
@@ -58,9 +57,11 @@ Next a slightly less obnoxious response format called *simple*.
           ]
         }
 
-The above format example ( the *simple* format ) returns an array of arrays of objects where the 'key' is the column name ( in the above example the column name is empty thus the string 'undefined' ) and the value is the column data.
+I'm piping the response to [jq](https://stedolan.github.io/jq/) in the example, simply to make format it for display.
 
-The *simple* response format will return a single array for each _result set_ in the query, and an object with properties (keys) matching the column names  for each row output by the query. The array of result sets will be assigned to the property 'results' of the response object. Below is an example of a result set with two rows having columns *id* and *name*.
+The above format example ( the `simple` format ) returns an array of arrays of objects where the key is the column name ( in the above example the column name is empty thus the string 'undefined' ) and the value is the column data.
+
+The `simple` response format will return a single array for each _result set_ in the query, and an object with properties matching the column names  for each row output by the query. The array of result sets will be assigned to the property 'results' of the response object. Below is an example of a result set with two rows having columns *id* and *name*.
 
         $ curl http://localhost:8080/simple/pants/test/multiple_rows -s | jq .
         {
@@ -108,7 +109,7 @@ The final format is *epiquery1* and is intended to be the same as the response f
 
 ##### Gotchas
 
-It's worth noting that only the *standard* format supports multiple columns having the same name, the other formats the last column encountered with a duplicate name will 'win'. For example, given the template */test/same_column_name* containing:
+It's worth noting that only the *standard* format supports multiple columns having the same name. The simple and epiquery1 formats the last column encountered with a given name will overwrite any previous column data. For example, given the template */test/same_column_name* containing:
 
         select 'one' [col1], 'two' [col1]
 
