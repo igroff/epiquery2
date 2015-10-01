@@ -6,6 +6,8 @@ path    = require 'path'
 attachResponder = (context, res) ->
   if context.responseFormat is 'resty'
     attachSimpleResponder(context, res)
+  else if context.responseFormat is 'simple'
+    attachSimpleResponder(context, res)
   else if context.responseFormat is 'epiquery1'
     attachEpiqueryResponder(context, res)
   else
@@ -36,7 +38,7 @@ attachEpiqueryResponder = (context, res) ->
   context.on 'row', (row) ->
     delete(row['queryId'])
     columns = {}
-    _.map(row.columns, (e, i, l) -> columns[l[i].name || 'undefiend'] = l[i].value)
+    _.map(row.columns, (e, i, l) -> columns[l[i].name || 'undefined'] = l[i].value)
     writeResultElement columns
 
   context.on 'beginrowset', (d={}) ->
@@ -84,7 +86,7 @@ attachSimpleResponder = (context, res) ->
   context.on 'row', (row) ->
     delete(row['queryId'])
     columns = {}
-    _.map(row.columns, (e, i, l) -> columns[l[i].name || 'undefiend'] = l[i].value)
+    _.map(row.columns, (e, i, l) -> columns[l[i].name || 'undefined'] = l[i].value)
     writeResultElement columns
 
   context.on 'beginrowset', (d={}) ->
@@ -171,6 +173,8 @@ getQueryRequestInfo = (req, useSecure) ->
   if pathParts[0] is 'resty'
     transport = pathParts.shift()
   else if pathParts[0] is 'epiquery1'
+    transport = pathParts.shift()
+  else if pathParts[0] is 'simple'
     transport = pathParts.shift()
   else
     transport = 'standard'
