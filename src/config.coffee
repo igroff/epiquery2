@@ -31,5 +31,6 @@ config =
   driverDirectory: DRIVER_DIRECTORY
   connections: CONNECTIONS
   forks: FORKS
+  roleBasedAuthorization: true
 
 module.exports = config

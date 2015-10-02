@@ -87,6 +87,12 @@ renderTemplate = (context, callback) ->
       context.renderedTemplate = renderedTemplate
       callback err, context
   )
+  
+validateRequestAuthorization = (context, callback) ->
+  if config.roleBasedAuthorization
+    if context.renderedTemplate.indexOf("require role: #{context.requestRole}") is -1
+      return callback new Error("execution denied by role")
+  return callback null, context
 
 executeQuery = (context, callback) ->
   driver = core.selectDriver context.connection
@@ -146,6 +152,7 @@ queryRequestHandler = (context) ->
     escapeInput,
     sanitizeInput,
     renderTemplate,
+    validateRequestAuthorization,
     selectConnection,
     executeQuery,
     collectStats
