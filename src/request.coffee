@@ -76,8 +76,8 @@ getTemplatePath = (context, callback) ->
   # first we make sure that, if we are whitelisting templates, that 
   # our requested template is in a whitelisted directory
   if config.allowedTemplates isnt null
-    log.debug "validating template dir %s against allowed templates", templateDir
     templateDir = path.dirname context.templateName
+    log.debug "validating template dir %s against allowed templates", templateDir
     if not config.allowedTemplates[templateDir]
       return callback new Error("Template access denied: " + context.templateName), context
   # if we've arrived here then we've either got no whitelist, or we're running
