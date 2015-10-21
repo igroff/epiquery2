@@ -81,7 +81,20 @@ The `simple` response format will return a single array for each _result set_ in
 
 ##### epiquery1
 
-The final format is *epiquery1* and is intended to be the same as the response format used in epiquery 1.  Generally it's the same format as simple without the enclosing object, which is to say it retuns just the array named *results* from the simple format.
+The final format is *epiquery1* and is intended to be similar to the response format used in epiquery 1.  Generally it's the same format as simple without the enclosing object, which is to say it retuns just the array named *results* from the simple format.
+This only differs from the response format in epiquery1 in that the response here is *always* an array of arrays, whereas epiquery1 would pluck out the first result set and present it in the response directly in the case of the respones only having one result set.
+
+##### the REAL epiquery [one](https://github.com/igroff/epiquery) response 
+
+        $ curl http://localhost:9090/test/servername -s | jq .
+        [
+          {
+            "": "PANTSDB"
+          }
+        ]
+
+
+##### epiquery2 response using the 'epiquery1' format
 
         $ curl http://localhost:8080/epiquery1/pants/test/servername -s | jq .
         [

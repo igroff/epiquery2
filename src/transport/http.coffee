@@ -36,7 +36,7 @@ attachEpiqueryResponder = (context, res) ->
   context.on 'row', (row) ->
     delete(row['queryId'])
     columns = {}
-    _.map(row.columns, (e, i, l) -> columns[l[i].name || 'undefined'] = l[i].value)
+    _.map(row.columns, (e, i, l) -> columns[l[i].name || ''] = l[i].value)
     writeResultElement columns
 
   context.on 'beginrowset', (d={}) ->
