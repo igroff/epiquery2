@@ -2,7 +2,113 @@ _       = require 'underscore'
 log     = require 'simplog'
 path    = require 'path'
 
+
 attachResponder = (context, res) ->
+  if context.responseFormat is 'simple'
+    attachSimpleResponder(context, res)
+  else if context.responseFormat is 'epiquery1'
+    attachEpiqueryResponder(context, res)
+  else
+    attachStandardResponder(context, res)
+
+attachEpiqueryResponder = (context, res) ->
+  status = 200
+  responseData = []
+  resultElementDelimiter = ""
+  responseObjectDelimiter = ""
+  stack = []
+  responseData.push "["
+
+  completeResponse = () ->
+    responseData.push "]"
+    res
+      .status(status)
+      .header('Content-Type', 'application/javascript')
+      .end(responseData.join(''))
+
+  writeResultElement = (obj) ->
+    responseData.push "#{resultElementDelimiter}#{JSON.stringify obj}"
+    resultElementDelimiter = ","
+
+  writeResponseObjectElement = (str) ->
+    responseData.push "#{responseObjectDelimiter}#{str}"
+
+  context.on 'row', (row) ->
+    delete(row['queryId'])
+    columns = {}
+    _.map(row.columns, (e, i, l) -> columns[l[i].name || 'undefined'] = l[i].value)
+    writeResultElement columns
+
+  context.on 'beginrowset', (d={}) ->
+    writeResponseObjectElement "["
+    responseObjectDelimiter = ""
+    resultElementDelimiter = ""
+
+  context.on 'endrowset', (d={}) ->
+    writeResponseObjectElement "]"
+    responseObjectDelimiter = ","
+
+  context.on 'data', (data) ->
+    writeResultElement data
+
+  context.on 'error', (err) ->
+    d = message: 'error', errorDetail: err
+    d.error = err.message if err.message
+    log.error err
+    status = 500
+    writeResultElement d
+
+  context.once 'completequeryexecution', completeResponse
+attachSimpleResponder = (context, res) ->
+  status = 200
+  responseData = []
+  resultElementDelimiter = ""
+  responseObjectDelimiter = ""
+  stack = []
+  responseData.push "{\"results\":["
+
+  completeResponse = () ->
+    responseData.push "]}"
+    res
+      .status(status)
+      .header('Content-Type', 'application/javascript')
+      .end(responseData.join(''))
+
+  writeResultElement = (obj) ->
+    responseData.push "#{resultElementDelimiter}#{JSON.stringify obj}"
+    resultElementDelimiter = ","
+
+  writeResponseObjectElement = (str) ->
+    responseData.push "#{responseObjectDelimiter}#{str}"
+
+  context.on 'row', (row) ->
+    delete(row['queryId'])
+    columns = {}
+    _.map(row.columns, (e, i, l) -> columns[l[i].name || 'undefined'] = l[i].value)
+    writeResultElement columns
+
+  context.on 'beginrowset', (d={}) ->
+    writeResponseObjectElement "["
+    responseObjectDelimiter = ""
+    resultElementDelimiter = ""
+
+  context.on 'endrowset', (d={}) ->
+    writeResponseObjectElement "]"
+    responseObjectDelimiter = ","
+
+  context.on 'data', (data) ->
+    writeResultElement data
+
+  context.on 'error', (err) ->
+    d = message: 'error', errorDetail: err
+    d.error = err.message if err.message
+    log.error err
+    status = 500
+    writeResultElement d
+
+  context.once 'completequeryexecution', completeResponse
+
+attachStandardResponder = (context, res) ->
   delim = ""
   indent = ""
   stack = []
@@ -55,12 +161,20 @@ attachResponder = (context, res) ->
 
   c.once 'completequeryexecution', completeResponse
 
+
 getQueryRequestInfo = (req, useSecure) ->
   templatePath = req.path.replace(/\.\./g, '').replace(/^\//, '')
   pathParts = templatePath.split('/')
   # If we're using a key secured client, the key must be before the connection name
   if useSecure
     clientKey = pathParts.shift()
+  if pathParts[0] is 'epiquery1'
+    transport = pathParts.shift()
+  else if pathParts[0] is 'simple'
+    transport = pathParts.shift()
+  else
+    transport = 'standard'
+
   connectionName = pathParts.shift()
   connection = null
   if connectionName is 'header'
@@ -75,6 +189,7 @@ getQueryRequestInfo = (req, useSecure) ->
     templateContext: params
     templateName: templatePath
     clientKey: clientKey
+    responseFormat: transport
 
 module.exports.attachResponder = attachResponder
 module.exports.getQueryRequestInfo = getQueryRequestInfo
