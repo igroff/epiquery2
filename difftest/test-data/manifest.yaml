@@ -1,0 +1,11 @@
+env:
+    -
+        server_os: Ubuntu
+        server_version: 11.10
+        server_disk_size_gb: 10
+        number_of_servers: 1
+        number_of_cpu: 4
+        server_memory_gb: 4
+        stew: false
+        clone_directory: app
+        bootstrap_shell_command: cd ~/app/storm ; ./move_keys.sh
