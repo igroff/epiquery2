@@ -13,14 +13,20 @@ attachResponder = (context, res) ->
 
 attachEpiqueryResponder = (context, res) ->
   status = 200
+  rowSetCount = 0
   responseData = []
   resultElementDelimiter = ""
   responseObjectDelimiter = ""
   stack = []
-  responseData.push "["
 
   completeResponse = () ->
-    responseData.push "]"
+    # epiquery "helpfully" sent only one array in the case tat the query
+    # contained only a single result set, otherwise it returned an array of
+    # arrays.  So we'll only make the response and array of arrays if we 
+    # have more than a single resultSet
+    if rowSetCount > 1
+      responseData.unshift "["
+      responseData.push "]"
     res
       .status(status)
       .header('Content-Type', 'application/javascript')
@@ -43,6 +49,7 @@ attachEpiqueryResponder = (context, res) ->
     writeResponseObjectElement "["
     responseObjectDelimiter = ""
     resultElementDelimiter = ""
+    rowSetCount += 1
 
   context.on 'endrowset', (d={}) ->
     writeResponseObjectElement "]"
@@ -59,6 +66,7 @@ attachEpiqueryResponder = (context, res) ->
     writeResultElement d
 
   context.once 'completequeryexecution', completeResponse
+
 attachSimpleResponder = (context, res) ->
   status = 200
   responseData = []
