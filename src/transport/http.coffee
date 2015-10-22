@@ -8,7 +8,7 @@ attachResponder = (context, res) ->
     attachSimpleResponder(context, res)
   else if context.responseFormat is 'epiquery1'
     attachEpiqueryResponder(context, res)
-  else
+  else # the original format, matching the socket protocol
     attachStandardResponder(context, res)
 
 attachEpiqueryResponder = (context, res) ->
