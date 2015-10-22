@@ -8,19 +8,25 @@ attachResponder = (context, res) ->
     attachSimpleResponder(context, res)
   else if context.responseFormat is 'epiquery1'
     attachEpiqueryResponder(context, res)
-  else
+  else # the original format, matching the socket protocol
     attachStandardResponder(context, res)
 
 attachEpiqueryResponder = (context, res) ->
   status = 200
+  rowSetCount = 0
   responseData = []
   resultElementDelimiter = ""
   responseObjectDelimiter = ""
   stack = []
-  responseData.push "["
 
   completeResponse = () ->
-    responseData.push "]"
+    # epiquery "helpfully" sent only one array in the case tat the query
+    # contained only a single result set, otherwise it returned an array of
+    # arrays.  So we'll only make the response and array of arrays if we 
+    # have more than a single resultSet
+    if rowSetCount > 1
+      responseData.unshift "["
+      responseData.push "]"
     res
       .status(status)
       .header('Content-Type', 'application/javascript')
@@ -43,6 +49,7 @@ attachEpiqueryResponder = (context, res) ->
     writeResponseObjectElement "["
     responseObjectDelimiter = ""
     resultElementDelimiter = ""
+    rowSetCount += 1
 
   context.on 'endrowset', (d={}) ->
     writeResponseObjectElement "]"
@@ -59,27 +66,27 @@ attachEpiqueryResponder = (context, res) ->
     writeResultElement d
 
   context.once 'completequeryexecution', completeResponse
+
 attachSimpleResponder = (context, res) ->
   status = 200
   responseData = []
   resultElementDelimiter = ""
   responseObjectDelimiter = ""
   stack = []
-  responseData.push "{\"results\":["
+  res.status(200)
+  res.header('Content-Type', 'application/javascript')
 
   completeResponse = () ->
-    responseData.push "]}"
-    res
-      .status(status)
-      .header('Content-Type', 'application/javascript')
-      .end(responseData.join(''))
+    responseObjectDelimiter = ""
+    writeResponseObjectElement "]}"
+    res.end()
 
   writeResultElement = (obj) ->
-    responseData.push "#{resultElementDelimiter}#{JSON.stringify obj}"
+    res.write "#{resultElementDelimiter}#{JSON.stringify obj}"
     resultElementDelimiter = ","
 
   writeResponseObjectElement = (str) ->
-    responseData.push "#{responseObjectDelimiter}#{str}"
+    res.write "#{responseObjectDelimiter}#{str}"
 
   context.on 'row', (row) ->
     delete(row['queryId'])
@@ -107,6 +114,11 @@ attachSimpleResponder = (context, res) ->
     writeResultElement d
 
   context.once 'completequeryexecution', completeResponse
+  
+  # open our response. no matter what, we're gonna write a json response
+  # and our return will be 200 with any actual information about the query provided
+  # within the response JSON structure
+  writeResponseObjectElement "{\"results\":["
 
 attachStandardResponder = (context, res) ->
   delim = ""
