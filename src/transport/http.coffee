@@ -42,7 +42,12 @@ attachEpiqueryResponder = (context, res) ->
   context.on 'row', (row) ->
     delete(row['queryId'])
     columns = {}
-    _.map(row.columns, (v, i, l) -> columns[i || ''] = v)
+    # this is a bit gruesome, unfortunately, the underlying driver can either return
+    # an array of objects, or an array of name/value pairs
+    if _.isArray(row.columns)
+      _.map(row.columns, (v, i, l) -> columns[l[i].name || 'undefined'] = l[i].value)
+    else
+      _.map(row.columns, (v, k, o) -> columns[k || 'undefined'] = v)
     writeResultElement columns
 
   context.on 'beginrowset', (d={}) ->
@@ -91,9 +96,12 @@ attachSimpleResponder = (context, res) ->
   context.on 'row', (row) ->
     delete(row['queryId'])
     columns = {}
-    util = require('util')
-    console.log(util.inspect(row.columns))
-    _.map(row.columns, (v, i, l) -> columns[i || 'undefined'] = v)
+    # this is a bit gruesome, unfortunately, the underlying driver can either return
+    # an array of objects, or an array of name/value pairs
+    if _.isArray(row.columns)
+      _.map(row.columns, (v, i, l) -> columns[l[i].name || 'undefined'] = l[i].value)
+    else
+      _.map(row.columns, (v, k, o) -> columns[k || 'undefined'] = v)
     writeResultElement columns
 
   context.on 'beginrowset', (d={}) ->
