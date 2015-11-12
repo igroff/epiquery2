@@ -1,0 +1,17 @@
+{
+  "events":[
+  {"queryId":"superpants","message":"beginquery"},
+  {"queryId":"superpants","data":"env:","message":"data"},
+  {"queryId":"superpants","data":"    -","message":"data"},
+  {"queryId":"superpants","data":"        server_os: Ubuntu","message":"data"},
+  {"queryId":"superpants","data":"        server_version: 11.10","message":"data"},
+  {"queryId":"superpants","data":"        server_disk_size_gb: 10","message":"data"},
+  {"queryId":"superpants","data":"        number_of_servers: 1","message":"data"},
+  {"queryId":"superpants","data":"        number_of_cpu: 4","message":"data"},
+  {"queryId":"superpants","data":"        server_memory_gb: 4","message":"data"},
+  {"queryId":"superpants","data":"        stew: false","message":"data"},
+  {"queryId":"superpants","data":"        clone_directory: app","message":"data"},
+  {"queryId":"superpants","data":"        bootstrap_shell_command: cd ~/app/storm ; ./move_keys.sh","message":"data"},
+  {"queryId":"superpants","message":"endquery"}
+  ]
+}
