@@ -42,7 +42,7 @@ attachEpiqueryResponder = (context, res) ->
   context.on 'row', (row) ->
     delete(row['queryId'])
     columns = {}
-    _.map(row.columns, (e, i, l) -> columns[l[i].name || ''] = l[i].value)
+    _.map(row.columns, (v, i, l) -> columns[i || ''] = v)
     writeResultElement columns
 
   context.on 'beginrowset', (d={}) ->
@@ -91,7 +91,9 @@ attachSimpleResponder = (context, res) ->
   context.on 'row', (row) ->
     delete(row['queryId'])
     columns = {}
-    _.map(row.columns, (e, i, l) -> columns[l[i].name || 'undefined'] = l[i].value)
+    util = require('util')
+    console.log(util.inspect(row.columns))
+    _.map(row.columns, (v, i, l) -> columns[i || 'undefined'] = v)
     writeResultElement columns
 
   context.on 'beginrowset', (d={}) ->
