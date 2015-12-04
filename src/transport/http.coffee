@@ -17,6 +17,7 @@ attachEpiqueryResponder = (context, res) ->
   responseData = []
   resultElementDelimiter = ""
   responseObjectDelimiter = ""
+  didBeginRowSet = false
   stack = []
 
   completeResponse = () ->
@@ -52,6 +53,7 @@ attachEpiqueryResponder = (context, res) ->
 
   context.on 'beginrowset', (d={}) ->
     writeResponseObjectElement "["
+    didBeginRowSet = true
     responseObjectDelimiter = ""
     resultElementDelimiter = ""
     rowSetCount += 1
@@ -69,6 +71,9 @@ attachEpiqueryResponder = (context, res) ->
     log.error err
     status = 500
     writeResultElement d
+    #check if we hit beginrowset - if so add a closing ']' since we won't hit endrowset
+    #and only if we hit beginroset because it is possible an error occurs prior to getting there.
+    if didBeginRowSet then writeResponseObjectElement ']'
 
   context.once 'completequeryexecution', completeResponse
 
@@ -77,6 +82,7 @@ attachSimpleResponder = (context, res) ->
   responseData = []
   resultElementDelimiter = ""
   responseObjectDelimiter = ""
+  didBeginRowSet = false
   stack = []
   res.status(200)
   res.header('Content-Type', 'application/javascript')
@@ -106,6 +112,7 @@ attachSimpleResponder = (context, res) ->
 
   context.on 'beginrowset', (d={}) ->
     writeResponseObjectElement "["
+    didBeginRowSet = true
     responseObjectDelimiter = ""
     resultElementDelimiter = ""
 
@@ -122,6 +129,9 @@ attachSimpleResponder = (context, res) ->
     log.error err
     status = 500
     writeResultElement d
+    #check if we hit beginrowset - if so add a closing ']' since we won't hit endrowset
+    #and only if we hit beginroset because it is possible an error occurs prior to getting there.
+    if didBeginRowSet then writeResponseObjectElement ']'
 
   context.once 'completequeryexecution', completeResponse
   
