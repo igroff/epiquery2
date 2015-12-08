@@ -1,0 +1,2 @@
+#! /usr/bin/env bash
+curl -s http://localhost:8080/epiquery1/datahub/test/multi_result_error | jq .

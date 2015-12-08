@@ -1,0 +1,19 @@
+[
+  {
+    "One Column": "One"
+  },
+  {
+    "message": "error",
+    "errorDetail": {
+      "message": "Invalid object name 'pants'.",
+      "code": "EREQUEST",
+      "number": 208,
+      "state": 1,
+      "class": 16,
+      "serverName": "WESTSQLREPLICA",
+      "procName": "",
+      "lineNumber": 2
+    },
+    "error": "Invalid object name 'pants'."
+  }
+]
