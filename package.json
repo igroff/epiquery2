@@ -1,6 +1,6 @@
 {
   "name": "epiquery2",
-  "version": "0.0.2",
+  "version": "0.0.13",
   "description": "run templated queries from the http's using learnings from 1",
   "devDependencies": {
     "coffeelint": "0.6.1",
