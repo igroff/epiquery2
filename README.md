@@ -322,5 +322,3 @@ very concise and simple, it should support a robust handling of that functionali
   comes through as a 'row' event.
 * msmdx - allows for MDX querying of a Microsoft Analysis Server interface
 * render - simply renders the template requested and returns the result
-
-

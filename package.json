@@ -15,13 +15,15 @@
     "browserify": "6.2.0",
     "cluster2": "igroff/cluster2.git",
     "coffee-script": "1.9.1",
-    "coffeeify": "^0.6.0",
     "difftest-runner": "0.0.9",
+    "coffeeify": "0.6.0",
     "docopt": "0.4.0",
     "dot": "1.0.1",
     "express": "3.1.0",
+    "generic-pool": "2.2.0",
     "hogan.js": "2.0.0",
     "install": "^0.1.7",
+    "jsforce": "^1.4.1",
     "line-by-line": "0.1.1",
     "lodash-contrib": "241.4.14",
     "mysql": "2.0.0-rc1",
@@ -30,7 +32,6 @@
     "simplog": "*",
     "sockjs": "0.3.8",
     "tedious": "^1.11.0",
-    "tedious-connection-pool": "^0.3.5",
     "underscore": "1.4.4",
     "xmla4js": "git+https://github.com/glg/xmla4js.git"
   },
@@ -61,3 +62,5 @@
     "!win32"
   ]
 }
+
+
