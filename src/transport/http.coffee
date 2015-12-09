@@ -222,6 +222,7 @@ getQueryRequestInfo = (req, useSecure) ->
     templateName: templatePath
     clientKey: clientKey
     responseFormat: transport
+    aclIdentity: req.get('X-EPI-ACL-IDENTITY')?.split(',') || []
 
 module.exports.attachResponder = attachResponder
 module.exports.getQueryRequestInfo = getQueryRequestInfo
