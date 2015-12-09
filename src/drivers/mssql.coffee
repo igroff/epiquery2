@@ -1,4 +1,5 @@
 BaseDriver  = require('./mssql_base.coffee').DriverClass
+_ = require 'lodash-contrib'
 
 class MSSQLDriver extends BaseDriver
 
@@ -10,7 +11,10 @@ class MSSQLDriver extends BaseDriver
   # what we want here, all that fancy parameterization and 'stuff' is
   # done
   # in the template
-  mapper: (column) ->
-    {value: column.value, name: column.metadata.colName}
+  mapper: (columns) ->
+    r = []
+    _.each columns, (column) ->
+      r.push {value: column.value, name: column.metadata.colName}
+    r
 
 module.exports.DriverClass = MSSQLDriver

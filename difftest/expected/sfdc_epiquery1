@@ -1,0 +1,12 @@
+{
+  "attributes": {
+    "type": "Subscription__c",
+    "url": "/services/data/v34.0/sobjects/Subscription__c/a0AU0000019hqdGMAQ"
+  },
+  "Subscription_Id__c": "SUB-905822",
+  "Start_Date__c": "2015-08-01",
+  "Expiry_Date__c": "2016-01-31",
+  "IsUsageBased__c": false,
+  "Subscription_Revenue_Type__c": "Non-Unit Based",
+  "Subscription_Type__c": "OSP"
+}

@@ -68,8 +68,7 @@ class MSSQLDriver extends events.EventEmitter
     request.on 'row', (columns) =>
       @emit('beginrowset') if not rowSetStarted
       rowSetStarted = true
-      c = _.map(columns, @mapper.bind({}))
-      @emit 'row', c
+      @emit 'row', @mapper(columns)
 
     parameters = @parseQueryParameters(query,context)
 
