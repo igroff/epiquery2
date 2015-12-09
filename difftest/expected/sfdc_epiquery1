@@ -1,7 +1,7 @@
 {
   "attributes": {
     "type": "Subscription__c",
-    "url": "/services/data/v34.0/sobjects/Subscription__c/a0AU0000019hqdGMAQ"
+    "url": "/services/data/version/sobjects/Subscription__c/a0AU0000019hqdGMAQ"
   },
   "Subscription_Id__c": "SUB-905822",
   "Start_Date__c": "2015-08-01",

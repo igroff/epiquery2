@@ -26,9 +26,8 @@ getDriverInstance = (driver, connectionConfig, driverAquired) ->
 execute = (driver, context, cb) ->
   query = context.renderedTemplate
   config = context.connection
-  # if we have a driver that supports pooling, we'll use that
+  # if we have a driver that supports pooling we'll use pooling
   if typeof(driver.class.prototype.connect) is "function" && typeof(driver.class.prototype.disconnect) is "function"
-    # use pooling
     getDriverInstance driver, config, (err, driver) ->
       if err
         message = "unable to acquire driver from pool for connection: #{config.name}"
