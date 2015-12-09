@@ -35,19 +35,19 @@ execute = (driver, context, cb) ->
         log.error message, err
         context.emit 'error', message
       else
-        attachAndExecute driver, driver.name, context, cb
+        attachAndExecute driver, context, cb
   else
     # otherwise we'll new up a driver for each request
     driverInstance = new driver.class(query, config.config, context)
-    attachAndExecute driverInstance, driver.name, context, cb
+    attachAndExecute driverInstance, context, cb
 
-attachAndExecute = (driverInstance, driverName, context, cb) ->
+attachAndExecute = (driverInstance, context, cb) ->
   query = context.renderedTemplate
   # this query identifier is used by the client to corellate events from
   # simultaneously executing query requests
   queryId = context.queryId || "#{process.pid}_#{queryRequestCounter++}"
   context.queryId = queryId
-  log.debug "using #{driverName}, #{queryId} to execute query '#{query}', with connection %j", context.connection
+  log.debug "using #{context.connection.name}, queryId: #{queryId} to execute query '#{query}', with connection %j", context.connection
 
   context.emit 'beginquery', queryId: queryId
 
