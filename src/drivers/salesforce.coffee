@@ -26,5 +26,6 @@ class SalesforceDriver extends events.EventEmitter
 
   # do nothing, but we need this so we can be pooled
   disconnect: ->
+    log.debug "connection to %j closed", @config.server
 
 module.exports.DriverClass = SalesforceDriver
