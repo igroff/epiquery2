@@ -95,6 +95,10 @@ testExecutionPermissions = (context, callback) ->
     context.aclIdentity.push('*')
     # first we fetch our acl info from the template
     acl = context.renderedTemplate.match(///^--acl:.*$///mg)
+    # if we have no acl, yet acls are enabled... it's an error we're not gonna execute 
+    # anything
+    if not acl
+      return callback(new Error("no acl specified for template #{context.templatePath}"), context)
     # we'll get all our acl information in one place and remove the markers
     # ending up with a comma delimited string of allowances
     acl = acl.join(',').replace(/--acl:/g, '')

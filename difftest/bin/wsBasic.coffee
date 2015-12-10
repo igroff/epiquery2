@@ -59,6 +59,7 @@ c.on 'endquery', (msg) ->
   callMeTillDone()
 c.on 'error', (msg) ->
   c.errorOutput.push 'error' + JSON.stringify msg
+  executionComplete.resolve()
 
 if repeatCount is 1
   c.query(connectionName, template, data, "basicSocketQueryId")

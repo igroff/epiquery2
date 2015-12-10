@@ -111,7 +111,7 @@ socketServer.on 'connection', (conn) ->
       connectionName: message.connectionName
       queryId: message.queryId
       templateContext: message.data
-      aclIdentity: req.get('X-EPI-ACL-IDENTITY')?.split(',') || []
+      aclIdentity: conn.headers['X-EPI-ACL-IDENTITY']?.split(',') || []
     context = new Context(ctxParms)
     log.debug "[q:#{context.queryId}] starting processing"
     sockjsClient.attachResponder(context, conn)
