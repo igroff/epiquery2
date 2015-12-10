@@ -24,14 +24,11 @@ for conn_name in CONNECTION_VAR_NAMES.split(" ")
     throw e
   CONNECTIONS[conn_o.name] = conn_o
 
-ENFORCE_ACLS=process.env.ENFORCE_ACLS isnt "false"# Yeah, you need to turn it off
-
 config =
   port: PORT
   templateDirectory: TEMPLATE_DIRECTORY
   driverDirectory: DRIVER_DIRECTORY
   connections: CONNECTIONS
   forks: FORKS
-  enforceAcls: ENFORCE_ACLS
 
 module.exports = config
