@@ -209,10 +209,6 @@ getQueryRequestInfo = (req, useSecure) ->
 
   connectionName = pathParts.shift()
   connection = null
-  if connectionName is 'header'
-    # we allow an inbound connection header to override any other method
-    # of selecting a connection
-    connection = JSON.parse(@req.get('X-DB-CONNECTION') || null)
   templatePath = path.join.apply(path.join, pathParts)
   params = _.extend({}, req.body, req.query, req.headers)
   returnThis =
