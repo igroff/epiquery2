@@ -34,7 +34,6 @@ c.dataOutput = []
 c.errorOutput = []
 
 executionComplete = Q.defer()
-callMeTillDone = _.after( repeatCount, executionComplete.resolve )
 
 dumpOutput = () ->
   console.log c.beginqueryOutput
@@ -56,9 +55,9 @@ c.on 'data', (msg) ->
   c.rowOutput.push 'data' + JSON.stringify msg
 c.on 'endquery', (msg) ->
   c.endqueryOutput = 'endquery' + JSON.stringify msg
-  callMeTillDone()
 c.on 'error', (msg) ->
   c.errorOutput.push 'error' + JSON.stringify msg
+c.on 'completequeryexecution', () ->
   executionComplete.resolve()
 
 if repeatCount is 1

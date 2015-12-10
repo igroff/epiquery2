@@ -186,6 +186,7 @@ queryRequestHandler = (context) ->
     if err
       log.error "[q:#{context.queryId}] queryRequestHandler Error: #{err}"
       context.emit 'error', err
+    log.event 'completequeryexecution'
     context.emit 'completequeryexecution'
 
 module.exports.queryRequestHandler = queryRequestHandler

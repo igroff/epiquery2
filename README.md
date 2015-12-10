@@ -153,13 +153,13 @@ Epiquery2 provides a client you can use to connect which simplifies your
 interaction with epiquery2 as well as providing reconnection and other
 valuable features.
 
-There are currently three versions of the client, the original ( without `_v*` )
-and `_v2` should not be used by any new applications and are only there for
+There are currently four versions of the client, the original ( without `_v*` )
+, `_v2`, and `_v3` should not be used by any new applications and are only there for
 legacy apps so they don't have to unwillingly take new functionality.
 
 ##### Simple Client Example
 
-      <script src="http://some.epiquery.server/static/js/epiclient_v3.js"></script>
+      <script src="http://some.epiquery.server/static/js/epiclient_v4.js"></script>
       <script type="text/javascript">   
       //an array of urls is required
       client = new EpiClient([

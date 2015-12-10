@@ -24,8 +24,8 @@ lint:
 static/js/sockjstest.js: static/js/src/wstest.coffee
 	./node_modules/.bin/browserify -t coffeeify static/js/src/wstest.coffee > static/js/sockjstest.js
 
-static/js/epiclient_v3.js: src/clients/EpiClient.coffee
-	./node_modules/.bin/browserify -t coffeeify -r ./src/clients/EpiClient.coffee:epi-client --outfile $@
+static/js/epiclient_v4.js: src/clients/EpiClient.coffee
+	./node_modules/.bin/browserify -r ./src/clients/EpiClient.coffee:epi-client --outfile $@
 
 static/js/hunting-websocket.js: src/clients/hunting-websocket.litcoffee
 	./node_modules/.bin/browserify -t coffeeify src/clients/hunting-websocket.litcoffee --outfile $@

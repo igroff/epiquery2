@@ -137,6 +137,7 @@ class EpiClient extends EventEmitter
       @emit 'error', msg
   onbeginrowset: (msg) => @emit 'beginrowset', msg
   onendrowset: (msg) => @emit 'endrowset', msg
+  oncompletequeryexecution: (msg) => @emit 'completequeryexecution', msg
   onsend: (msg) => @emit 'send', msg
   onreplicamasterwrite: (msg) =>
     query_data = @pending_queries[msg.queryId]
