@@ -34,6 +34,7 @@ c.dataOutput = []
 c.errorOutput = []
 
 executionComplete = Q.defer()
+callMeTillDone = _.after( repeatCount, executionComplete.resolve )
 
 dumpOutput = () ->
   console.log c.beginqueryOutput
@@ -55,10 +56,9 @@ c.on 'data', (msg) ->
   c.rowOutput.push 'data' + JSON.stringify msg
 c.on 'endquery', (msg) ->
   c.endqueryOutput = 'endquery' + JSON.stringify msg
+  callMeTillDone()
 c.on 'error', (msg) ->
   c.errorOutput.push 'error' + JSON.stringify msg
-c.on 'completequeryexecution', () ->
-  executionComplete.resolve()
 
 if repeatCount is 1
   c.query(connectionName, template, data, "basicSocketQueryId")
@@ -66,7 +66,7 @@ else
   c.query(connectionName, template, data, "basicSocketQueryId#{num}") for num in [1..repeatCount]
 
 timedOut = ->
-  console.log "timed out!"
+  dumpOutput()
   process.exit 1
 
 executionComplete.promise.then dumpOutput
