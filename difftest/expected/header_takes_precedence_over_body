@@ -1,0 +1,9 @@
+{
+  "events":[
+  {queryid,"message":"beginquery"},
+  {queryid,"message":"beginrowset"},
+  {queryid,"columns":[{"value":" jwt=header  user-agent=curl/7.37.1  host=localhost:8080  accept=*/*  content-length=8  content-type=application/x-www-form-urlencoded ","name":"everything"}],"message":"row"},
+  {queryid,"message":"endrowset"},
+  {queryid,"message":"endquery"}
+  ]
+}
