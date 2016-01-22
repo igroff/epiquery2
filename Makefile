@@ -1,8 +1,10 @@
 SHELL=/bin/bash
-.PHONY: watch test pass lint clean
+.PHONY: watch test pass lint clean start
 
 watch:
 	DEBUG=true supervisor --ignore "./test"  -e ".litcoffee|.coffee|.js" --exec make run-server
+
+start: run-server
 
 run-server: static/js/epiclient_v2.js static/js/epiclient_v3.js
 	exec ./ar-start

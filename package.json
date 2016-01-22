@@ -33,7 +33,8 @@
     "xmla4js": "git+https://github.com/glg/xmla4js.git"
   },
   "scripts": {
-    "start": "./bin/npm-starter"
+    "start": "make start",
+    "watch": "make watch"
   },
   "bin": {
     "update_repo_dir": "bin/update_or_clone_repo"
