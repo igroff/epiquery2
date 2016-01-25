@@ -14,7 +14,7 @@ getDriverInstance = (driver, connectionConfig, driverAquired) ->
     pool = Pool({
       name: connectionConfig.name,
       create: (cb) ->
-        log.info "creating driver instance for connection #{connectionConfig.name}"
+        log.debug "creating driver instance for connection #{connectionConfig.name}"
         d = new driver.class(connectionConfig.config)
         d.connect(cb)
       destroy: (driver) -> driver.disconnect()
