@@ -7,7 +7,7 @@ watch:
 start: run-server
 
 run-server: static/js/epiclient_v2.js static/js/epiclient_v3.js
-	exec ./ar-start
+	exec ./bin/npm-starter
 
 difftest/templates:
 	cd difftest/ && git clone https://github.com/igroff/epiquery-templates.git \
