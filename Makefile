@@ -2,7 +2,7 @@ SHELL=/bin/bash
 .PHONY: watch test pass lint clean start
 
 watch:
-	DEBUG=true supervisor --ignore "./test"  -e ".litcoffee|.coffee|.js" --exec make run-server
+	DEBUG=true PORT=8080 supervisor -e ".litcoffee|.coffee|.js" --exec make run-server
 
 start: run-server
 
@@ -32,10 +32,10 @@ static/js/epiclient_v3.js: src/clients/EpiClient.coffee
 static/js/hunting-websocket.js: src/clients/hunting-websocket.litcoffee
 	./node_modules/.bin/browserify -t coffeeify src/clients/hunting-websocket.litcoffee --outfile $@
 
-debug: static/js/sockjstest.js
-	DEBUG=true PORT=8080 exec ./ar-start
+build: static/js/epiclient_v3.js node_modules/
 
-build: static/js/epiclient_v3.js
+node_modules/:
+	npm install .
 
 clean:
 	rm -rf ./node_modules/
