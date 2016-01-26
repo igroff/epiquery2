@@ -1,7 +1,5 @@
 *.swp
 *.bs
-test/templates/
-test/results/*
 difftest/templates/
 difftest/results/*
 ./templates/
