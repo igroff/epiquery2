@@ -85,14 +85,6 @@ initialize = () ->
   # swapped with existing state when initialize is complete, this 
   # will allow initialize to be run while epiquery is active
   #
-  # we will:
-  # 1. walk the template directory building a list of files
-  # 2. filter the list removing anything that isn't a template, or is not mustache
-  # 3. render the remaining paths as templates, logging any errors we 
-  #    encounter.
-  # 4. swap the newly created list of rendered templates with our
-  #    module level hoganTemplates variable
-  #
   log.debug("precompiling mustache templates from #{config.templateDirectory}")
   mustachePaths = getMustacheFiles(config.templateDirectory)
   log.debug("precompiled #{mustachePaths.length} mustache templates")
