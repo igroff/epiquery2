@@ -5,6 +5,7 @@ log     = require 'simplog'
 config  = require './config.coffee'
 events  = require 'events'
 buffer  = require './util/buffer.coffee'
+templates = require './templates.coffee'
 
 DRIVERS={}
 QUERY_EXEC_TIME_STATS={}
@@ -35,6 +36,16 @@ init = () ->
   loadDrivers(path.join(__dirname, 'drivers'))
   # load any additional drivers indicated by configuration
   config.driverDirectory and loadDrivers(config.driverDirectory)
+  templates.init()
+  # we're gonna watch the template directory for changes, and re-init
+  # the templates module accordingly
+  log.debug "watching #{config.templateChangeFile} as template change indicator"
+  if fs.existsSync config.templateChangeFile
+    fs.watch config.templateChangeFile, {persistent:false, recursive:false}, (event, filename) ->
+      log.info "template directory changed, reinitializing"
+      templates.init()
+  else
+    log.warn "template change file was not found, you'll have trigger template updates manually"
 
 trackExecutionTime = (templateName, executionTime) ->
   if QUERY_EXEC_TIME_STATS[templateName] == undefined
@@ -56,7 +67,7 @@ getInflightQueries = () ->
     inflightQueries[k] = v if v > 0
   return inflightQueries
 
-    
+process.on 'SIGHUP', () -> init()
   
 module.exports.init = init
 module.exports.loadDrivers = loadDrivers

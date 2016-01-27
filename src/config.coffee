@@ -15,6 +15,7 @@ PORT=process.env.PORT || 9090
 CONNECTIONS={}
 FORKS=process.env.FORKS || 8
 FORKS=2 unless FORKS > 1
+TEMPLATE_CHANGE_FILE=process.env.TEMPLATE_CHANGE_FILE || path.join(TEMPLATE_DIRECTORY, ".change")
 
 for conn_name in CONNECTION_VAR_NAMES.split(" ")
   try
@@ -42,5 +43,6 @@ config =
   connections: CONNECTIONS
   forks: FORKS
   allowedTemplates: allowedTemplates
+  templateChangeFile: TEMPLATE_CHANGE_FILE
 
 module.exports = config
