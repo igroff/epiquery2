@@ -7,10 +7,14 @@ args = optimist.argv
 
 context = JSON.parse(args.context)
 templatePath = args.templatePath
+template.init()
 template.renderTemplate(
   templatePath,
   context,
   (err, templateContent, renderedTemplate) ->
-    process.stdout.write(renderedTemplate)
+    if err
+     console.log err
+    else
+      console.log renderedTemplate
     process.exit(1)
 )

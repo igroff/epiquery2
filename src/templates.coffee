@@ -14,7 +14,7 @@ getRelativeTemplatePath = (templatePath) ->
 dot.templateSettings.strip = false
 
 # precompiled templates loaded by hogan during initilization
-hoganTemplates = []
+hoganTemplates = null
 
 # keep track of our renderers, we're storing them by
 # their associated file extension as that is how we'll
@@ -29,7 +29,10 @@ renderers[".mustache"] =  (templatePath, templateString, context) ->
   log.debug "looking for template #{relativeTemplatePath}"
   template = hoganTemplates[relativeTemplatePath]
   log.debug "using hogan template #{relativeTemplatePath}"
-  template.render context, hoganTemplates
+  if template
+    template.render context, hoganTemplates
+  else
+    log.error "could not find template: #{relativeTemplatePath}"
 
 # set our default handler, which does nothing
 # but return the templateString it was given
