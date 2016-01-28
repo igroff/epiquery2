@@ -27,7 +27,7 @@ getDriverInstance = (driver, connectionConfig, driverAquired) ->
           return valid
         else
           return true
-      max: 1
+      max: 50
     })
     DRIVER_POOL[connectionConfig.name] = pool
   pool.acquire(driverAquired)
