@@ -8,6 +8,9 @@ _         = require 'underscore'
 config    = require './config.coffee'
 
 getRelativeTemplatePath = (templatePath) ->
+  # as per the MDN
+  #   If either argument is greater than stringName.length,
+  #   it is treated as if it were stringName.length.
   templatePath.substring(config.templateDirectory.length + 1, 9999)
 
 # whitespace is important, we don't want to strip it
@@ -20,53 +23,43 @@ hoganTemplates = null
 # their associated file extension as that is how we'll
 # be looking them up
 renderers = {}
-renderers[".dot"] =  (templatePath, templateString, context) ->
-  templateFn = dot.template templateString
-  templateFn context
+renderers[".dot"] =  (templatePath, context, cb) ->
+  log.debug "rendering #{templatePath} with dot renderer"
+  fs.readFile templatePath, {encoding: 'utf8'}, (err, templateString) ->
+    templateFn = dot.template templateString
+    if err
+      cb(err)
+    else
+      cb(null, templateString, templateFn(context))
 
-renderers[".mustache"] =  (templatePath, templateString, context) ->
+renderers[".mustache"] =  (templatePath, context, cb) ->
+  log.debug "rendering #{templatePath} with mustache renderer"
   relativeTemplatePath = getRelativeTemplatePath(templatePath)
   log.debug "looking for template #{relativeTemplatePath}"
   template = hoganTemplates[relativeTemplatePath]
   log.debug "using hogan template #{relativeTemplatePath}"
   if template
-    template.render context, hoganTemplates
+    cb(null, template, template.render(context, hoganTemplates))
   else
-    log.error "could not find template: #{relativeTemplatePath}"
+    cb(new Error("could not find template: #{relativeTemplatePath}"))
 
 # set our default handler, which does nothing
 # but return the templateString it was given
-renderers[""] = (_, templateString) ->
-  templateString
+renderers[""] = (templatePath, _, cb) ->
+  log.debug "rendering #{templatePath} with generic renderer"
+  fs.readFile templatePath, {encoding: 'utf8'}, (err, templateString) ->
+    if err
+      cb(err)
+    else
+      cb(null, templateString, templateString)
 
 getRendererForTemplate = (templatePath) ->
   renderer = renderers[path.extname templatePath]
-  # hava 'default' renderer for any unrecognized extensions
+  # have a 'default' renderer for any unrecognized extensions
   if renderer
     return renderer
   else
     return renderers[""]
-
-
-templateLoader = (templatePath, context, cb) ->
-  log.debug "loading template %s", templatePath
-  callbackWithData = (error, rawTemplate) ->
-    cb error, templatePath, rawTemplate, context
-  # in the case of mustache templates, all our loading of templates is done
-  # during a call to initialize, so we really don't want to do anything here
-  if path.extname(templatePath) is ".mustache"
-    log.debug "looks like we have a mustache template, we won't load it as it has been precompiled"
-    cb null, templatePath, null, context
-  else
-    fs.readFile templatePath, {encoding: 'utf8'}, callbackWithData
-
-renderTemplate = (templatePath, templateContent, context, cb) ->
-  log.debug "renderingTemplate #{templatePath}"
-  renderer = getRendererForTemplate templatePath
-  templateContent = templateContent.toString() if templateContent isnt null
-  rendered = renderer templatePath, templateContent, context
-  log.debug "renderd template content:\n%s", rendered
-  cb null, [templateContent, rendered]
 
 getMustacheFiles = (templateDirectory, fileList=[]) ->
   names = fs.readdirSync(templateDirectory)
@@ -105,23 +98,8 @@ initialize = () ->
   log.debug _.keys(templates)
   # swap in the newly loaded templates
   hoganTemplates = templates
-    
 
-
-module.exports.renderTemplate = (templatePath, context, cb) ->
-  stepsToRender = [
-    # this step is only to get our parameters that our real workers expect
-    # into the callback 'stream'
-    (bootstrapCallback) -> bootstrapCallback(null, templatePath, context),
-    templateLoader,
-    renderTemplate
-  ]
-  async.waterfall stepsToRender,
-    (err, results) ->
-      if err
-        log.error "error during template render"
-        cb(err)
-      else
-        results.unshift(err)
-        cb.apply cb, results
 module.exports.init = initialize
+module.exports.renderTemplate = (templatePath, context, cb) ->
+  renderer = getRendererForTemplate(templatePath)
+  renderer(templatePath, context, cb)
