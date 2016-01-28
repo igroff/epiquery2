@@ -1,0 +1,6 @@
+{
+  "events":[
+  {"message":"error","errorDetail":{},"error":"unable to acquire driver from pool for connection: no_server"},
+  {"message":"endquery"}
+  ]
+}
