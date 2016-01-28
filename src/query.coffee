@@ -18,7 +18,15 @@ getDriverInstance = (driver, connectionConfig, driverAquired) ->
         d = new driver.class(connectionConfig.config)
         d.connect(cb)
       destroy: (driver) -> driver.disconnect()
-      max: 50
+      validate: (driver) ->
+        # if the driver has a validate method, use it, otherwise we'll
+        # mimic the default behavior of the pool wich is to assume good
+        log.debug "checking driver validity for connection #{connectionConfig.name}"
+        if driver.validate
+          return driver.validate()
+        else
+          return true
+      max: 1
     })
     DRIVER_POOL[connectionConfig.name] = pool
   pool.acquire(driverAquired)
@@ -26,15 +34,17 @@ getDriverInstance = (driver, connectionConfig, driverAquired) ->
 execute = (driver, context, cb) ->
   query = context.renderedTemplate
   config = context.connection
-  # if we have a driver that supports pooling we'll use pooling
+  # if we have a driver that supports pooling we'll use pooling, which is defined by a driver
+  # having a connect and disconnect method
   if typeof(driver.class.prototype.connect) is "function" && typeof(driver.class.prototype.disconnect) is "function"
-    getDriverInstance driver, config, (err, driver) ->
+    getDriverInstance(driver, config, (err, driver) ->
       if err
         message = "unable to acquire driver from pool for connection: #{config.name}"
         log.error message, err
-        context.emit 'error', message
+        cb(new Error(message))
       else
         attachAndExecute driver, context, cb
+      )
   else
     # otherwise we'll new up a driver for each request
     driverInstance = new driver.class(query, config.config, context)
