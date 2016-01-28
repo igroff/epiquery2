@@ -46,6 +46,7 @@ class MSSQLDriver extends events.EventEmitter
       log.error "tedious errorMessage: #{message}"
       @emit 'errorMessage', message
     @conn.on 'error', (message) =>
+      # on error we mark this instance invalid, JIC
       @valid = false
       log.error "tedious error: #{message}"
       @emit 'error', message
@@ -54,7 +55,6 @@ class MSSQLDriver extends events.EventEmitter
     @conn.close()
 
   validate: ->
-    log.debug "checking validity"
     @valid
 
   execute: (query, context) =>

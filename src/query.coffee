@@ -12,7 +12,7 @@ getDriverInstance = (driver, connectionConfig, driverAquired) ->
   pool = DRIVER_POOL[connectionConfig.name]
   if not pool
     pool = Pool({
-      name: connectionConfig.name,
+      name: connectionConfig.name
       create: (cb) ->
         log.debug "creating driver instance for connection #{connectionConfig.name}"
         d = new driver.class(connectionConfig.config)
@@ -21,9 +21,10 @@ getDriverInstance = (driver, connectionConfig, driverAquired) ->
       validate: (driver) ->
         # if the driver has a validate method, use it, otherwise we'll
         # mimic the default behavior of the pool wich is to assume good
-        log.debug "checking driver validity for connection #{connectionConfig.name}"
         if driver.validate
-          return driver.validate()
+          valid = driver.validate()
+          log.debug "using driver.validate to check validity of driver for #{connectionConfig.name} says driver validity is #{valid}"
+          return valid
         else
           return true
       max: 1
