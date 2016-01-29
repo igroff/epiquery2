@@ -44,7 +44,7 @@ renderers[".mustache"] =  (templatePath, context, cb) ->
     cb(new Error("could not find template: #{relativeTemplatePath}"))
 
 # set our default handler, which does nothing
-# but return the templateString it was given
+# but return the the contents of the template it was provided
 renderers[""] = (templatePath, _, cb) ->
   log.debug "rendering #{templatePath} with generic renderer"
   fs.readFile templatePath, {encoding: 'utf8'}, (err, templateString) ->
