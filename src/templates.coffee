@@ -1,10 +1,9 @@
 hogan     = require 'hogan.js'
 dot       = require 'dot'
-async     = require 'async'
 log       = require 'simplog'
 fs        = require 'fs'
 path      = require 'path'
-_         = require 'underscore'
+_         = require 'lodash'
 config    = require './config.coffee'
 util      = require 'util'
 
@@ -107,7 +106,7 @@ initialize = () ->
   # then we get our mustacheLambdas
   lambdaPath = path.join(config.templateDirectory, 'mustache_lambdas.js')
   if fs.existsSync(lambdaPath)
-    log.debug "loading lambdas for template directory: #{lambdaPath}"
+    log.info "loading lambdas for template directory: #{lambdaPath}"
     mustacheLambdas = require lambdaPath
     log.debug "loaded lambdas:\n #{util.inspect(mustacheLambdas)}"
 
