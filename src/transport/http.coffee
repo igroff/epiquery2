@@ -1,6 +1,8 @@
 _       = require 'underscore'
 log     = require 'simplog'
 path    = require 'path'
+fs      = require 'fs'
+templates = require '../templates.coffee'
 
 
 attachResponder = (context, res) ->
@@ -8,8 +10,52 @@ attachResponder = (context, res) ->
     attachSimpleResponder(context, res)
   else if context.responseFormat is 'epiquery1'
     attachEpiqueryResponder(context, res)
+  else if context.responseFormat is 'mustache'
+    log.debug "mustache responder requested"
+    attachTemplatedResponder(context, res)
   else # the original format, matching the socket protocol
     attachStandardResponder(context, res)
+
+attachTemplatedResponder = (context, res) ->
+  currentRowset = null
+  response =
+    rowSets: []
+
+  completeResponse = () ->
+    log.debug "query complete, loading response template: #{context.responseTemplate}"
+    fs.readFile context.responseTemplate, encoding: 'utf-8', (err, data) ->
+      if err
+        response.errors?.push(err) ? response.errors = [err]
+        log.error "error loading reponse template #{err}"
+        res.status(500).header('Content-Type', 'application/javascript').send({error: err}).end()
+      else
+        log.info "response: \n %j", response
+        context.response = response
+        log.debug "response context:\n %j", context
+        templates.renderTemplate context.responseTemplate, context, (err, template, renderedTemplate) ->
+          res
+            .status(200)
+            .header('Content-Type', 'application/javascript')
+            .end(renderedTemplate)
+    
+  context.on 'row', (row) ->
+    currentRowset.push(row.columns)
+
+  context.on 'beginrowset', (d={}) ->
+    currentRowset = []
+
+  context.on 'endrowset', (d={}) ->
+    response.rowSets.push(currentRowset)
+    currentRowset = null
+
+  context.on 'data', (data) ->
+    response.data?.push(data) ? response.data = [data]
+
+  context.on 'error', (err) ->
+    if err
+      response.errors?.push(err) ? response.errors = [err]
+
+  context.once 'completequeryexecution', completeResponse
 
 attachEpiqueryResponder = (context, res) ->
   status = 200
@@ -202,6 +248,8 @@ getQueryRequestInfo = (req, useSecure) ->
     clientKey = pathParts.shift()
   if pathParts[0] is 'epiquery1'
     transport = pathParts.shift()
+  else if pathParts[0] is 'mustache'
+    transport = pathParts.shift()
   else if pathParts[0] is 'simple'
     transport = pathParts.shift()
   else
@@ -222,6 +270,7 @@ getQueryRequestInfo = (req, useSecure) ->
     templateName: templatePath
     clientKey: clientKey
     responseFormat: transport
+    responseTemplate: req.query.responseTemplate
 
 module.exports.attachResponder = attachResponder
 module.exports.getQueryRequestInfo = getQueryRequestInfo

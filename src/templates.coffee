@@ -99,7 +99,6 @@ initialize = () ->
       catch e
         log.error "error precompiling template #{mustachePath}, it will be skipped"
         log.error e
-  log.debug _.keys(templates)
   # swap in the newly loaded templates
   hoganTemplates = templates
   ############################################
@@ -111,7 +110,8 @@ initialize = () ->
     delete require.cache['./lambdas.coffee']
     # and we load it
     mustacheLambdas = require './lambdas.coffee'
-    # then we tell the module to load the lambdas, which brings them 'into module space'
+    # then we tell the module to load the lambdas, which brings them in as
+    # module members
     mustacheLambdas.loadLambdas(lambdaPath)
     log.debug "lambdas: #{util.inspect(mustacheLambdas)}"
 
