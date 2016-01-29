@@ -106,9 +106,14 @@ initialize = () ->
   # then we get our mustacheLambdas
   lambdaPath = path.join(config.templateDirectory, 'mustache_lambdas.js')
   if fs.existsSync(lambdaPath)
-    log.info "loading lambdas for template directory: #{lambdaPath}"
-    mustacheLambdas = require lambdaPath
-    log.debug "loaded lambdas:\n #{util.inspect(mustacheLambdas)}"
+    # first we make sure to clear the cache, so we can assure we
+    # load the latest
+    delete require.cache['./lambdas.coffee']
+    # and we load it
+    mustacheLambdas = require './lambdas.coffee'
+    # then we tell the module to load the lambdas, which brings them 'into module space'
+    mustacheLambdas.loadLambdas(lambdaPath)
+    log.debug "lambdas: #{util.inspect(mustacheLambdas)}"
 
 module.exports.init = initialize
 module.exports.renderTemplate = (templatePath, context, cb) ->
