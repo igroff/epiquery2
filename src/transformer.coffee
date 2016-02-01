@@ -2,6 +2,7 @@ fs     = require 'fs'
 config = require './config.coffee'
 log    = require 'simplog'
 path   = require 'path'
+vm     = require 'vm'
 
 loadedTransforms = {}
 
@@ -17,9 +18,23 @@ getRequestedTransform = (transformName, cb) ->
       # will be the same for the transforms
       transformPath = path.join(config.responseTransformDirectory, transformName)
       log.debug "full path to transform: #{transformPath}"
-      cb(null, require(transformPath))
-      loadedTransforms[transformPath] = transformPath
-      return true
+      fs.readFile transformPath, (err, data) ->
+        cb(err) if err
+        transformFunction = loadedTransforms[transformPath]
+        if transformFunction
+          log.debug "using cached transform for #{transformPath}"
+        else
+          log.debug "loading transformation from #{transformPath}"
+          scriptContext = vm.createContext( module: {} , require: require)
+          try
+            transformFunction = vm.runInContext(data, scriptContext)
+          catch e
+            log.error "error during load of response transform #{transformName}\n#{e.stack}"
+            cb(e)
+            return false
+          loadedTransforms[transformPath] = transformFunction
+        cb(null, transformFunction)
+        return true
     catch e
       log.error "error loading transform: #{transformName}\n #{e}"
       cb(new Error("failed to load transform #{transformName}"))
