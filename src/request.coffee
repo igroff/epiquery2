@@ -83,8 +83,6 @@ getTemplatePath = (context, callback) ->
   # if we've arrived here then we've either got no whitelist, or we're running
   # a whitelisted template
   context.templatePath = path.join(config.templateDirectory, context.templateName)
-  if context.responseTemplate
-    context.responseTemplate = path.join(config.templateDirectory, context.responseTemplate)
   if not context.templatePath
     callback(new Error "[q:#{context.queryId}] no template path!")
   else

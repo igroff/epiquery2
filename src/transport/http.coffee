@@ -254,7 +254,6 @@ getQueryRequestInfo = (req, useSecure) ->
   else if req.query['transform']
     format = 'transform'
     transformName = req.query['transform']
-    console.log(require('util').inspect(req.query))
   else if pathParts[0] is 'simple'
     format = pathParts.shift()
   else
