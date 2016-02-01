@@ -44,5 +44,6 @@ config =
   forks: FORKS
   allowedTemplates: allowedTemplates
   templateChangeFile: TEMPLATE_CHANGE_FILE
+  responseTransformDirectory: path.join(TEMPLATE_DIRECTORY, 'response_transforms')
 
 module.exports = config
