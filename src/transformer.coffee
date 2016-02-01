@@ -3,6 +3,8 @@ config = require './config.coffee'
 log    = require 'simplog'
 path   = require 'path'
 
+loadedTransforms = {}
+
 # given the name of a response transformation (file name), load it from the 
 # proper location
 getRequestedTransform = (transformName, cb) ->
@@ -15,11 +17,24 @@ getRequestedTransform = (transformName, cb) ->
       # will be the same for the transforms
       transformPath = path.join(config.responseTransformDirectory, transformName)
       log.debug "full path to transform: #{transformPath}"
-      delete(require.cache[transformPath])
-      return cb(null, require(transformPath))
+      cb(null, require(transformPath))
+      loadedTransforms[transformPath] = transformPath
+      return true
     catch e
-      log.error "error loading transform: #{transformName}"
-      log.error e.message
-      return cb(new Error("failed to load transform #{transformName}"))
+      log.error "error loading transform: #{transformName}\n #{e}"
+      cb(new Error("failed to load transform #{transformName}"))
+      return false
+
+clearCache = () ->
+  log.info "clearing response transformation cache"
+  removeCacheEntry = (transformPath) ->
+    log.debug "removing transformation #{transformPath} from cache"
+    delete(require.cache[transformPath])
+  removeCacheEntry(transformPath) for own transformPath, _ of loadedTransforms
+  loadedTransforms = {}
+
+initialize = () ->
+  clearCache()
 
 module.exports.getRequestedTransform = getRequestedTransform
+module.exports.init = initialize

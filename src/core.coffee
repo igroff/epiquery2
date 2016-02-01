@@ -6,6 +6,7 @@ config  = require './config.coffee'
 events  = require 'events'
 buffer  = require './util/buffer.coffee'
 templates = require './templates.coffee'
+transformer = require './transformer.coffee'
 
 DRIVERS={}
 QUERY_EXEC_TIME_STATS={}
@@ -44,6 +45,9 @@ init = () ->
     fs.watch config.templateChangeFile, {persistent:false, recursive:false}, (event, filename) ->
       log.info "template directory changed, reinitializing"
       templates.init()
+      # this will clear our response transformation cache, causing them to be reloaded
+      # as needed
+      transformer.init()
   else
     log.warn "template change file was not found, you'll have trigger template updates manually"
 

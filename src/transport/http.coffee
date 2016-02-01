@@ -31,7 +31,7 @@ attachTransformationResponder = (context, res) ->
     log.debug "using response transform #{context.responseTransform}"
     getRequestedTransform context.responseTransform, (err, transform) ->
       if err
-        res.status(500).end(error: "error loading requested response transform #{context.responseTransform}")
+        res.status(500).send(error: "error loading requested response transform #{context.responseTransform}").end()
       else
         res
           .status(200)
