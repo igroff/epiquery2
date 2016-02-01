@@ -31,6 +31,7 @@ attachTransformationResponder = (context, res) ->
     log.debug "using response transform #{context.responseTransform}"
     getRequestedTransform context.responseTransform, (err, transform) ->
       if err
+        log.error "error loading response transform\n#{err}"
         res.status(500).send(error: "error loading requested response transform #{context.responseTransform}").end()
       else
         try
@@ -41,7 +42,7 @@ attachTransformationResponder = (context, res) ->
             .send(transformedResponse)
             .end()
         catch e
-          log.error "error during transformation of response\n #{e}"
+          log.error "error during transformation of response\n #{e.stack}"
           res.status(500).send(error: "error during transformation of response #{e.message}").end()
     
   context.on 'row', (row) ->
