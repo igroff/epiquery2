@@ -31,13 +31,19 @@ attachTransformationResponder = (context, res) ->
     log.debug "using response transform #{context.responseTransform}"
     getRequestedTransform context.responseTransform, (err, transform) ->
       if err
+        log.error "error loading response transform\n#{err}"
         res.status(500).send(error: "error loading requested response transform #{context.responseTransform}").end()
       else
-        res
-          .status(200)
-          .header('Content-Type', 'application/javascript')
-          .send(transform(context.response))
-          .end()
+        try
+          transformedResponse = transform(context.response)
+          res
+            .status(200)
+            .header('Content-Type', 'application/javascript')
+            .send(transformedResponse)
+            .end()
+        catch e
+          log.error "error during transformation of response\n #{e.stack}"
+          res.status(500).send(error: "error during transformation of response #{e.message}").end()
     
   context.on 'row', (row) ->
     currentRowset.push(row.columns)

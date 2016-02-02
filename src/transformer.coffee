@@ -2,28 +2,47 @@ fs     = require 'fs'
 config = require './config.coffee'
 log    = require 'simplog'
 path   = require 'path'
+vm     = require 'vm'
 
 loadedTransforms = {}
 
 # given the name of a response transformation (file name), load it from the 
 # proper location
 getRequestedTransform = (transformName, cb) ->
-  # if the requestor asks for a tranform, we'll go ahead and load it
-  if transformName
-    log.debug "loading requested response transform: #{transformName}"
-    try
-      # calculate the path for the transform location, so that we can 
-      # clear the cache, templates are loaded on each execution so the expectation
-      # will be the same for the transforms
-      transformPath = path.join(config.responseTransformDirectory, transformName)
-      log.debug "full path to transform: #{transformPath}"
-      cb(null, require(transformPath))
-      loadedTransforms[transformPath] = transformPath
-      return true
-    catch e
-      log.error "error loading transform: #{transformName}\n #{e}"
-      cb(new Error("failed to load transform #{transformName}"))
-      return false
+  if not transformName
+    log.error "no transformName provided, unable to load transform"
+    cb new Error("no transformName provided, unable to load transform")
+    return false
+  log.debug "loading requested response transform: #{transformName}"
+  try
+    # calculate the path for the transform location, so that we can 
+    # clear the cache, templates are loaded on each execution so the expectation
+    # will be the same for the transforms
+    transformPath = path.join(config.responseTransformDirectory, transformName)
+    log.debug "full path to transform: #{transformPath}"
+    transformFunction = loadedTransforms[transformPath]
+    if transformFunction
+      log.debug "using cached transform for #{transformPath}"
+    else
+      log.debug "loading transformation from #{transformPath}"
+      fs.readFile transformPath, (err, data) ->
+        return cb(err) if err
+        scriptContext = vm.createContext( module: {} , require: require)
+        try
+          transformFunction = vm.runInContext(data, scriptContext)
+          console.log transformFunction
+          # cache up our transform for later use
+          loadedTransforms[transformPath] = transformFunction
+        catch e
+          log.error "error during load of response transform #{transformName}\n#{e.stack}"
+          cb(new Error("error during load of response transform #{transformName}"))
+          return false
+        cb(null, transformFunction)
+        return true
+  catch e
+    log.error "error loading transform: #{transformName}\n #{e}"
+    cb(new Error("failed to load transform #{transformName}"))
+    return false
 
 clearCache = () ->
   log.info "clearing response transformation cache"
