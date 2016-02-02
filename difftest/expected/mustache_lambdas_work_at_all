@@ -1,0 +1,9 @@
+{
+  "events":[
+  {queryid,"message":"beginquery"},
+  {queryid,"message":"beginrowset"},
+  {queryid,"columns":[{"value":sawADate","name":"sql_date"},{"value":sawADate","name":"sql_date_utc"},{"value":sawADate","name":"sql_dte"},{"value":sawADate","name":"sql_dte_utc"},{"value":"this is a string","name":"sql_str"},{"value":"log this","name":"logged"}],"message":"row"},
+  {queryid,"message":"endrowset"},
+  {queryid,"message":"endquery"}
+  ]
+}

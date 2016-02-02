@@ -1,6 +1,8 @@
 _       = require 'underscore'
 log     = require 'simplog'
 path    = require 'path'
+fs      = require 'fs'
+getRequestedTransform = require('../transformer.coffee').getRequestedTransform
 
 
 attachResponder = (context, res) ->
@@ -8,8 +10,59 @@ attachResponder = (context, res) ->
     attachSimpleResponder(context, res)
   else if context.responseFormat is 'epiquery1'
     attachEpiqueryResponder(context, res)
+  else if context.responseFormat is 'transform'
+    attachTransformationResponder(context, res)
   else # the original format, matching the socket protocol
     attachStandardResponder(context, res)
+
+attachTransformationResponder = (context, res) ->
+  currentRowset = null
+  # response will always contain rowsets, even if they are 
+  # empty, however it can optionally contain errors and data
+  # elements depending on how things go and what was requested 
+  response =
+    rowSets: []
+    # errors: []
+    # data: []
+
+  completeResponse = () ->
+    context.response = response
+    log.debug "response context:\n %j", context
+    log.debug "using response transform #{context.responseTransform}"
+    getRequestedTransform context.responseTransform, (err, transform) ->
+      if err
+        log.error "error loading response transform\n#{err}"
+        res.status(500).send(error: "error loading requested response transform #{context.responseTransform}").end()
+      else
+        try
+          transformedResponse = transform(context.response)
+          res
+            .status(200)
+            .header('Content-Type', 'application/javascript')
+            .send(transformedResponse)
+            .end()
+        catch e
+          log.error "error during transformation of response\n #{e.stack}"
+          res.status(500).send(error: "error during transformation of response #{e.message}").end()
+    
+  context.on 'row', (row) ->
+    currentRowset.push(row.columns)
+
+  context.on 'beginrowset', (d={}) ->
+    currentRowset = []
+
+  context.on 'endrowset', (d={}) ->
+    response.rowSets.push(currentRowset)
+    currentRowset = null
+
+  context.on 'data', (data) ->
+    response.data?.push(data) ? response.data = [data]
+
+  context.on 'error', (err) ->
+    if err
+      response.errors?.push(err) ? response.errors = [err]
+
+  context.once 'completequeryexecution', completeResponse
 
 attachEpiqueryResponder = (context, res) ->
   status = 200
@@ -200,12 +253,17 @@ getQueryRequestInfo = (req, useSecure) ->
   # If we're using a key secured client, the key must be before the connection name
   if useSecure
     clientKey = pathParts.shift()
+
+  # pick out any requested response formats
   if pathParts[0] is 'epiquery1'
-    transport = pathParts.shift()
+    format = pathParts.shift()
+  else if req.query['transform']
+    format = 'transform'
+    transformName = req.query['transform']
   else if pathParts[0] is 'simple'
-    transport = pathParts.shift()
+    format = pathParts.shift()
   else
-    transport = 'standard'
+    format = 'standard'
 
   connectionName = pathParts.shift()
   connection = null
@@ -214,14 +272,14 @@ getQueryRequestInfo = (req, useSecure) ->
     # of selecting a connection
     connection = JSON.parse(@req.get('X-DB-CONNECTION') || null)
   templatePath = path.join.apply(path.join, pathParts)
-  params = _.extend({}, req.body, req.query, req.headers)
   returnThis =
     connectionName: connectionName
     connectionConfig: connection
-    templateContext: params
+    templateContext: _.extend({}, req.body, req.query, req.headers)
     templateName: templatePath
     clientKey: clientKey
-    responseFormat: transport
+    responseFormat: format
+    responseTransform: transformName
 
 module.exports.attachResponder = attachResponder
 module.exports.getQueryRequestInfo = getQueryRequestInfo

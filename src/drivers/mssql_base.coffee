@@ -6,6 +6,7 @@ os              = require 'os'
 
 class MSSQLDriver extends events.EventEmitter
   constructor: (@config) ->
+    @valid = false
 
   escape: (context) ->
     _.walk.preorder context, (value, key, parent) ->
@@ -37,18 +38,24 @@ class MSSQLDriver extends events.EventEmitter
     @conn.on 'connect', (err) =>
       if err
         log.error "tedious connection error: #{err}"
-        @emit('error', err)
+        cb(err)
       else
+        @valid = true
         cb(@)
     @conn.on 'errorMessage', (message) =>
       log.error "tedious errorMessage: #{message}"
       @emit 'errorMessage', message
     @conn.on 'error', (message) =>
+      # on error we mark this instance invalid, JIC
+      @valid = false
       log.error "tedious error: #{message}"
       @emit 'error', message
 
   disconnect: ->
     @conn.close()
+
+  validate: ->
+    @valid
 
   execute: (query, context) =>
     rowSetStarted = false

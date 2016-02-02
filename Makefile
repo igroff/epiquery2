@@ -1,11 +1,13 @@
 SHELL=/bin/bash
-.PHONY: watch test pass lint clean
+.PHONY: watch test pass lint clean start
 
 watch:
-	DEBUG=true supervisor --ignore "./test"  -e ".litcoffee|.coffee|.js" --exec make run-server
+	PORT=8080 supervisor -e ".litcoffee|.coffee|.js" --exec make run-server
+
+start: run-server
 
 run-server: static/js/epiclient_v2.js static/js/epiclient_v3.js
-	exec ./ar-start
+	exec ./bin/npm-starter
 
 difftest/templates:
 	cd difftest/ && git clone https://github.com/igroff/epiquery-templates.git \
@@ -30,10 +32,10 @@ static/js/epiclient_v3.js: src/clients/EpiClient.coffee
 static/js/hunting-websocket.js: src/clients/hunting-websocket.litcoffee
 	./node_modules/.bin/browserify -t coffeeify src/clients/hunting-websocket.litcoffee --outfile $@
 
-debug: static/js/sockjstest.js
-	DEBUG=true PORT=8080 exec ./ar-start
+build: static/js/epiclient_v3.js node_modules/
 
-build: static/js/epiclient_v3.js
+node_modules/:
+	npm install .
 
 clean:
 	rm -rf ./node_modules/

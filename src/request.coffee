@@ -82,10 +82,11 @@ getTemplatePath = (context, callback) ->
       return callback new Error("Template access denied: " + context.templateName), context
   # if we've arrived here then we've either got no whitelist, or we're running
   # a whitelisted template
-  context.templatePath = path.join(config.templateDirectory,
-    context.templateName)
-  callback(new Error "[q:#{context.queryId}] no template path!") if not context.templatePath
-  callback null, context
+  context.templatePath = path.join(config.templateDirectory, context.templateName)
+  if not context.templatePath
+    callback(new Error "[q:#{context.queryId}] no template path!")
+  else
+    callback null, context
 
 renderTemplate = (context, callback) ->
   templates.renderTemplate(
