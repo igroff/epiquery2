@@ -16,6 +16,9 @@ CONNECTIONS={}
 FORKS=process.env.FORKS || 8
 FORKS=2 unless FORKS > 1
 TEMPLATE_CHANGE_FILE=process.env.TEMPLATE_CHANGE_FILE || path.join(TEMPLATE_DIRECTORY, ".change")
+NODE_ENV=process.env.NODE_ENV || "development"
+EPISTREAM_API_KEY=process.env.EPISTREAM_API_KEY
+URL_BASED_API_KEY=process.env.URL_BASED_API_KEY # use second env var for backwards compatibility 
 
 for conn_name in CONNECTION_VAR_NAMES.split(" ")
   try
@@ -45,5 +48,9 @@ config =
   allowedTemplates: allowedTemplates
   templateChangeFile: TEMPLATE_CHANGE_FILE
   responseTransformDirectory: path.join(TEMPLATE_DIRECTORY, 'response_transforms')
+  nodeEnvironment: NODE_ENV
+  epistreamApiKey: EPISTREAM_API_KEY
+  urlBasedApiKey: URL_BASED_API_KEY
+  isDevelopmentMode: () -> NODE_ENV isnt "production"
 
 module.exports = config

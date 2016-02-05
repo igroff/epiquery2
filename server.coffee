@@ -23,25 +23,22 @@ app.use '/static', express.static(path.join(__dirname, 'static'))
 app.use app.router
 app.use express.errorHandler()
 
-apiKey = process.env.EPISTREAM_API_KEY
-urlBasedKey = process.env.URL_BASED_API_KEY # use second env var for backwards compatibility 
+apiKey = config.epistreamApiKey
 
 socketServer = sockjs.createServer(app, options: disconnect_delay: 900000)
 
 # initialize the core including driver loading, etc.
 core.init()
 
-if process.env.NODE_ENV == 'development'
+if config.isDevelopmentMode()
+  log.info "running in development mode"
   set_cors_headers = (req, res, next) ->
     res.header 'Access-Control-Allow-Origin', '*'
     res.header 'Access-Control-Allow-Headers', 'Content-Type'
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     next()
-
   app.use set_cors_headers
-
   app.all '*', set_cors_headers
-
   app.options '*', (req, res) ->
     res.status(200).send()
 
@@ -133,7 +130,7 @@ server = http.createServer(app)
 
 # use key based prefix if key is in url
 prefix = {prefix: '/sockjs'}
-prefix.prefix = "/#{apiKey}/sockjs" if apiKey && urlBasedKey
+prefix.prefix = "/#{apiKey}/sockjs" if apiKey && config.urlBasedApiKey
 
 socketServer.installHandlers(server, prefix)
 
