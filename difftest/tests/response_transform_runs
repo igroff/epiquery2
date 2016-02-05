@@ -1,2 +1,2 @@
 #! /usr/bin/env bash
-curl -s 'http://localhost:8080/mssql/test/servername?transform=test/return_howdy'
+curl -s 'http://localhost:8080/mssql/test/servername?transform=test/return_howdy' | jq .
