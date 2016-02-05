@@ -31,7 +31,7 @@ socketServer = sockjs.createServer(app, options: disconnect_delay: 900000)
 core.init()
 
 if config.isDevelopmentMode()
-  log.info "running in development mode"
+  log.warn "epiquery2 running in development mode, this will cause requests to be slower"
   set_cors_headers = (req, res, next) ->
     res.header 'Access-Control-Allow-Origin', '*'
     res.header 'Access-Control-Allow-Headers', 'Content-Type'

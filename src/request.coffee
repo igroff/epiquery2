@@ -8,6 +8,7 @@ core        = require './core.coffee'
 config      = require './config.coffee'
 query       = require './query.coffee'
 templates   = require './templates.coffee'
+transformer = require './transformer.coffee'
 
 # regex to replace MS special charactes, these are characters that are known to
 # cause issues in storage and retrieval so we're going to switch 'em wherever
@@ -32,6 +33,13 @@ setupContext = (context, callback) ->
   context.Stats = {}
   context.Stats.startDate = new Date()
   context.Stats.templateName = context.templateName
+  callback null, context
+
+initializeRequest = (context, callback) ->
+  core.trackInflightQuery context.templateName
+  if config.isDevelopmentMode()
+    templates.init()
+    transformer.init()
   callback null, context
 
 logTemplateContext = (context, callback) ->
@@ -146,10 +154,8 @@ escapeInput = (context, callback) ->
 queryRequestHandler = (context) ->
   async.waterfall [
     # just to create our context
-    (callback) ->
-      core.trackInflightQuery context.templateName
-      callback(null, context)
-    ,
+    (callback) -> callback(null, context),
+    initializeRequest,
     setupContext,
     logTemplateContext,
     getTemplatePath,
