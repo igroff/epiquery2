@@ -23,6 +23,8 @@ getRequestedTransform = (transformName, cb) ->
     transformFunction = loadedTransforms[transformPath]
     if transformFunction
       log.debug "using cached transform for #{transformPath}"
+      cb(null, transformFunction)
+      return true
     else
       log.debug "loading transformation from #{transformPath}"
       fs.readFile transformPath, (err, data) ->
@@ -30,7 +32,6 @@ getRequestedTransform = (transformName, cb) ->
         scriptContext = vm.createContext( module: {} , require: require)
         try
           transformFunction = vm.runInContext(data, scriptContext)
-          console.log transformFunction
           # cache up our transform for later use
           loadedTransforms[transformPath] = transformFunction
         catch e
