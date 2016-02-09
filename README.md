@@ -1,5 +1,6 @@
 ## Websockets suck. I use 'normal' HTTP
 
+
 Ok, so websockets can kind of suck.  And lots of people are more comfortable
 with the request/response behavior of 'standard' HTTP as opposed to the asynch
 event based nature of websockets. To that end, we offer multiple transport
