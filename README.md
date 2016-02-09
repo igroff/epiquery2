@@ -232,7 +232,7 @@ the JSON encoded information needed to configure the various drivers.  Ya, gnarl
         export CONNECTIONS="EPI_C_MSSQL EPI_C_FILE EPI_C_MYSQL EPI_C_RENDER EPI_C_MSSQL_RO"
         export EPI_C_FILE='{"driver":"file","config":{},"name":"file"}'
         export EPI_C_RENDER='{"driver":"render","config":{},"name":"render"}'
-        export EPI_C_MSSQL='{"driver":"mssql","name":"mssql","config":{"server":"10.211.55.5","password":"GLGROUP_LIVE","userName":"GLGROUP_LIVE","options":{"port":1433}}}'
+        export EPI_C_MSSQL='{"driver":"mssql","name":"mssql","config":{"server":"10.211.55.5","password":"PASSWORD","userName":"USER","options":{"port":1433}}}'
         export EPI_C_MYSQL='{"name":"mysql","driver":"mysql","config":{"host":"localhost","user":"root","password":""}}'
         export EPI_C_MSSQL_RO="{\"driver\":\"mssql\",\"name\":\"db250\",\"config\":{\"server\":\"${DATABASE_READONLY_SERVER}\",\"password\":\"${DATABASE_READONLY_PASSWORD}\",\"userName\":\"${DATABASE_READONLY_USER}\",\"options\":{\"port\":1433}}}"
 
