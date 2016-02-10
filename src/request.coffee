@@ -1,7 +1,7 @@
 # vim:ft=coffee
 
 async       = require 'async'
-log         = require 'simplog'
+log         = require './util/log.coffee'
 _           = require 'lodash-contrib'
 path        = require 'path'
 core        = require './core.coffee'
@@ -40,10 +40,11 @@ initializeRequest = (context, callback) ->
   if config.isDevelopmentMode()
     templates.init()
     transformer.init()
+  log.warn "debug logging enabled for this request" if context.debug
   callback null, context
 
 logTemplateContext = (context, callback) ->
-  log.debug "[q:#{context.queryId}] template context: #{JSON.stringify context.templateContext}"
+  log.debugRequest context.debug, "[q:#{context.queryId}] template context: #{JSON.stringify context.templateContext}"
   callback null, context
 
 selectConnection = (context, callback) ->
@@ -61,31 +62,31 @@ selectConnection = (context, callback) ->
     context.connection = connectionConfig
 
   # Replica check here...
-  log.debug "[q:#{context.queryId}] context.connection.name", context.connection.name
+  log.debugRequest context.debug, "[q:#{context.queryId}] context.connection.name", context.connection.name
   if context.connection.replica_of or context.connection.replica_master
-    log.debug "[q:#{context.queryId}] query is using replica setup"
+    log.debugRequest context.debug, "[q:#{context.queryId}] query is using replica setup"
     if context.rawTemplate.match(/(^|\W)(update|insert|exec|delete)\W/i)
-      log.debug "[q:#{context.queryId}] Unable to implicitly determine query is replica safe", context.rawTemplate
+      log.debugRequest context.debug, "[q:#{context.queryId}] Unable to implicitly determine query is replica safe", context.rawTemplate
       if context.rawTemplate.indexOf('replicasafe') != -1
-        log.debug "query to replica flagged as replicasafe"
+        log.debugRequest context.debug, "query to replica flagged as replicasafe"
       else
         if context.connection.replica_master
           context.emit 'replicamasterwrite', context.queryId
         else
-          log.debug "[q:#{context.queryId}] query to replica is a write. switching host"
-          log.debug 'hostswitch template:', context.templatePath
+          log.debugRequest context.debug, "[q:#{context.queryId}] query to replica is a write. switching host"
+          log.debugRequest context.debug 'hostswitch template:', context.templatePath
           return callback 'replicawrite', context
 
   context.Stats.connectionName = context.connection.name
   callback null, context
 
 getTemplatePath = (context, callback) ->
-  log.debug "[q:#{context.queryId}] getting template path for #{context.templateName}"
+  log.debugRequest context.debug, "[q:#{context.queryId}] getting template path for #{context.templateName}"
   # first we make sure that, if we are whitelisting templates, that 
   # our requested template is in a whitelisted directory
   if config.allowedTemplates isnt null
     templateDir = path.dirname context.templateName
-    log.debug "validating template dir %s against allowed templates", templateDir
+    log.debugRequest context.debug, "validating template dir %s against allowed templates", templateDir
     if not config.allowedTemplates[templateDir]
       return callback new Error("Template access denied: " + context.templateName), context
   # if we've arrived here then we've either got no whitelist, or we're running
@@ -102,7 +103,9 @@ renderTemplate = (context, callback) ->
     context.templateContext,
     (err, rawTemplate, renderedTemplate) ->
       context.rawTemplate = rawTemplate
+      log.debugRequest context.debug, "raw template: \n #{context.rawTemplate}"
       context.renderedTemplate = renderedTemplate
+      log.debugRequest context.debug, "rendered template: \n #{context.renderedTemplate}"
       callback err, context
   )
 
