@@ -119,6 +119,5 @@ module.exports.init = initialize
 module.exports.renderTemplate = (templatePath, context, cb) ->
   renderer = getRendererForTemplate(templatePath)
   templateCallback = (err, templateUnrendered, templateRendered) ->
-    log.debug "rendered template: \n #{templateRendered}"
     cb(err, templateUnrendered, templateRendered)
   renderer(templatePath, context, templateCallback)

@@ -280,6 +280,7 @@ getQueryRequestInfo = (req, useSecure) ->
     clientKey: clientKey
     responseFormat: format
     responseTransform: transformName
+    debug: req.query.debug is "true"
 
 module.exports.attachResponder = attachResponder
 module.exports.getQueryRequestInfo = getQueryRequestInfo
