@@ -42,7 +42,7 @@ renderers[".mustache"] = (templatePath, context, cb) ->
   template = hoganTemplates[relativeTemplatePath]
   context = _.extend(context, mustacheLambdas)
   if template
-    cb(null, template, template.render(context, hoganTemplates))
+    cb(null, template.text, template.render(context, hoganTemplates))
   else
     cb(new Error("could not find template: #{relativeTemplatePath}"))
 
