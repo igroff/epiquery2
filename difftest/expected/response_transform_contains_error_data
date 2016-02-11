@@ -1,0 +1,15 @@
+{
+  "rowSets": [],
+  "errors": [
+    {
+      "message": "Incorrect syntax near the keyword 'from'.",
+      "code": "EREQUEST",
+      "number": 156,
+      "state": 1,
+      "class": 15,
+      "serverName": "WIN-9D2AH7VSCSL",
+      "procName": "",
+      "lineNumber": 1
+    }
+  ]
+}
