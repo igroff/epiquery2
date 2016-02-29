@@ -74,7 +74,7 @@ getMustacheFiles = (templateDirectory, fileList=[]) ->
       return if name is ".git"
       getMustacheFiles(fullPath, fileList)
     else
-      fileList.push(fs.realpathSync(fullPath)) if path.extname(name) is ".mustache"
+      fileList.push(fullPath) if path.extname(name) is ".mustache"
   fileList
 
 initialize = () ->
