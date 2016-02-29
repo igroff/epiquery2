@@ -1,2 +1,2 @@
 #! /usr/bin/env bash
-curl -s 'http://localhost:8080/mssql/test/echo.dot' -H 'jwt: header' --data-urlencode "jwt=body"
+curl -s 'http://localhost:8080/mssql/test/echo_jwt.mustache' -H 'jwt: header' --data-urlencode "jwt=body"
