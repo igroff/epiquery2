@@ -1,2 +1,3 @@
 #! /usr/bin/env bash
-cat | sed -e 's/"queryId":"[0-9]*_[0-9]*"/queryid/g'
+MY_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cat | sed -e 's/"queryId":"[0-9]*_[0-9]*"/queryid/g' | ${MY_DIR}/normalize_hostname
