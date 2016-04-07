@@ -2,6 +2,7 @@ _       = require 'underscore'
 log     = require 'simplog'
 path    = require 'path'
 fs      = require 'fs'
+config  = require '../config.coffee'
 getRequestedTransform = require('../transformer.coffee').getRequestedTransform
 
 
@@ -281,6 +282,7 @@ getQueryRequestInfo = (req, useSecure) ->
     responseFormat: format
     responseTransform: transformName
     debug: req.query.debug is "true"
+    aclIdentity: req.get(config.aclIdentityHeader)?.split(',') || []
 
 module.exports.attachResponder = attachResponder
 module.exports.getQueryRequestInfo = getQueryRequestInfo

@@ -109,6 +109,35 @@ renderTemplate = (context, callback) ->
       callback err, context
   )
 
+testExecutionPermissions = (context, callback) ->
+  # skip this if acl is explicitly disabled via config
+  return callback(null, context) if config.aclIdentityHeader is "DISABLED"
+  # everyone is automatically in the all '*' group
+  context.aclIdentity.push('*')
+  # first we fetch our acl info from the template
+  acl = context.renderedTemplate.match(/^--acl:.*$|^#acl:.*$/mg)
+  # if we have no acl, yet acls are enabled... it's an error we're not gonna execute 
+  # anything
+  if not acl
+    return callback(new Error("no acl specified for template #{context.templatePath}"), context)
+  # we'll get all our acl information in one place and remove the markers
+  # ending up with a comma delimited string of allowances
+  acl = acl.join(',').replace(/--acl:|#acl:/g, '')
+  # then we clean up the individual strings (remove whitespace) and create
+  # an array (set) of the allowances
+  acl = _.map(acl.split(','), (s) -> return s.trim())
+  log.debug "acl for template #{context.templatePath}: %j", acl
+  log.debug "request identity %j", context.aclIdentity
+  # then we intersect the user identity with the allowances, if we get anything
+  # then they're allowed to execute
+  aclIntersection = _.intersection acl, context.aclIdentity
+  if aclIntersection.length is 0
+    log.debug "execution denied by acl. user acl: #{context.aclIdentity} template acl: #{acl}"
+    return callback(new Error("Execution denied by acl"), context)
+  else
+    log.debug "execution allowed by acl"
+    return callback null, context
+
 executeQuery = (context, callback) ->
   driver = core.selectDriver context.connection
   context.emit 'beginqueryexecution'
@@ -165,6 +194,7 @@ queryRequestHandler = (context) ->
     escapeInput,
     sanitizeInput,
     renderTemplate,
+    testExecutionPermissions,
     selectConnection,
     executeQuery,
     collectStats

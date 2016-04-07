@@ -19,6 +19,7 @@ TEMPLATE_CHANGE_FILE=process.env.TEMPLATE_CHANGE_FILE || path.join(TEMPLATE_DIRE
 NODE_ENV=process.env.NODE_ENV || "development"
 EPISTREAM_API_KEY=process.env.EPISTREAM_API_KEY
 URL_BASED_API_KEY=process.env.URL_BASED_API_KEY # use second env var for backwards compatibility 
+ACL_IDENTITY_HEADER=process.env.ACL_IDENTITY_HEADER || "X-EPI-ACL-IDENTITY"
 
 for conn_name in CONNECTION_VAR_NAMES.split(" ")
   try
@@ -52,5 +53,6 @@ config =
   epistreamApiKey: EPISTREAM_API_KEY
   urlBasedApiKey: URL_BASED_API_KEY
   isDevelopmentMode: () -> NODE_ENV isnt "production"
+  aclIdentityHeader: ACL_IDENTITY_HEADER
 
 module.exports = config
