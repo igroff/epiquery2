@@ -101,8 +101,9 @@ renderTemplate = (context, callback) ->
   templates.renderTemplate(
     context.templatePath,
     context.templateContext,
-    (err, rawTemplate, renderedTemplate) ->
+    (err, rawTemplate, renderedTemplate, templateConfig) ->
       context.rawTemplate = rawTemplate
+      context.templateConfig = templateConfig
       log.debugRequest context.debug, "raw template: \n #{context.rawTemplate}"
       context.renderedTemplate = renderedTemplate
       log.debugRequest context.debug, "rendered template: \n #{context.renderedTemplate}"
@@ -118,21 +119,15 @@ testExecutionPermissions = (context, callback) ->
   acl = context.renderedTemplate.match(/^--acl:.*$|^#acl:.*$/mg)
   # if we have no acl, yet acls are enabled... it's an error we're not gonna execute 
   # anything
-  if not acl
+  if not context.templateConfig?.acl
     return callback(new Error("no acl specified for template #{context.templatePath}"), context)
-  # we'll get all our acl information in one place and remove the markers
-  # ending up with a comma delimited string of allowances
-  acl = acl.join(',').replace(/--acl:|#acl:/g, '')
-  # then we clean up the individual strings (remove whitespace) and create
-  # an array (set) of the allowances
-  acl = _.map(acl.split(','), (s) -> return s.trim())
-  log.debug "acl for template #{context.templatePath}: %j", acl
+  log.debug "acl for template #{context.templatePath}: %s", context.templateConfig.acl
   log.debug "request identity %j", context.aclIdentity
   # then we intersect the user identity with the allowances, if we get anything
   # then they're allowed to execute
-  aclIntersection = _.intersection acl, context.aclIdentity
+  aclIntersection = _.intersection context.templateConfig.acl, context.aclIdentity
   if aclIntersection.length is 0
-    log.debug "execution denied by acl. user acl: #{context.aclIdentity} template acl: #{acl}"
+    log.debug "execution denied by acl. user acl: #{context.aclIdentity} template acl: #{context.templateConfig.acl}"
     return callback(new Error("Execution denied by acl"), context)
   else
     log.debug "execution allowed by acl"

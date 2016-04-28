@@ -6,6 +6,7 @@ path      = require 'path'
 _         = require 'lodash'
 config    = require './config.coffee'
 util      = require 'util'
+yaml      = require 'js-yaml'
 
 getRelativeTemplatePath = (templatePath) ->
   # as per the MDN
@@ -18,6 +19,9 @@ dot.templateSettings.strip = false
 
 # precompiled templates loaded by hogan during initilization
 hoganTemplates = null
+
+# front matter parsed out of hogan templates
+hoganFrontMatter = null
 
 # keep track of our renderers, we're storing them by
 # their associated file extension as that is how we'll
@@ -42,7 +46,7 @@ renderers[".mustache"] = (templatePath, context, cb) ->
   template = hoganTemplates[relativeTemplatePath]
   context = _.extend(context, mustacheLambdas)
   if template
-    cb(null, template.text, template.render(context, hoganTemplates))
+    cb(null, template.text, template.render(context, hoganTemplates), hoganFrontMatter[relativeTemplatePath])
   else
     cb(new Error("could not find template: #{relativeTemplatePath}"))
 
@@ -89,18 +93,37 @@ initialize = () ->
   mustachePaths = getMustacheFiles(config.templateDirectory)
   log.debug("precompiled #{mustachePaths.length} mustache templates")
   templates = {}
+  templateFrontMatter = {}
   # compile all of the templates
   _.each mustachePaths, (mustachePath) ->
       try
+        # we load the template, so we can pull of any metadata we might have
+        # that isn't part of the actual template
+        templateContents = fs.readFileSync(mustachePath).toString()
+        # if we have a leading '---\n' then we have front matter in our template
+        # we'll pull it out, parse the contents and store 'em
+        if templateContents.indexOf("---\n") is 0
+          log.debug "processing front matter from template: #{mustachePath}"
+          endOfFrontMatter = templateContents.indexOf("---\n", 4)
+          frontMatter = templateContents.substring(4, endOfFrontMatter)
+          log.debug "parsing frontmatter\n#{frontMatter}"
+          frontMatterParsed = yaml.load(frontMatter + "\n", 'utf8')
+          log.debug "parsed frontmatter: %j", frontMatterParsed
+          templateFrontMatter[getRelativeTemplatePath(mustachePath)] = frontMatterParsed
+          # strip off the front matter, running past the leng of string with the end pos
+          # simply results in the whole string
+          templateContents = templateContents.substring(endOfFrontMatter + 4, 999999)
+        
         # we're going to use a key relative to the root of our template directory, as it
         # is epxected that the templates will be stored in their own repository and used
         # anywhere, and we'll remove the leading / so it's clear that the path is relative
-        templates[getRelativeTemplatePath(mustachePath)] = hogan.compile(fs.readFileSync(mustachePath).toString())
+        templates[getRelativeTemplatePath(mustachePath)] = hogan.compile(templateContents)
       catch e
         log.error "error precompiling template #{mustachePath}, it will be skipped"
         log.error e
   # swap in the newly loaded templates
   hoganTemplates = templates
+  hoganFrontMatter = templateFrontMatter
   ############################################
   # then we get our mustacheLambdas
   lambdaPath = path.join(config.templateDirectory, 'mustache_lambdas.js')
@@ -118,6 +141,6 @@ initialize = () ->
 module.exports.init = initialize
 module.exports.renderTemplate = (templatePath, context, cb) ->
   renderer = getRendererForTemplate(templatePath)
-  templateCallback = (err, templateUnrendered, templateRendered) ->
-    cb(err, templateUnrendered, templateRendered)
+  templateCallback = (err, templateUnrendered, templateRendered, frontMatter) ->
+    cb(err, templateUnrendered, templateRendered, frontMatter)
   renderer(templatePath, context, templateCallback)
