@@ -111,19 +111,20 @@ renderTemplate = (context, callback) ->
   )
 
 testExecutionPermissions = (context, callback) ->
-  # skip this if acl is explicitly disabled via config
+  # skip this if acl is explicitly disabled via config, normally the
+  # config.aclIdentityHeader is the name of the HTTP header used to pass in
+  # the user identity, in this case if it is set to DISABLED then acl 
+  # checking is NOT DONE
   return callback(null, context) if config.aclIdentityHeader is "DISABLED"
   # everyone is automatically in the all '*' group
   context.aclIdentity.push('*')
-  # first we fetch our acl info from the template
-  acl = context.renderedTemplate.match(/^--acl:.*$|^#acl:.*$/mg)
   # if we have no acl, yet acls are enabled... it's an error we're not gonna execute 
   # anything
   if not context.templateConfig?.acl
     return callback(new Error("no acl specified for template #{context.templatePath}"), context)
   log.debug "acl for template #{context.templatePath}: %s", context.templateConfig.acl
   log.debug "request identity %j", context.aclIdentity
-  # then we intersect the user identity with the allowances, if we get anything
+  # then we intersect the user identity with the acl data from the template, if we get anything
   # then they're allowed to execute
   aclIntersection = _.intersection context.templateConfig.acl, context.aclIdentity
   if aclIntersection.length is 0

@@ -33,12 +33,13 @@ mustacheLambdas = null
 
 renderers[".dot"] = (templatePath, context, cb) ->
   log.debug "rendering #{templatePath} with dot renderer"
-  fs.readFile templatePath, {encoding: 'utf8'}, (err, templateString) ->
+  [frontMatterParsed, templateContents] = parseFrontMatter(templateContents)
+  fs.readFile templatePath, {encoding: 'utf8'}, (err, templateContents) ->
     templateFn = dot.template templateString
     if err
       cb(err)
     else
-      cb(null, templateString, templateFn(context))
+      cb(null, templateString, templateFn(context), frontMatterParsed)
 
 renderers[".mustache"] = (templatePath, context, cb) ->
   log.debug "rendering #{templatePath} with mustache renderer"
@@ -54,11 +55,12 @@ renderers[".mustache"] = (templatePath, context, cb) ->
 # but return the the contents of the template it was provided
 renderers[""] = (templatePath, _, cb) ->
   log.debug "rendering #{templatePath} with generic renderer"
-  fs.readFile templatePath, {encoding: 'utf8'}, (err, templateString) ->
+  [frontMatterParsed, templateContents] = parseFrontMatter(templateContents)
+  fs.readFile templatePath, {encoding: 'utf8'}, (err, templateContents) ->
     if err
       cb(err)
     else
-      cb(null, templateString, templateString)
+      cb(null, templateString, templateString, frontMatterParsed)
 
 getRendererForTemplate = (templatePath) ->
   renderer = renderers[path.extname templatePath]
@@ -67,6 +69,23 @@ getRendererForTemplate = (templatePath) ->
     return renderer
   else
     return renderers[""]
+
+parseFrontMatter = (templateContents) ->
+  # if we have a leading '---\n' then we have front matter in our template
+  # we'll pull it out, parse the contents and store 'em
+  if templateContents.indexOf("---\n") is 0
+    endOfFrontMatter = templateContents.indexOf("---\n", 4)
+    frontMatter = templateContents.substring(4, endOfFrontMatter)
+    log.debug "parsing frontmatter\n#{frontMatter}"
+    frontMatterParsed = yaml.load(frontMatter + "\n", 'utf8')
+    log.debug "parsed frontmatter: %j", frontMatterParsed
+    # strip off the front matter, running past the leng of string with the end pos
+    # simply results in the whole string
+    templateContentsWithoutFrontMatter = templateContents.substring(endOfFrontMatter + 4, 999999)
+    return [frontMatterParsed, templateContentsWithoutFrontMatter]
+  else
+    return [undefined, templateContents]
+
 
 getMustacheFiles = (templateDirectory, fileList=[]) ->
   names = fs.readdirSync(templateDirectory)
@@ -100,20 +119,8 @@ initialize = () ->
         # we load the template, so we can pull of any metadata we might have
         # that isn't part of the actual template
         templateContents = fs.readFileSync(mustachePath).toString()
-        # if we have a leading '---\n' then we have front matter in our template
-        # we'll pull it out, parse the contents and store 'em
-        if templateContents.indexOf("---\n") is 0
-          log.debug "processing front matter from template: #{mustachePath}"
-          endOfFrontMatter = templateContents.indexOf("---\n", 4)
-          frontMatter = templateContents.substring(4, endOfFrontMatter)
-          log.debug "parsing frontmatter\n#{frontMatter}"
-          frontMatterParsed = yaml.load(frontMatter + "\n", 'utf8')
-          log.debug "parsed frontmatter: %j", frontMatterParsed
-          templateFrontMatter[getRelativeTemplatePath(mustachePath)] = frontMatterParsed
-          # strip off the front matter, running past the leng of string with the end pos
-          # simply results in the whole string
-          templateContents = templateContents.substring(endOfFrontMatter + 4, 999999)
-        
+        [frontMatterParsed, templateContents] = parseFrontMatter(templateContents)
+        templateFrontMatter[getRelativeTemplatePath(mustachePath)] = frontMatterParsed
         # we're going to use a key relative to the root of our template directory, as it
         # is epxected that the templates will be stored in their own repository and used
         # anywhere, and we'll remove the leading / so it's clear that the path is relative
