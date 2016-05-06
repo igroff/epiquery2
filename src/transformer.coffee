@@ -3,6 +3,7 @@ config = require './config.coffee'
 log    = require 'simplog'
 path   = require 'path'
 vm     = require 'vm'
+coffee = require 'coffee-script'
 
 loadedTransforms = {}
 
@@ -31,6 +32,11 @@ getRequestedTransform = (transformName, cb) ->
         return cb(err) if err
         scriptContext = vm.createContext( module: {} , require: require)
         try
+          # compile it, if we're given coffeescript
+          if ".coffee" is path.extname(transformPath)
+            log.debug "response tranform provided appears to be coffee script"
+            log.debug require('util').inspect(coffee.compile)
+            data = coffee.compile(data.toString('utf8'), {header:false, bare: true})
           transformFunction = vm.runInContext(data, scriptContext)
           # cache up our transform for later use
           loadedTransforms[transformPath] = transformFunction
