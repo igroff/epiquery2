@@ -73,7 +73,7 @@ getRendererForTemplate = (templatePath) ->
 parseFrontMatter = (templateContents) ->
   # if we have a leading '---\n' then we have front matter in our template
   # we'll pull it out, parse the contents and store 'em
-  if templateContents.indexOf("---\n") is 0
+  if templateContents?.indexOf("---\n") is 0
     endOfFrontMatter = templateContents.indexOf("---\n", 4)
     frontMatter = templateContents.substring(4, endOfFrontMatter)
     log.debug "parsing frontmatter\n#{frontMatter}"
