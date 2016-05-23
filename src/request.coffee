@@ -82,7 +82,7 @@ selectConnection = (context, callback) ->
 
 getTemplatePath = (context, callback) ->
   log.debugRequest context.debug, "[q:#{context.queryId}] getting template path for #{context.templateName}"
-  # first we make sure that, if we are whitelisting templates, that 
+  # first we make sure that, if we are whitelisting templates, that
   # our requested template is in a whitelisted directory
   if config.allowedTemplates isnt null
     templateDir = path.dirname context.templateName
@@ -113,21 +113,37 @@ renderTemplate = (context, callback) ->
 testExecutionPermissions = (context, callback) ->
   # skip this if acl is explicitly disabled via config, normally the
   # config.aclIdentityHeader is the name of the HTTP header used to pass in
-  # the user identity, in this case if it is set to DISABLED then acl 
+  # the user identity, in this case if it is set to DISABLED then acl
   # checking is NOT DONE
   return callback(null, context) if config.aclIdentityHeader is "DISABLED"
   # everyone is automatically in the all '*' group
-  context.aclIdentity.push('*')
-  # if we have no acl, yet acls are enabled... it's an error we're not gonna execute 
+  # if we have no acl, yet acls are enabled... it's an error we're not gonna execute
   # anything
   if not context.templateConfig?.acl
     return callback(new Error("no acl specified for template #{context.templatePath}"), context)
   log.debug "acl for template #{context.templatePath}: %s", context.templateConfig.acl
   log.debug "request identity %j", context.aclIdentity
+  # TODO: I would propose a more broad solution here and support multiple bitmask groups.
+  #       However, the consensus is that people can't wrap their mind around bitmasks so
+  #       this concept is probably gonna go away anyway.  As such, I'm just going to implement
+  #       as "acl: <bitmask>" for now.
+  #
+  #       I believe a final solution should support something like this instead:
+  #       acl:
+  #
+  #         $acl-group-name: $mask
+  #
+  #       Where starphleet can pass any number of headers with bitmask groups so apps
+  #       can also have their own setup.  For instance:
+  #
+  #       acl:
+  #         role-glg: 5
+  #         role-engage: 4
+  #         role-cmp: 7
+  #
   # then we intersect the user identity with the acl data from the template, if we get anything
   # then they're allowed to execute
-  aclIntersection = _.intersection context.templateConfig.acl, context.aclIdentity
-  if aclIntersection.length is 0
+  if context.templateConfig.acl & context.aclIdentity
     log.debug "execution denied by acl. user acl: #{context.aclIdentity} template acl: #{context.templateConfig.acl}"
     return callback(new Error("Execution denied by acl"), context)
   else

@@ -103,8 +103,8 @@ getMustacheFiles = (templateDirectory, fileList=[]) ->
 initialize = () ->
   # allows for any initialization a template provider needs to do
   # in this case we'll be compiling all the mustache templates so that
-  # we can use partials. Any state created by this process will be 
-  # swapped with existing state when initialize is complete, this 
+  # we can use partials. Any state created by this process will be
+  # swapped with existing state when initialize is complete, this
   # will allow initialize to be run while epiquery is active
   ############################################
   # first we load our templates
