@@ -143,7 +143,7 @@ testExecutionPermissions = (context, callback) ->
   #
   # then we intersect the user identity with the acl data from the template, if we get anything
   # then they're allowed to execute
-  if context.templateConfig.acl & context.aclIdentity
+  if not context.templateConfig.acl & context.aclIdentity
     log.debug "execution denied by acl. user acl: #{context.aclIdentity} template acl: #{context.templateConfig.acl}"
     return callback(new Error("Execution denied by acl"), context)
   else
