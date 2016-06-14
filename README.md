@@ -147,7 +147,6 @@ Whereas standard will provide:
 
 Notice the inclusion of both columns named *col1* only in the standard response.
 
-
 ## Websockets: I don't care, how do I use it.
   
 Epiquery2 provides a client you can use to connect which simplifies your
@@ -236,6 +235,75 @@ the JSON encoded information needed to configure the various drivers.  Ya, gnarl
         export EPI_C_MSSQL='{"driver":"mssql","name":"mssql","config":{"server":"10.211.55.5","password":"PASSWORD","userName":"USER","options":{"port":1433}}}'
         export EPI_C_MYSQL='{"name":"mysql","driver":"mysql","config":{"host":"localhost","user":"root","password":""}}'
         export EPI_C_MSSQL_RO="{\"driver\":\"mssql\",\"name\":\"db250\",\"config\":{\"server\":\"${DATABASE_READONLY_SERVER}\",\"password\":\"${DATABASE_READONLY_PASSWORD}\",\"userName\":\"${DATABASE_READONLY_USER}\",\"options\":{\"port\":1433}}}"
+
+
+### Bulk Connection Type
+
+It's possible to specify a Named Connection as being a 'bulk type', this is done by simply adding
+a property named 'type' with the value 'bulk' to the connection definition.
+
+When a connection of type bulk is created, the connection functions much like other connections
+allowing for various output formats and transforms with some changes to the way the query is
+executed and the response is returned.
+
+This type is generally designed to be used by the REST-y interfaces, although nothing is done
+to prevent it being used with the websocket interface.
+
+#### Behavior of a Bulk Type Connections
+
+The basic concepts for bulk connections are that they are used to run 'big' queries that
+you'd like to have run less frequently, control execution, and cache the response for 
+use over an extended time.
+
+When a request is received that references a bulk connection, the system handles the
+request as follows
+
+    if cached response exists
+      if cached response is old
+          start rebuild as needed
+      return cached response
+    else
+      start rebuild as needed
+      return 202
+
+    start rebuild as needed = (request) ->
+        hash request body, and query string params 
+        create lock based on request or return
+        start rebuild
+
+    start rebuild = (lock) ->
+      execute query
+      then
+        write query result to cache
+      catch
+        log error information
+      finally
+        release lock     
+      
+
+The end result is that callers can make requests of a bulk connection with impunity
+knowing that the request will result in no more than a single query to the data source
+executing at any time and that they will either get a 202 or the actual data returned
+by the query.  The expectation is that they'll do just that, as the 202 response state
+is expected to be very short lived ( the time it takes for the query to run to completion
+and be cached the first time ) callers should basically just poll the epiquery URL until
+they get what they're looking for, which can be seen as 'until they get a 200'.
+
+
+##### Things to Know About Bulk Type Connections
+
+Request headers are included in the template context, these are generally not used (as seen
+in practice) and the majority vary far more across browsers and such for what is
+basically the same request. Request headers are NOT used to define request uniqueness
+for bulk caching.
+
+If the query being run encounters an error, the caller will be given NO INDICATION
+all error information will be written to the log. Error responses will NOT be 
+cached, so if a template is inherently flawed it will simply be run once to completion 
+the first time it's requested and not already running. This is simply because there is
+no obvious value in caching an errored response, and caching an error is generally 
+problematic.
+        
 
 ## Interface
 
