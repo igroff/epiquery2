@@ -4,6 +4,7 @@ async       = require 'async'
 log         = require './util/log.coffee'
 _           = require 'lodash-contrib'
 path        = require 'path'
+crypto      = require 'crypto'
 core        = require './core.coffee'
 config      = require './config.coffee'
 query       = require './query.coffee'
@@ -154,6 +155,13 @@ escapeInput = (context, callback) ->
       parent[key] = value.replace(/'/g, "''") if _.isString(value)
   callback null, context
 
+handleBulkRequest = (context, callback) ->
+  return unless context.connection.type is "bulk"
+  keyRequestData = "#{JSON.stringify(_.extend({}, context.requestBody, context.requestQuery))}"
+  bulkRequestIdentifier = crypto.createHash('md5').update(keyRequestData).digest("hex")
+  log.debug "handling bulk connection request for request with key #{bulkRequestIdentifier}"
+  callback null, context
+
 queryRequestHandler = (context) ->
   async.waterfall [
     # just to create our context
@@ -166,6 +174,7 @@ queryRequestHandler = (context) ->
     sanitizeInput,
     renderTemplate,
     selectConnection,
+    handleBulkRequest,
     executeQuery,
     collectStats
   ],

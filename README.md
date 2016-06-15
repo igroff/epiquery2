@@ -244,7 +244,9 @@ a property named 'type' with the value 'bulk' to the connection definition.
 
 Bulk connections return response data as a new-line delimited list of JSON objects.  This is
 exactly a JSON encoded object for each row, one row per line.  The reason is that the data is expected
-to be large, and the caller should use it 'stream like' instead of loading it all into memory.
+to be large, and the caller should use it 'stream like' instead of loading it all into memory. If you have
+multiple queries being run, the JSON objects will simply change when subsequent result sets are
+processed.
 
 This type is generally designed to be used by the REST-y interfaces, although nothing is done
 to prevent it being used with the websocket interface.

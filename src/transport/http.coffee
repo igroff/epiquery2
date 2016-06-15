@@ -275,6 +275,8 @@ getQueryRequestInfo = (req, useSecure) ->
   returnThis =
     connectionName: connectionName
     connectionConfig: connection
+    requestBody: req.body
+    requestQuery: req.query
     templateContext: _.extend({}, req.body, req.query, req.headers)
     templateName: templatePath
     clientKey: clientKey
