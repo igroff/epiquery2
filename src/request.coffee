@@ -4,6 +4,7 @@ async       = require 'async'
 log         = require './util/log.coffee'
 _           = require 'lodash-contrib'
 path        = require 'path'
+fs          = require 'fs'
 crypto      = require 'crypto'
 core        = require './core.coffee'
 config      = require './config.coffee'
@@ -111,6 +112,12 @@ renderTemplate = (context, callback) ->
   )
 
 executeQuery = (context, callback) ->
+  # if this request is bulk, and we've NOT been told to execute the query
+  # we execute. Which is to say the bulk query handling can determine that
+  # we have a bulk request but don't need to fire off the query
+  if context.requestType is "bulk" and not context.executeBulkQuery
+    callback(null, context)
+    return
   driver = core.selectDriver context.connection
   context.emit 'beginqueryexecution'
   queryCompleteCallback = (err, data) ->
@@ -127,8 +134,10 @@ executeQuery = (context, callback) ->
     queryCompleteCallback
   )
 
+
 collectStats = (context, callback) ->
   stats = context.Stats
+  return unless stats
   stats.executionTimeInMillis = stats.endDate.getTime() - stats.startDate.getTime()
   core.QueryStats.buffer.store stats
   # storing the exec time for this query so we can track recent query
@@ -155,12 +164,38 @@ escapeInput = (context, callback) ->
       parent[key] = value.replace(/'/g, "''") if _.isString(value)
   callback null, context
 
-handleBulkRequest = (context, callback) ->
-  return unless context.connection.type is "bulk"
+processBulkQueryRequest = (context, callback) ->
+  return callback(null, context) unless context.requestType is "bulk"
   keyRequestData = "#{JSON.stringify(_.extend({}, context.requestBody, context.requestQuery))}"
   bulkRequestIdentifier = crypto.createHash('md5').update(keyRequestData).digest("hex")
   log.debug "handling bulk connection request for request with key #{bulkRequestIdentifier}"
-  callback null, context
+  lockFileHandler = (err, fd) ->
+    if err?.message.indexOf("EAGAIN") > 0
+      # we've encountered an error that indicates that the lock file is in use
+      # indicating another epi process is executing this query
+      log.debug "couldn't obtain lock for bulk request #{bulkRequestIdentifier}"
+      # this is an expected state, so not an error
+      err = undefined
+      # we're not gonna run a query, so we will have no stats
+      context.Stats = undefined
+    else # we've locked the file, so we can execute our reqeust as needed
+      context.executeBulkQuery = true
+      cacheFileWriteStream = fs.createWriteStream context.bulkRequestCacheFile
+      context.on 'row', (row) ->
+        cacheFileWriteStream.write(JSON.stringify(row))
+      context.on 'completequeryexecution', () ->
+        cacheFileWriteStream.end()
+    callback err, context
+      
+  context.bulkRequestLockfilePath = path.join(config.lockDirectory, "#{bulkRequestIdentifier}.epi.bulk.lock")
+  context.bulkRequestIdentifier = bulkRequestIdentifier
+  context.bulkResponseCacheFile = path.join(config.bulkCacheDirectory, "#{bulkRequestIdentifier}.epi.bulk.cache")
+  context.emit 'bulkqueryrequest'
+  # this is our lock file, we're gonna attempt to open it with an exclusive lock
+  # ( 0x0020 ) create it if not existant (0x0200) truncate it if it is there
+  # ( 0x0400 ) open it async ( 0x0040 ) and most importantly do not block
+  # ( 0x0004 )
+  fs.open(context.bulkRequestLockfilePath, 0x0020|0x0200|0x0400|0x0040|0x0004, lockFileHandler)
 
 queryRequestHandler = (context) ->
   async.waterfall [
@@ -174,7 +209,7 @@ queryRequestHandler = (context) ->
     sanitizeInput,
     renderTemplate,
     selectConnection,
-    handleBulkRequest,
+    processBulkQueryRequest,
     executeQuery,
     collectStats
   ],

@@ -12,8 +12,26 @@ attachResponder = (context, res) ->
     attachEpiqueryResponder(context, res)
   else if context.responseFormat is 'transform'
     attachTransformationResponder(context, res)
+  else if context.responseFormat is 'bulk'
+    attachBulkQueryResponder(context, res)
+    context.requestType = "bulk"
   else # the original format, matching the socket protocol
     attachStandardResponder(context, res)
+
+attachBulkQueryResponder = (context, res) ->
+  context.on 'bulkqueryrequest', () ->
+    fs.access(context.bulkResponseCacheFile, (err) ->
+      if err
+        log.debug "could access bulk response cache file #{err}"
+        res.status(202).end()
+      else
+        res.sendfile(context.bulkResponseCacheFile, (err) ->
+          if err
+            log.debug "error sending bulk resopnse #{err}"
+            res.status(202)
+          res.end()
+        )
+    )
 
 attachTransformationResponder = (context, res) ->
   currentRowset = null
@@ -261,6 +279,8 @@ getQueryRequestInfo = (req, useSecure) ->
     format = 'transform'
     transformName = req.query['transform']
   else if pathParts[0] is 'simple'
+    format = pathParts.shift()
+  else if pathParts[0] is 'bulk'
     format = pathParts.shift()
   else
     format = 'standard'

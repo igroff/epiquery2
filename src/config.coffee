@@ -17,6 +17,8 @@ FORKS=process.env.FORKS || 8
 FORKS=2 unless FORKS > 1
 TEMPLATE_CHANGE_FILE=process.env.TEMPLATE_CHANGE_FILE || path.join(TEMPLATE_DIRECTORY, ".change")
 NODE_ENV=process.env.NODE_ENV || "development"
+LOCK_DIRECTORY=hack_tilde(process.env.LOCK_DIRECTORY || "/var/run")
+CACHE_DIRECTORY=hack_tilde(process.env.CACHE_DIRECTORY || "/tmp")
 EPISTREAM_API_KEY=process.env.EPISTREAM_API_KEY
 URL_BASED_API_KEY=process.env.URL_BASED_API_KEY # use second env var for backwards compatibility 
 # this is the default timeout that matches node's HTTP library default and thus
@@ -46,6 +48,8 @@ config =
   port: PORT
   templateDirectory: TEMPLATE_DIRECTORY
   driverDirectory: DRIVER_DIRECTORY
+  lockDirectory: LOCK_DIRECTORY
+  bulkCacheDirectory: CACHE_DIRECTORY
   connections: CONNECTIONS
   forks: FORKS
   allowedTemplates: allowedTemplates
