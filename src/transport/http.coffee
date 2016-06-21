@@ -22,15 +22,13 @@ attachBulkQueryResponder = (context, res) ->
   context.on 'bulkqueryrequest', () ->
     fs.access(context.bulkResponseCacheFile, (err) ->
       if err
-        log.debug "could access bulk response cache file #{err}"
+        log.debug "could not access bulk response cache file #{err}"
         res.status(202).end()
       else
-        res.sendfile(context.bulkResponseCacheFile, (err) ->
-          if err
-            log.debug "error sending bulk resopnse #{err}"
-            res.status(202)
-          res.end()
-        )
+        log.debug "returning cached response (#{context.bulkResponseCacheFile}) to bulk request"
+        util = require "util"
+        #console.log util.inspect(res)
+        fs.createReadStream(context.bulkResponseCacheFile).pipe(res).on('end', () -> console.log("done"))
     )
 
 attachTransformationResponder = (context, res) ->

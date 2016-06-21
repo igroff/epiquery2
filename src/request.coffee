@@ -116,8 +116,10 @@ executeQuery = (context, callback) ->
   # we execute. Which is to say the bulk query handling can determine that
   # we have a bulk request but don't need to fire off the query
   if context.requestType is "bulk" and not context.executeBulkQuery
+    log.debug "not executing query"
     callback(null, context)
     return
+  log.debug "executing query"
   driver = core.selectDriver context.connection
   context.emit 'beginqueryexecution'
   queryCompleteCallback = (err, data) ->
@@ -165,12 +167,13 @@ escapeInput = (context, callback) ->
   callback null, context
 
 processBulkQueryRequest = (context, callback) ->
-  return callback(null, context) unless context.requestType is "bulk"
+  if context.requestType isnt "bulk"
+    return callback(null, context)
   keyRequestData = "#{JSON.stringify(_.extend({}, context.requestBody, context.requestQuery))}"
   bulkRequestIdentifier = crypto.createHash('md5').update(keyRequestData).digest("hex")
   log.debug "handling bulk connection request for request with key #{bulkRequestIdentifier}"
   lockFileHandler = (err, fd) ->
-    if err?.message.indexOf("EAGAIN") > 0
+    if err?.code is 'EAGAIN'
       # we've encountered an error that indicates that the lock file is in use
       # indicating another epi process is executing this query
       log.debug "couldn't obtain lock for bulk request #{bulkRequestIdentifier}"
@@ -179,12 +182,20 @@ processBulkQueryRequest = (context, callback) ->
       # we're not gonna run a query, so we will have no stats
       context.Stats = undefined
     else # we've locked the file, so we can execute our reqeust as needed
-      context.executeBulkQuery = true
-      cacheFileWriteStream = fs.createWriteStream context.bulkRequestCacheFile
-      context.on 'row', (row) ->
-        cacheFileWriteStream.write(JSON.stringify(row))
-      context.on 'completequeryexecution', () ->
-        cacheFileWriteStream.end()
+      fs.stat(context.bulkResponseCacheFile, (err, stats) ->
+        log.debug "ctime #{stats.ctime.getTime()}"
+        log.debug "allowing cache rebuild"
+        context.executeBulkQuery = true
+        #write to a temp file so we don clobber the cache until we've fully run our query
+        cacheFileWriteStream = fs.createWriteStream "#{context.bulkResponseCacheFile}.tmp"
+        context.on 'row', (row) ->
+          cacheFileWriteStream.write(JSON.stringify(row))
+        context.on 'completequeryexecution', () ->
+          cacheFileWriteStream.end()
+          # now that we're done we can rename our file and 'update' the cache
+          fs.rename("#{context.bulkResponseCacheFile}.tmp", context.bulkResponseCacheFile)
+          fs.close(fd)
+      )
     callback err, context
       
   context.bulkRequestLockfilePath = path.join(config.lockDirectory, "#{bulkRequestIdentifier}.epi.bulk.lock")
@@ -217,6 +228,7 @@ queryRequestHandler = (context) ->
     if err
       log.error "[q:#{context.queryId}] queryRequestHandler Error: #{err}"
       context.emit 'error', err
+    log.debug "query execution complete"
     context.emit 'completequeryexecution'
 
 module.exports.queryRequestHandler = queryRequestHandler
