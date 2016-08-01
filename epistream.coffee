@@ -108,7 +108,7 @@ socketServer.on 'connection', (conn) ->
       connectionName: message.connectionName
       queryId: message.queryId
       templateContext: message.data
-      aclIdentity: conn.headers[config.aclIdentityHeader] || 0
+      connectionHeaders: conn.headers
     ctxParms.debug if message.debug
     context = new Context(ctxParms)
     log.debug "[q:#{context.queryId}] starting processing"

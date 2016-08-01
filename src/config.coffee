@@ -18,8 +18,8 @@ FORKS=2 unless FORKS > 1
 TEMPLATE_CHANGE_FILE=process.env.TEMPLATE_CHANGE_FILE || path.join(TEMPLATE_DIRECTORY, ".change")
 NODE_ENV=process.env.NODE_ENV || "development"
 EPISTREAM_API_KEY=process.env.EPISTREAM_API_KEY
+ENABLE_TEMPLATE_ACLS=process.env.ENABLE_TEMPLATE_ACLS || false
 URL_BASED_API_KEY=process.env.URL_BASED_API_KEY # use second env var for backwards compatibility
-ACL_IDENTITY_HEADER=process.env.ACL_IDENTITY_HEADER || "X-EPI-ACL-IDENTITY"
 # this is the default timeout that matches node's HTTP library default and thus
 # matches epiquery1
 HTTP_REQUEST_TIMEOUT_IN_SECONDS=process.env.HTTP_REQUEST_TIMEOUT_IN_SECONDS || 120
@@ -54,9 +54,9 @@ config =
   responseTransformDirectory: path.join(TEMPLATE_DIRECTORY, 'response_transforms')
   nodeEnvironment: NODE_ENV
   epistreamApiKey: EPISTREAM_API_KEY
+  enableTemplateAcls: ENABLE_TEMPLATE_ACLS
   urlBasedApiKey: URL_BASED_API_KEY
   isDevelopmentMode: () -> NODE_ENV isnt "production"
-  aclIdentityHeader: ACL_IDENTITY_HEADER
   httpRequestTimeoutInSeconds: HTTP_REQUEST_TIMEOUT_IN_SECONDS
 
 module.exports = config

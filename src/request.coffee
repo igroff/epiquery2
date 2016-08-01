@@ -111,44 +111,58 @@ renderTemplate = (context, callback) ->
   )
 
 testExecutionPermissions = (context, callback) ->
-  # skip this if acl is explicitly disabled via config, normally the
-  # config.aclIdentityHeader is the name of the HTTP header used to pass in
-  # the user identity, in this case if it is set to DISABLED then acl
-  # checking is NOT DONE
-  return callback(null, context) if config.aclIdentityHeader is "DISABLED"
-  # everyone is automatically in the all '*' group
-  # if we have no acl, yet acls are enabled... it's an error we're not gonna execute
-  # anything
-  if not context.templateConfig?.acl
+  # Processing Template ACL's must be explicitly enabled.
+  return callback(null, context) if not config.enableTemplateAcls
+  # If ACL Checking is enabled and front matter is not found (templateConfig)
+  # it is an error condition.  This would imply that we did not find
+  # ACL information in the header portion of a template
+  if not context.templateConfig
+    return callback(new Error("No Front Matter For Template #{context.templatePath}"), context)
+  # If we find front matter but it is blank or does not result in a the YAML
+  # being processed correctly, or we somehow get here without any ACLS, we have
+  # an error condition.
+  if Object.keys(context.templateConfig).length is 0
     return callback(new Error("no acl specified for template #{context.templatePath}"), context)
   log.debug "acl for template #{context.templatePath}: %s", context.templateConfig.acl
   log.debug "request identity %j", context.aclIdentity
-  # TODO: I would propose a more broad solution here and support multiple bitmask groups.
-  #       However, the consensus is that people can't wrap their mind around bitmasks so
-  #       this concept is probably gonna go away anyway.  As such, I'm just going to implement
-  #       as "acl: <bitmask>" for now.
+  # The top of a template can have the following format:
   #
-  #       I believe a final solution should support something like this instead:
-  #       acl:
+  #       ---
+  #       jwt-app1: 5
+  #       anybitmask: 2
+  #       passed: 4
+  #       as: 7
+  #       header: 1
+  #       ---
   #
-  #         $acl-group-name: $mask
+  # The list above would be a set of bitmask flags.  We will allow the template
+  # to proceed if we find an enabled bit between the above list and a header
+  # containing a bitmask mask passed to epiquery
   #
-  #       Where starphleet can pass any number of headers with bitmask groups so apps
-  #       can also have their own setup.  For instance:
+  # For instance |
   #
-  #       acl:
-  #         role-glg: 5
-  #         role-engage: 4
-  #         role-cmp: 7
+  #      Success:
+  #      -------
+  #        conn.headers.jwt-app1 = 1
+  #        templateConfig.jwt-app1 = 5 (bits 4 & 1)
   #
-  # then we intersect the user identity with the acl data from the template, if we get anything
-  # then they're allowed to execute
-  if context.templateConfig.acl & context.aclIdentity
-    log.debug "execution allowed by acl"
-    return callback null, context
-  else
-    log.debug "execution denied by acl. user acl: #{context.aclIdentity} template acl: #{context.templateConfig.acl}"
-    return callback(new Error("Execution denied by acl"), context)
+  #        The above mask of 5 (bits 4 and 1) has a match with the 1 field.  The
+  #        template would be allowed to proceed
+  #
+  #      Fail:
+  #      -------
+  #        conn.headers.jwt-app1 = 2
+  #        templateConfig.jwt-app1 = 5
+  #
+  #        The above mask of 5 (bits 4 and 1) does _not_ match the bit field 2
+  #        Template would not be allowed to proceed
+  for own key of context.templateConfig
+    if context.connectionHeaders[key] and context.connectionHeaders[key] & config.templateConfig[key]
+      log.debug "execution allowed by acl"
+      return callback null, context
+
+  log.debug "execution denied by acl. user acl: #{context.aclIdentity} template acl: #{context.templateConfig.acl}"
+  return callback(new Error("Execution denied by acl"), context)
 
 executeQuery = (context, callback) ->
   driver = core.selectDriver context.connection

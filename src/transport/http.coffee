@@ -282,7 +282,7 @@ getQueryRequestInfo = (req, useSecure) ->
     responseFormat: format
     responseTransform: transformName
     debug: req.query.debug is "true"
-    aclIdentity: req.get(config.aclIdentityHeader) || 0
+    connectionHeaders: req.get(config.connectionHeaders) || {}
 
 module.exports.attachResponder = attachResponder
 module.exports.getQueryRequestInfo = getQueryRequestInfo

@@ -6,14 +6,14 @@ with the request/response behavior of 'standard' HTTP as opposed to the asynch
 event based nature of websockets. To that end, we offer multiple transport
 formats for HTTP.
 
-First a little about HTTP requests to epiquery. 
+First a little about HTTP requests to epiquery.
 
 The general format is as follows:
 
         http://epiquery.server.com/[optional format]/<required connection name>/template_path
 
 Epiquery 2 supports multiple named connections, so the _connection name_ portion of
-the url is required, as is the template path.  As an option you may provide a 
+the url is required, as is the template path.  As an option you may provide a
 format specifier, currently epiquery 2 supports two optional formats `simple` or `epiquery1`.
 
 So the following would execute the template */test/servername* against the connection named *pants*:
@@ -23,12 +23,12 @@ So the following would execute the template */test/servername* against the conne
 
 #### HTTP Response Format Examples
 
-In our examples we'll assume a epiquery instance running locally with a connection named 
+In our examples we'll assume a epiquery instance running locally with a connection named
 *pants* to a local MSSQL instance named *PANTSDB*.
 
 ##### Standard
 
-First the 'standard' HTTP format, this format mirrors the websocket api and thus is fairly 
+First the 'standard' HTTP format, this format mirrors the websocket api and thus is fairly
 chatty showing all the events as elements in an array.  You're probably not interested, so you'll have to look way down below to see more detail about those events.
 
 
@@ -149,7 +149,7 @@ Notice the inclusion of both columns named *col1* only in the standard response.
 
 
 ## Websockets: I don't care, how do I use it.
-  
+
 Epiquery2 provides a client you can use to connect which simplifies your
 interaction with epiquery2 as well as providing reconnection and other
 valuable features.
@@ -190,7 +190,7 @@ resulting in multiple result sets.
 processed by epiquery.  This time is specifically that which is bounded by
 Query Begin and Query Complete messages.
 
-* QueryRequest - An inbound request for epiquery to render and execute a 
+* QueryRequest - An inbound request for epiquery to render and execute a
 template against a specific connection.
 
 * Data Source - A server from which epiquery is capable of retrieving data for
@@ -207,15 +207,15 @@ results to epiquery.
 
 
 ## Supported data sources
-* Microsoft SQL Server 
+* Microsoft SQL Server
 * MySQL
 * Microsoft SQL Server Analysis Services (MDX)
 * File system
 
-## Configuration 
+## Configuration
 
 Configuration of epiquery is done entirely through environment variables, this
-is done to simplify the deployment specifically within 
+is done to simplify the deployment specifically within
 [Starphleet](https://github.com/wballard/starphleet).  The configuration can
 be done solely through environment variables or, as a convenience, epiquery
 will source a file `~/.epiquery2/config` in which the variables can be specified.
@@ -272,11 +272,11 @@ associated with the containing result set.
     {"message":"row", "queryId":"", "columns":{"col_name": "col_value"}}
 
 ##### beginrowset
-Used to indicate that a result set has begun.  Some providers, given a particular query, 
+Used to indicate that a result set has begun.  Some providers, given a particular query,
 can return multiple result sets, this message indicates the start of a new result set from the
 execution of a given query.  Individual query processing is synchronous, so while there is no
 in built way to tie a particular section of a Query to a result set directly, each query contained
-within the QueryRequest sent to the provider can result in a distinct result set, and thus the 
+within the QueryRequest sent to the provider can result in a distinct result set, and thus the
 emission of a 'beginrowset' message.
 
     {"message":"beginrowset", "queryId":""}
@@ -294,7 +294,7 @@ be raised.
     {"message":"beginquery", "queryId":""}
 
 ##### endquery
-Indicates that a particular query has completed, all of it's data having been returned.  Indicates the 
+Indicates that a particular query has completed, all of it's data having been returned.  Indicates the
 final stage of an Active Query, once this event is raised the associated Query is no longer considered
 active.
 
@@ -312,7 +312,7 @@ very concise and simple, it should support a robust handling of that functionali
 
 ##### Provided Drivers
 * mssql - based on tedious, used to query an MS SQL Server instance
-* mssql_o - based on tedious, used to query an MS SQL Server instance, this 
+* mssql_o - based on tedious, used to query an MS SQL Server instance, this
   driver returns the results as an object instead of an array of key/value pairs
   this has some limitations (like not handling duplicate column names) but in
   many cases it's simpler to use.
