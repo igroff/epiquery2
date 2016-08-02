@@ -123,8 +123,9 @@ testExecutionPermissions = (context, callback) ->
   # an error condition.
   if Object.keys(context.templateConfig).length is 0
     return callback(new Error("no acl specified for template #{context.templatePath}"), context)
-  log.debug "acl for template #{context.templatePath}: %s", context.templateConfig.acl
-  log.debug "request identity %j", context.aclIdentity
+
+  log.debug "acl for template #{context.templatePath}: %s", JSON.stringify(context.templateConfig, null, 2)
+
   # The top of a template can have the following format:
   #
   #       ---
@@ -157,7 +158,7 @@ testExecutionPermissions = (context, callback) ->
   #        The above mask of 5 (bits 4 and 1) does _not_ match the bit field 2
   #        Template would not be allowed to proceed
   for own key of context.templateConfig
-    if context.connectionHeaders[key] and context.connectionHeaders[key] & config.templateConfig[key]
+    if context.connectionHeaders[key] and context.connectionHeaders[key] & context.templateConfig[key]
       log.debug "execution allowed by acl"
       return callback null, context
 

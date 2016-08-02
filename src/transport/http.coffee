@@ -282,7 +282,7 @@ getQueryRequestInfo = (req, useSecure) ->
     responseFormat: format
     responseTransform: transformName
     debug: req.query.debug is "true"
-    connectionHeaders: req.get(config.connectionHeaders) || {}
+    connectionHeaders: req.headers || {}
 
 module.exports.attachResponder = attachResponder
 module.exports.getQueryRequestInfo = getQueryRequestInfo
