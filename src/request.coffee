@@ -117,12 +117,12 @@ testExecutionPermissions = (context, callback) ->
   # it is an error condition.  This would imply that we did not find
   # ACL information in the header portion of a template
   if not context.templateConfig
-    return callback(new Error("No Front Matter For Template #{context.templatePath}"), context)
+    return callback(new Error("ACL Checking Enabled - Template missing ACL Config #{context.templatePath}"), context)
   # If we find front matter but it is blank or does not result in a the YAML
   # being processed correctly, or we somehow get here without any ACLS, we have
   # an error condition.
   if Object.keys(context.templateConfig).length is 0
-    return callback(new Error("no acl specified for template #{context.templatePath}"), context)
+    return callback(new Error("ACL Checking Enabled - Template Contains Invalid ACL Config #{context.templatePath}"), context)
 
   log.debug "acl for template #{context.templatePath}: %s", JSON.stringify(context.templateConfig, null, 2)
 
