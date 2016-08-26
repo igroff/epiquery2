@@ -115,7 +115,7 @@ executeQuery = (context, callback) ->
   queryCompleteCallback = (err, data) ->
     context.Stats.endDate = new Date()
     if err
-      log.error "[q:#{context.queryId}] error executing query #{err}"
+      log.error "[q:#{context.queryId}, t:#{context.templateName}] error executing query #{err}"
       context.emit 'error', err, data
 
     context.emit 'endquery', data
@@ -171,7 +171,7 @@ queryRequestHandler = (context) ->
   ],
   (err, results) ->
     if err
-      log.error "[q:#{context.queryId}] queryRequestHandler Error: #{err}"
+      log.error "[q:#{context.queryId}, t:#{context.templateName}] queryRequestHandler Error: #{err}"
       context.emit 'error', err
     context.emit 'completequeryexecution'
 
