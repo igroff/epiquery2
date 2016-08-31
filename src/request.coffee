@@ -136,7 +136,11 @@ collectStats = (context, callback) ->
     context.templateName
     stats.executionTimeInMillis
   )
-  log.info "[EXECUTION STATS] template: '#{context.templateName}', duration: #{stats.executionTimeInMillis}ms"
+  # supporting pooling is optional, so some drivers won't have pool details
+  if context.connectionPoolKey
+    log.info "[EXECUTION STATS] template: '#{context.templateName}', duration: #{stats.executionTimeInMillis}ms, connWait: #{context.connectionAcquisitionDuration}ms, pool: #{context.connectionPoolKey}"
+  else
+    log.info "[EXECUTION STATS] template: '#{context.templateName}', duration: #{stats.executionTimeInMillis}ms"
   callback null, context
 
 sanitizeInput = (context, callback) ->
