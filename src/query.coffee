@@ -88,7 +88,7 @@ attachAndExecute = (driverInstance, context, cb) ->
     context.emit 'data', {queryId: queryId, data: data}
 
   errorHandler = (err) ->
-    log.error "[q:#{context.queryId}] te %j", err
+    log.error "[q:#{context.queryId}, t:#{context.templateName}] te %j", err
     pool = DRIVER_POOL[context.connection.name]
     pool.destroy(driverInstance) if pool
 

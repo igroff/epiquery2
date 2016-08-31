@@ -81,7 +81,7 @@ class MSSQLDriver extends events.EventEmitter
 
     if _.isEmpty parameters
       @conn.execSqlBatch request, (error) =>
-        log.error "[q:#{context.queryId}] connect failed %j", error
+        log.error "[q:#{context.queryId}, t:#{context.templateName}] connect failed %j", error
         @emit 'error', error
     else
       parameters.forEach (param) =>
