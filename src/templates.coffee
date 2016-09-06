@@ -76,6 +76,8 @@ parseFrontMatter = (templateContents) ->
   if templateContents?.indexOf("---\n") is 0
     endOfFrontMatter = templateContents.indexOf("---\n", 4)
     frontMatter = templateContents.substring(4, endOfFrontMatter)
+    # Each of the bitmask lines should be a comment to be backwards compatible
+    frontMatter = frontMatter.replace(/---\s*/g,"")
     log.debug "parsing frontmatter\n#{frontMatter}"
     frontMatterParsed = yaml.load(frontMatter + "\n", 'utf8')
     log.debug "parsed frontmatter: %j", frontMatterParsed
