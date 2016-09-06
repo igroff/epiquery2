@@ -8,7 +8,7 @@ DRIVER_POOL={}
 #https://github.com/pekim/tedious/issues/19
 #tedious and generic connection pooling is sort of crap
 
-getDriverInstance = (driver, connectionConfig, driverAquired) ->
+getDriverInstance = (driver, connectionConfig, driverAcquired) ->
   pool = DRIVER_POOL[connectionConfig.name]
   if not pool
     pool = Pool({
@@ -30,7 +30,9 @@ getDriverInstance = (driver, connectionConfig, driverAquired) ->
       max: 50
     })
     DRIVER_POOL[connectionConfig.name] = pool
-  pool.acquire(driverAquired)
+  poolAcquireStart = new Date()
+  pool.acquire (err, poolItem) ->
+    driverAcquired(err, poolItem, new Date().getTime() - poolAcquireStart.getTime(), connectionConfig.name)
 
 execute = (driver, context, cb) ->
   query = context.renderedTemplate
@@ -38,7 +40,11 @@ execute = (driver, context, cb) ->
   # if we have a driver that supports pooling we'll use pooling, which is defined by a driver
   # having a connect and disconnect method
   if typeof(driver.class.prototype.connect) is "function" && typeof(driver.class.prototype.disconnect) is "function"
-    getDriverInstance(driver, config, (err, driver) ->
+    getDriverInstance(driver, config, (err, driver, acquisitionDuration, poolKey) ->
+      # tracking the time it takes to get a connection
+      context.connectionAcquisitionDuration = acquisitionDuration
+      # and the pool used
+      context.connectionPoolKey = poolKey
       if err
         message = "unable to acquire driver from pool for connection: #{config.name}"
         log.error message, err
