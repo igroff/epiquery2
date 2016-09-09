@@ -59,7 +59,10 @@ class MSSQLDriver extends events.EventEmitter
 
   execute: (query, context) =>
     rowSetStarted = false
-
+    # in an attempt to make thing easier to track down on the SQL server side
+    # we're going to insert the name of the template that we're executing
+    query = "-- #{context.templateName}\n#{query}"
+    log.debug "query as sent to server:\n#{query}"
     request = new tedious.Request query, (err,rowCount) =>
       return @emit('error', err) if err
       @emit('endrowset') if rowSetStarted
