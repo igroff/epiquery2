@@ -1,2 +1,2 @@
 #! /usr/bin/env bash
-./difftest/bin/wsEcho.coffee --connection 503a --template '/test/multiple_result.mustache'
+./difftest/bin/wsEcho.coffee --connection mssql --template '/test/multiple_result.mustache'
