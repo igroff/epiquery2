@@ -57,6 +57,11 @@ class MSSQLDriver extends events.EventEmitter
   validate: ->
     @valid
 
+  invalidate: -> @valid = false
+
+  releaseToPool: (cb) ->
+    @conn.reset(cb)
+
   execute: (query, context) =>
     rowSetStarted = false
     # in an attempt to make thing easier to track down on the SQL server side
