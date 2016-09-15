@@ -69,11 +69,13 @@ attachAndExecute = (driverInstance, context, cb) ->
 
   endqueryHandler = ->
     pool = DRIVER_POOL[context.connection.name]
-    if pool
+    if pool and driverInstance.releaseToPool
       driverInstance.releaseToPool (err) ->
         if err
           driverInstance.invalidate()
         pool.release(driverInstance)
+    else if pool
+      pool.release(driverInstance)
 
     driverInstance
       .removeListener('beginrowset', beginrowsetHandler)
