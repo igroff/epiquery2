@@ -2,7 +2,7 @@ SHELL=/bin/bash
 .PHONY: watch test pass lint clean start
 
 watch:
-	PORT=${PORT:8080} supervisor -e ".litcoffee|.coffee|.js" --exec make run-server
+	supervisor -e ".litcoffee|.coffee|.js" --exec make -- run-server
 
 start: run-server
 
