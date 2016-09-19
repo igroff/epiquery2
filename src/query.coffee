@@ -20,13 +20,13 @@ getDriverInstance = (driver, connectionConfig, driverAcquired) ->
         connectionHandler = (err, connectedInstance) ->
           if err
             if connectionAttempts > 8
-              log.error "unable to connect successfully\n%s\n", err, err.stack
+              log.error "unable to connect successfully after %s attempts \n%s\n", (connectionAttempts - 1), err, err.stack
               return cb(err)
             connectionAttempts += 1
             attemptConnect = ->
-              log.debug "attempting reconnect for connection #{connectionConfig.name} because #{err}"
+              log.debug "attempting reconnect for connection #{connectionConfig.name} because #{err} at #{new Date().getTime()} attempt: #{connectionAttempts}"
               d.connect(connectionHandler)
-            setTimeout(attemptConnect, 2^connectionAttempts)
+            setTimeout(attemptConnect, Math.pow(2, connectionAttempts))
           else
             cb(connectedInstance)
         d.connect(connectionHandler)
