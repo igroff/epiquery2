@@ -37,11 +37,10 @@ class MSSQLDriver extends events.EventEmitter
     @conn.on 'debug', (message) => log.debug message
     @conn.on 'connect', (err) =>
       if err
-        log.error "tedious connection error: #{err}"
         cb(err)
       else
         @valid = true
-        cb(@)
+        cb(err, @)
     @conn.on 'errorMessage', (message) =>
       log.error "tedious errorMessage: #{message}"
       @emit 'errorMessage', message
@@ -56,6 +55,10 @@ class MSSQLDriver extends events.EventEmitter
 
   validate: ->
     @valid
+
+  invalidate: -> @valid = false
+
+  resetForReleaseToPool: (cb) -> @conn.reset(cb)
 
   execute: (query, context) =>
     rowSetStarted = false
