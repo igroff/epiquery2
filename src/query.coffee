@@ -19,7 +19,9 @@ getDriverInstance = (driver, connectionConfig, driverAcquired) ->
         connectionAttempts = 1
         connectionHandler = (err, connectedInstance) ->
           if err
-            return cb(err) unless connectionAttempts <= 8
+            if connectionAttempts > 8
+              log.error "unable to connect successfully\n%s\n", err, err.stack
+              return cb(err)
             connectionAttempts += 1
             attemptConnect = ->
               log.debug "attempting reconnect for connection #{connectionConfig.name} because #{err}"

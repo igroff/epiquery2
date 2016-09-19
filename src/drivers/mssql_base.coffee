@@ -37,7 +37,6 @@ class MSSQLDriver extends events.EventEmitter
     @conn.on 'debug', (message) => log.debug message
     @conn.on 'connect', (err) =>
       if err
-        log.error "tedious connection error: #{err}"
         cb(err)
       else
         @valid = true
