@@ -41,7 +41,7 @@ class MSSQLDriver extends events.EventEmitter
         cb(err)
       else
         @valid = true
-        cb(@)
+        cb(err, @)
     @conn.on 'errorMessage', (message) =>
       log.error "tedious errorMessage: #{message}"
       @emit 'errorMessage', message
@@ -59,7 +59,7 @@ class MSSQLDriver extends events.EventEmitter
 
   invalidate: -> @valid = false
 
-  releaseToPool: (cb) -> @conn.reset(cb)
+  resetForReleaseToPool: (cb) -> @conn.reset(cb)
 
   execute: (query, context) =>
     rowSetStarted = false

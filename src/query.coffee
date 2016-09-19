@@ -16,7 +16,18 @@ getDriverInstance = (driver, connectionConfig, driverAcquired) ->
       create: (cb) ->
         log.debug "creating driver instance for connection #{connectionConfig.name}"
         d = new driver.class(connectionConfig.config)
-        d.connect(cb)
+        connectionAttempts = 1
+        connectionHandler = (err, connectedInstance) ->
+          if err
+            return cb(err) unless connectionAttempts <= 8
+            connectionAttempts += 1
+            attemptConnect = ->
+              log.debug "attempting reconnect for connection #{connectionConfig.name} because #{err}"
+              d.connect(connectionHandler)
+            setTimeout(attemptConnect, 2^connectionAttempts)
+          else
+            cb(connectedInstance)
+        d.connect(connectionHandler)
       destroy: (driver) -> driver.disconnect()
       validate: (driver) ->
         # if the driver has a validate method, use it, otherwise we'll
@@ -69,8 +80,8 @@ attachAndExecute = (driverInstance, context, cb) ->
 
   endqueryHandler = ->
     pool = DRIVER_POOL[context.connection.name]
-    if pool and driverInstance.releaseToPool
-      driverInstance.releaseToPool (err) ->
+    if pool and driverInstance.resetForReleaseToPool
+      driverInstance.resetForReleaseToPool (err) ->
         if err
           driverInstance.invalidate()
         pool.release(driverInstance)
