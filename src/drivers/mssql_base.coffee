@@ -42,7 +42,7 @@ class MSSQLDriver extends events.EventEmitter
         @valid = true
         cb(err, @)
     @conn.on 'errorMessage', (message) =>
-      log.error "tedious errorMessage: #{message}"
+      log.error "tedious errorMessage: %j", message
       @emit 'errorMessage', message
     @conn.on 'error', (message) =>
       # on error we mark this instance invalid, JIC
