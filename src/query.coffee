@@ -16,20 +16,20 @@ getDriverInstance = (driver, connectionConfig, driverAcquired) ->
       create: (cb) ->
         log.debug "creating driver instance for connection #{connectionConfig.name}"
         d = new driver.class(connectionConfig.config)
-        connectionAttempts = 1
+        connectionAttempts = 0
         connectionHandler = (err, connectedInstance) ->
+          connectionAttempts += 1
           if err
             if connectionAttempts > 8
-              log.error "unable to connect successfully after %s attempts \n%s\n", (connectionAttempts - 1), err, err.stack
+              log.error "unable to connect successfully to #{connectionConfig.name} after %s attempts \n%s\n", (connectionAttempts - 1), err, err.stack
               return cb(err)
-            connectionAttempts += 1
             attemptConnect = ->
               log.warn "attempting reconnect for connection #{connectionConfig.name} because #{err}"
               d.connect(connectionHandler)
             setTimeout(attemptConnect, Math.pow(2, connectionAttempts))
           else
             if connectionAttempts > 1
-              log.warn "Successful connection for #{connectionConfig.name} after #{connectionAttempts} attempts"
+              log.warn "successful connection for #{connectionConfig.name} after #{connectionAttempts} attempts"
             cb(connectedInstance)
         d.connect(connectionHandler)
       destroy: (driver) -> driver.disconnect()
