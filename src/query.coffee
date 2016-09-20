@@ -24,10 +24,12 @@ getDriverInstance = (driver, connectionConfig, driverAcquired) ->
               return cb(err)
             connectionAttempts += 1
             attemptConnect = ->
-              log.debug "attempting reconnect for connection #{connectionConfig.name} because #{err}"
+              log.warn "attempting reconnect for connection #{connectionConfig.name} because #{err}"
               d.connect(connectionHandler)
             setTimeout(attemptConnect, Math.pow(2, connectionAttempts))
           else
+            if connectionAttempts > 1
+              log.warn "Successful connection for #{connectionConfig.name} after #{connectionAttempts} attempts"
             cb(connectedInstance)
         d.connect(connectionHandler)
       destroy: (driver) -> driver.disconnect()
