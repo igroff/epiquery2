@@ -34,7 +34,9 @@ if config.isDevelopmentMode()
   log.warn "epiquery2 running in development mode, this will cause requests to be slower"
   set_cors_headers = (req, res, next) ->
     res.header 'Access-Control-Allow-Origin', '*'
+    res.header 'Access-Control-Allow-Origin', 'http://localhost:9292'
     res.header 'Access-Control-Allow-Headers', 'Content-Type'
+    res.header 'Access-Control-Allow-Credentials', true
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     next()
   app.use set_cors_headers
