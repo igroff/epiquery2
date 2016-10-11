@@ -82,7 +82,7 @@ selectConnection = (context, callback) ->
 
 getTemplatePath = (context, callback) ->
   log.debugRequest context.debug, "[q:#{context.queryId}] getting template path for #{context.templateName}"
-  # first we make sure that, if we are whitelisting templates, that 
+  # first we make sure that, if we are whitelisting templates, that
   # our requested template is in a whitelisted directory
   if config.allowedTemplates isnt null
     templateDir = path.dirname context.templateName
@@ -101,13 +101,69 @@ renderTemplate = (context, callback) ->
   templates.renderTemplate(
     context.templatePath,
     context.templateContext,
-    (err, rawTemplate, renderedTemplate) ->
+    (err, rawTemplate, renderedTemplate, templateConfig) ->
       context.rawTemplate = rawTemplate
+      context.templateConfig = templateConfig
       log.debugRequest context.debug, "raw template: \n #{context.rawTemplate}"
       context.renderedTemplate = renderedTemplate
       log.debugRequest context.debug, "rendered template: \n #{context.renderedTemplate}"
       callback err, context
   )
+
+testExecutionPermissions = (context, callback) ->
+  # Processing Template ACL's must be explicitly enabled.
+  return callback(null, context) if not config.enableTemplateAcls
+  # If ACL Checking is enabled and front matter is not found (templateConfig)
+  # it is an error condition.  This would imply that we did not find
+  # ACL information in the header portion of a template
+  if not context.templateConfig
+    return callback(new Error("ACL Checking Enabled - Template missing ACL Config #{context.templatePath}"), context)
+  # If we find front matter but it is blank or does not result in a the YAML
+  # being processed correctly, or we somehow get here without any ACLS, we have
+  # an error condition.
+  if Object.keys(context.templateConfig).length is 0
+    return callback(new Error("ACL Checking Enabled - Template Contains Invalid ACL Config #{context.templatePath}"), context)
+
+  log.debug "acl for template #{context.templatePath}: %s", JSON.stringify(context.templateConfig, null, 2)
+
+  # The top of a template can have the following format:
+  #
+  #       /*
+  #       jwt-app1: 5
+  #       anybitmask: 2
+  #       passed: 4
+  #       as: 7
+  #       header: 1
+  #       */
+  #
+  # The list above would be a set of bitmask flags.  We will allow the template
+  # to proceed if we find an enabled bit between the above list and a header
+  # containing a bitmask mask passed to epiquery
+  #
+  # For instance |
+  #
+  #      Success:
+  #      -------
+  #        conn.headers.jwt-app1 = 1
+  #        templateConfig.jwt-app1 = 5 (bits 4 & 1)
+  #
+  #        The above mask of 5 (bits 4 and 1) has a match with the 1 field.  The
+  #        template would be allowed to proceed
+  #
+  #      Fail:
+  #      -------
+  #        conn.headers.jwt-app1 = 2
+  #        templateConfig.jwt-app1 = 5
+  #
+  #        The above mask of 5 (bits 4 and 1) does _not_ match the bit field 2
+  #        Template would not be allowed to proceed
+  for own key of context.templateConfig
+    if context.requestHeaders[key] and (context.requestHeaders[key] & context.templateConfig[key])
+      log.debug "execution allowed by acl"
+      return callback null, context
+
+  log.debug "Execution denied by acl: Headers %j template acl: %j", context.requestHeaders, context.templateConfig
+  return callback(new Error("Execution denied by acl"), context)
 
 executeQuery = (context, callback) ->
   driver = core.selectDriver context.connection
@@ -169,6 +225,7 @@ queryRequestHandler = (context) ->
     escapeInput,
     sanitizeInput,
     renderTemplate,
+    testExecutionPermissions,
     selectConnection,
     executeQuery,
     collectStats
