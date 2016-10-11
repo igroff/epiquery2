@@ -74,12 +74,14 @@ parseFrontMatter = (templateContents) ->
   # if we have a leading '---\n' then we have front matter in our template
   # we'll pull it out, parse the contents and store 'em
   if templateContents?.indexOf("/*\n") is 0
-    endOfFrontMatter = templateContents.indexOf("*/\n", 2)
-    frontMatter = templateContents.substring(2, endOfFrontMatter)
-    log.debug "parsing frontmatter\n#{frontMatter}"
     try
+      endOfFrontMatter = templateContents.indexOf("*/\n", 2)
+      frontMatter = templateContents.substring(2, endOfFrontMatter)
+      log.debug "parsing frontmatter\n#{frontMatter}"
+
       frontMatterParsed = yaml.load(frontMatter + "\n", 'utf8')
       log.debug "parsed frontmatter: %j", frontMatterParsed
+
       # strip off the front matter, running past the leng of string with the end pos
       # simply results in the whole string
       templateContentsWithoutFrontMatter = templateContents.substring(endOfFrontMatter + 2, 999999)
