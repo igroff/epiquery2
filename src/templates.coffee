@@ -85,7 +85,7 @@ parseFrontMatter = (templateContents) ->
       templateContentsWithoutFrontMatter = templateContents.substring(endOfFrontMatter + 2, 999999)
       return [frontMatterParsed, templateContentsWithoutFrontMatter]
     catch error
-      log.debug "Could not parse front matter: %j", frontMatterParsed
+      log.debug "Could not parse front matter: %s", error
 
   return [undefined, templateContents]
 
