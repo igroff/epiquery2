@@ -128,13 +128,13 @@ testExecutionPermissions = (context, callback) ->
 
   # The top of a template can have the following format:
   #
-  #       ---
+  #       /*
   #       jwt-app1: 5
   #       anybitmask: 2
   #       passed: 4
   #       as: 7
   #       header: 1
-  #       ---
+  #       */
   #
   # The list above would be a set of bitmask flags.  We will allow the template
   # to proceed if we find an enabled bit between the above list and a header
