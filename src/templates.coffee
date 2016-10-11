@@ -73,20 +73,21 @@ getRendererForTemplate = (templatePath) ->
 parseFrontMatter = (templateContents) ->
   # if we have a leading '---\n' then we have front matter in our template
   # we'll pull it out, parse the contents and store 'em
-  if templateContents?.indexOf("---\n") is 0
-    endOfFrontMatter = templateContents.indexOf("---\n", 4)
-    frontMatter = templateContents.substring(4, endOfFrontMatter)
-    # Each of the bitmask lines should be a comment to be backwards compatible
-    frontMatter = frontMatter.replace(/---\s*/g,"")
+  if templateContents?.indexOf("/*\n") is 0
+    endOfFrontMatter = templateContents.indexOf("*/\n", 2)
+    frontMatter = templateContents.substring(2, endOfFrontMatter)
     log.debug "parsing frontmatter\n#{frontMatter}"
-    frontMatterParsed = yaml.load(frontMatter + "\n", 'utf8')
-    log.debug "parsed frontmatter: %j", frontMatterParsed
-    # strip off the front matter, running past the leng of string with the end pos
-    # simply results in the whole string
-    templateContentsWithoutFrontMatter = templateContents.substring(endOfFrontMatter + 4, 999999)
-    return [frontMatterParsed, templateContentsWithoutFrontMatter]
-  else
-    return [undefined, templateContents]
+    try
+      frontMatterParsed = yaml.load(frontMatter + "\n", 'utf8')
+      log.debug "parsed frontmatter: %j", frontMatterParsed
+      # strip off the front matter, running past the leng of string with the end pos
+      # simply results in the whole string
+      templateContentsWithoutFrontMatter = templateContents.substring(endOfFrontMatter + 2, 999999)
+      return [frontMatterParsed, templateContentsWithoutFrontMatter]
+    catch error
+      log.debug "Could not parse front matter: %j", frontMatterParsed
+
+  return [undefined, templateContents]
 
 
 getMustacheFiles = (templateDirectory, fileList=[]) ->
