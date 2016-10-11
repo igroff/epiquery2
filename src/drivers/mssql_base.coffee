@@ -37,13 +37,12 @@ class MSSQLDriver extends events.EventEmitter
     @conn.on 'debug', (message) => log.debug message
     @conn.on 'connect', (err) =>
       if err
-        log.error "tedious connection error: #{err}"
         cb(err)
       else
         @valid = true
-        cb(@)
+        cb(err, @)
     @conn.on 'errorMessage', (message) =>
-      log.error "tedious errorMessage: #{message}"
+      log.error "tedious errorMessage: %j", message
       @emit 'errorMessage', message
     @conn.on 'error', (message) =>
       # on error we mark this instance invalid, JIC
@@ -57,9 +56,16 @@ class MSSQLDriver extends events.EventEmitter
   validate: ->
     @valid
 
+  invalidate: -> @valid = false
+
+  resetForReleaseToPool: (cb) -> @conn.reset(cb)
+
   execute: (query, context) =>
     rowSetStarted = false
-
+    # in an attempt to make thing easier to track down on the SQL server side
+    # we're going to insert the name of the template that we're executing
+    query = "-- #{context.templateName}\n#{query}"
+    log.debug "query as sent to server:\n#{query}"
     request = new tedious.Request query, (err,rowCount) =>
       return @emit('error', err) if err
       @emit('endrowset') if rowSetStarted

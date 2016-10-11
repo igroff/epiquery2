@@ -16,7 +16,22 @@ getDriverInstance = (driver, connectionConfig, driverAcquired) ->
       create: (cb) ->
         log.debug "creating driver instance for connection #{connectionConfig.name}"
         d = new driver.class(connectionConfig.config)
-        d.connect(cb)
+        connectionAttempts = 0
+        connectionHandler = (err, connectedInstance) ->
+          connectionAttempts += 1
+          if err
+            if connectionAttempts > 8
+              log.error "unable to connect successfully to #{connectionConfig.name} after %s attempts \n%s\n", (connectionAttempts - 1), err, err.stack
+              return cb(err)
+            attemptConnect = ->
+              log.warn "attempting reconnect for connection #{connectionConfig.name} because #{err}"
+              d.connect(connectionHandler)
+            setTimeout(attemptConnect, Math.pow(2, connectionAttempts))
+          else
+            if connectionAttempts > 1
+              log.warn "successful connection for #{connectionConfig.name} after #{connectionAttempts} attempts"
+            cb(connectedInstance)
+        d.connect(connectionHandler)
       destroy: (driver) -> driver.disconnect()
       validate: (driver) ->
         # if the driver has a validate method, use it, otherwise we'll
@@ -69,7 +84,13 @@ attachAndExecute = (driverInstance, context, cb) ->
 
   endqueryHandler = ->
     pool = DRIVER_POOL[context.connection.name]
-    pool.release(driverInstance) if pool
+    if pool and driverInstance.resetForReleaseToPool
+      driverInstance.resetForReleaseToPool (err) ->
+        if err
+          driverInstance.invalidate()
+        pool.release(driverInstance)
+    else if pool
+      pool.release(driverInstance)
 
     driverInstance
       .removeListener('beginrowset', beginrowsetHandler)
