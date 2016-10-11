@@ -162,7 +162,7 @@ testExecutionPermissions = (context, callback) ->
       log.debug "execution allowed by acl"
       return callback null, context
 
-  log.debug "execution denied by acl. user acl: #{context.aclIdentity} template acl: #{context.templateConfig.acl}"
+  log.debug "Execution denied by acl: Headers %j template acl: %j", context.requestHeaders, context.templateConfig
   return callback(new Error("Execution denied by acl"), context)
 
 executeQuery = (context, callback) ->
