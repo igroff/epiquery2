@@ -45,6 +45,9 @@ renderers[".mustache"] = (templatePath, context, cb) ->
   context = _.extend(context, mustacheLambdas)
   if template
     renderedTemplate = template.render(context, hoganTemplates)
+    # yes we parse out the config ( via frontmatter ) every time, this is because it's theoretically 
+    # desirable to template out your frontmatter as well. If you think this overhead is too much, you're probably
+    # wrong, and if you've proven you're not we can do something about it then
     [templateConfig, renderedTemplateWithoutFrontMatter] = parseFrontMatter(renderedTemplate)
     cb(null, template.text, renderedTemplateWithoutFrontMatter, templateConfig)
   else
