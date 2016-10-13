@@ -2,7 +2,6 @@ _       = require 'underscore'
 log     = require 'simplog'
 path    = require 'path'
 fs      = require 'fs'
-config  = require '../config.coffee'
 getRequestedTransform = require('../transformer.coffee').getRequestedTransform
 
 
