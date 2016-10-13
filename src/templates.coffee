@@ -33,8 +33,8 @@ mustacheLambdas = null
 
 renderers[".dot"] = (templatePath, context, cb) ->
   log.debug "rendering #{templatePath} with dot renderer"
-  [frontMatterParsed, templateContents] = parseFrontMatter(templateContents)
   fs.readFile templatePath, {encoding: 'utf8'}, (err, templateContents) ->
+    [frontMatterParsed, templateString] = parseFrontMatter(templateContents)
     templateFn = dot.template templateString
     if err
       cb(err)
@@ -55,8 +55,8 @@ renderers[".mustache"] = (templatePath, context, cb) ->
 # but return the the contents of the template it was provided
 renderers[""] = (templatePath, _, cb) ->
   log.debug "rendering #{templatePath} with generic renderer"
-  [frontMatterParsed, templateContents] = parseFrontMatter(templateContents)
   fs.readFile templatePath, {encoding: 'utf8'}, (err, templateContents) ->
+    [frontMatterParsed, templateString] = parseFrontMatter(templateContents)
     if err
       cb(err)
     else

@@ -38,7 +38,6 @@ attachResponder = (context, conn) ->
     conn.jwrite data
   context.on 'completequeryexecution', () ->
     log.debug "close?: #{context.closeOnEnd}"
-    conn.jwrite {message: 'completequeryexecution', queryId: context.queryId}
     if context.closeOnEnd
       conn.close()
 
