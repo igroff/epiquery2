@@ -20,9 +20,6 @@ dot.templateSettings.strip = false
 # precompiled templates loaded by hogan during initilization
 hoganTemplates = null
 
-# front matter parsed out of hogan templates
-hoganFrontMatter = null
-
 # keep track of our renderers, we're storing them by
 # their associated file extension as that is how we'll
 # be looking them up
@@ -33,13 +30,13 @@ mustacheLambdas = null
 
 renderers[".dot"] = (templatePath, context, cb) ->
   log.debug "rendering #{templatePath} with dot renderer"
-  fs.readFile templatePath, {encoding: 'utf8'}, (err, templateContents) ->
-    [frontMatterParsed, templateString] = parseFrontMatter(templateContents)
-    templateFn = dot.template templateString
+  fs.readFile templatePath, {encoding: 'utf8'}, (err, templateString) ->
     if err
       cb(err)
     else
-      cb(null, templateString, templateFn(context), frontMatterParsed)
+      renderedTemplate = dot.template(templateString)(context)
+      [templateConfig, renderedTemplateWithoutFrontMatter] = parseFrontMatter(renderedTemplate)
+      cb(null, templateString, renderedTemplateWithoutFrontMatter, templateConfig)
 
 renderers[".mustache"] = (templatePath, context, cb) ->
   log.debug "rendering #{templatePath} with mustache renderer"
@@ -47,7 +44,9 @@ renderers[".mustache"] = (templatePath, context, cb) ->
   template = hoganTemplates[relativeTemplatePath]
   context = _.extend(context, mustacheLambdas)
   if template
-    cb(null, template.text, template.render(context, hoganTemplates), hoganFrontMatter[relativeTemplatePath])
+    renderedTemplate = template.render(context, hoganTemplates)
+    [templateConfig, renderedTemplateWithoutFrontMatter] = parseFrontMatter(renderedTemplate)
+    cb(null, template.text, renderedTemplateWithoutFrontMatter, templateConfig)
   else
     cb(new Error("could not find template: #{relativeTemplatePath}"))
 
@@ -55,12 +54,12 @@ renderers[".mustache"] = (templatePath, context, cb) ->
 # but return the the contents of the template it was provided
 renderers[""] = (templatePath, _, cb) ->
   log.debug "rendering #{templatePath} with generic renderer"
-  fs.readFile templatePath, {encoding: 'utf8'}, (err, templateContents) ->
-    [frontMatterParsed, templateString] = parseFrontMatter(templateContents)
+  fs.readFile templatePath, {encoding: 'utf8'}, (err, templateString) ->
     if err
       cb(err)
     else
-      cb(null, templateString, templateString, frontMatterParsed)
+      [templateConfig, templateWithoutFrontMatter] = parseFrontMatter(templateString)
+      cb(null, templateString, templateWithoutFrontMatter, templateConfig)
 
 getRendererForTemplate = (templatePath) ->
   renderer = renderers[path.extname templatePath]
@@ -70,11 +69,11 @@ getRendererForTemplate = (templatePath) ->
   else
     return renderers[""]
 
-parseFrontMatter = (templateContents) ->
-  if templateContents?.indexOf("/*\n") is 0
+parseFrontMatter = (templateString) ->
+  if templateString?.indexOf("/*\n") is 0
     try
-      endOfFrontMatter = templateContents.indexOf("*/\n", 2)
-      frontMatter = templateContents.substring(2, endOfFrontMatter)
+      endOfFrontMatter = templateString.indexOf("*/\n", 2)
+      frontMatter = templateString.substring(2, endOfFrontMatter)
       log.debug "parsing frontmatter\n#{frontMatter}"
 
       frontMatterParsed = yaml.load(frontMatter + "\n", 'utf8')
@@ -82,12 +81,12 @@ parseFrontMatter = (templateContents) ->
 
       # strip off the front matter, running past the leng of string with the end pos
       # simply results in the whole string
-      templateContentsWithoutFrontMatter = templateContents.substring(endOfFrontMatter + 2, 999999)
-      return [frontMatterParsed, templateContentsWithoutFrontMatter]
+      templateStringWithoutFrontMatter = templateString.substring(endOfFrontMatter + 2, 999999)
+      return [frontMatterParsed, templateStringWithoutFrontMatter]
     catch error
       log.debug "Could not parse front matter: %s", error
 
-  return [undefined, templateContents]
+  return [undefined, templateString]
 
 
 getMustacheFiles = (templateDirectory, fileList=[]) ->
@@ -115,25 +114,18 @@ initialize = () ->
   mustachePaths = getMustacheFiles(config.templateDirectory)
   log.debug("precompiled #{mustachePaths.length} mustache templates")
   templates = {}
-  templateFrontMatter = {}
   # compile all of the templates
   _.each mustachePaths, (mustachePath) ->
       try
-        # we load the template, so we can pull of any metadata we might have
-        # that isn't part of the actual template
-        templateContents = fs.readFileSync(mustachePath).toString()
-        [frontMatterParsed, templateContents] = parseFrontMatter(templateContents)
-        templateFrontMatter[getRelativeTemplatePath(mustachePath)] = frontMatterParsed
         # we're going to use a key relative to the root of our template directory, as it
         # is epxected that the templates will be stored in their own repository and used
         # anywhere, and we'll remove the leading / so it's clear that the path is relative
-        templates[getRelativeTemplatePath(mustachePath)] = hogan.compile(templateContents)
+        templates[getRelativeTemplatePath(mustachePath)] = hogan.compile(fs.readFileSync(mustachePath).toString())
       catch e
         log.error "error precompiling template #{mustachePath}, it will be skipped"
         log.error e
   # swap in the newly loaded templates
   hoganTemplates = templates
-  hoganFrontMatter = templateFrontMatter
   ############################################
   # then we get our mustacheLambdas
   lambdaPath = path.join(config.templateDirectory, 'mustache_lambdas.js')
@@ -151,6 +143,6 @@ initialize = () ->
 module.exports.init = initialize
 module.exports.renderTemplate = (templatePath, context, cb) ->
   renderer = getRendererForTemplate(templatePath)
-  templateCallback = (err, templateUnrendered, templateRendered, frontMatter) ->
-    cb(err, templateUnrendered, templateRendered, frontMatter)
+  templateCallback = (err, templateUnrendered, templateRendered, templateConfig) ->
+    cb(err, templateUnrendered, templateRendered, templateConfig)
   renderer(templatePath, context, templateCallback)
