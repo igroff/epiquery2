@@ -4,6 +4,12 @@ _               = require 'lodash-contrib'
 tedious         = require 'tedious'
 os              = require 'os'
 
+lowerCaseTediousTypeMap = {}
+
+for propertyName in Object.getOwnPropertyNames(tedious.TYPES)
+  type = tedious.TYPES[propertyName]
+  lowerCaseTediousTypeMap[type.name.toLowerCase()] = type
+
 class MSSQLDriver extends events.EventEmitter
   constructor: (@config) ->
     @valid = false
@@ -91,7 +97,8 @@ class MSSQLDriver extends events.EventEmitter
         @emit 'error', error
     else
       parameters.forEach (param) =>
-        request.addParameter(param.varName, tedious.TYPES[param.type], parseInt(param.value || 0))
+        lowerCaseTypeName = param.type.toLowerCase()
+        request.addParameter(param.varName, lowerCaseTediousTypeMap[lowerCaseTypeName], param.value)
       @conn.execSql request
 
 module.exports.DriverClass = MSSQLDriver
