@@ -97,7 +97,7 @@ parseFrontMatter = (templateString) ->
 
       if roles and not _.isNumber(roles)  #non-numeric role-def needs to be parsed and applied
         frontMatterParsed.executionMasks['jwt-role-glg'] = _.reduce(roles.split(','), (acc,v) ->
-          return acc + ( roleMapping[_.trim(v.toUpperCase())] or 0 )
+          return acc | ( roleMapping[_.trim(v.toUpperCase())] or 0 )
         , 0)
 
       # strip off the front matter, running past the leng of string with the end pos
