@@ -14,7 +14,7 @@ class MSSQLDriver extends events.EventEmitter
   constructor: (@config) ->
     @valid = false
 
-  escape: (context) ->
+  escapeTemplateContext: (context) ->
     _.walk.preorder context, (value, key, parent) ->
       if parent
         parent[key] = value.replace(/'/g, "''") if _.isString(value)
@@ -31,9 +31,13 @@ class MSSQLDriver extends events.EventEmitter
       varName = varName.replace('@','')
       type = type.replace /\(.*\)/
 
+      # here we can use the unescaped context because
+      # parameter values are not subject to the sql injection problems that
+      # raw sql is, and our escaping would render parmeter values incorrect e.g.
+      # duplicating 's
       value = _.reduce value.split('.'), (doc,prop) ->
         doc[prop]
-      , context.templateContext
+      , context.unEscapedTemplateContext
 
       { varName, type, value }
 
@@ -98,7 +102,9 @@ class MSSQLDriver extends events.EventEmitter
     else
       parameters.forEach (param) =>
         lowerCaseTypeName = param.type.toLowerCase()
-        request.addParameter(param.varName, lowerCaseTediousTypeMap[lowerCaseTypeName], param.value)
+        tediousType = lowerCaseTediousTypeMap[lowerCaseTypeName]
+        log.debug "adding parameter #{param.varName}, value #{param.value} as type #{tediousType.name}"
+        request.addParameter(param.varName, tediousType, param.value)
       @conn.execSql request
 
 module.exports.DriverClass = MSSQLDriver

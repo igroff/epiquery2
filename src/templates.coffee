@@ -30,10 +30,10 @@ mustacheLambdas = null
 renderers[".dot"] = (templatePath, context, cb) ->
   log.debug "rendering #{templatePath} with dot renderer"
   fs.readFile templatePath, {encoding: 'utf8'}, (err, templateString) ->
-    templateFn = dot.template templateString
     if err
       cb(err)
     else
+      templateFn = dot.template templateString
       cb(null, templateString, templateFn(context))
 
 renderers[".mustache"] = (templatePath, context, cb) ->
@@ -55,6 +55,14 @@ renderers[""] = (templatePath, _, cb) ->
       cb(err)
     else
       cb(null, templateString, templateString)
+
+# first .sproc, you know for fun
+renderers[".sproc"] = renderers[""]
+# then, .executesql because this is ultimately what tedious will do for MS SQL 
+renderers[".executesql"] = renderers[""]
+# finally .rpc because the TDS spec defines an RPC method by which 
+# tedious implements our
+renderers[".rpc"] = renderers[""]
 
 getRendererForTemplate = (templatePath) ->
   renderer = renderers[path.extname templatePath]
