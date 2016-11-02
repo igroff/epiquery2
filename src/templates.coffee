@@ -8,17 +8,6 @@ config    = require './config.coffee'
 util      = require 'util'
 yaml      = require 'js-yaml'
 
-# TODO: store in environment or pull from services/auth/roles dynamically
-roleMapping = {
-  COUNCILMEMBER: 4,
-  APP: 16,
-  DENY_ALL: 0,
-  ALLOW_ALL: 2147483647,
-  USER: 1,
-  SURVEYRESPONDENT: 8,
-  CLIENT: 2
-}
-
 getRelativeTemplatePath = (templatePath) ->
   # as per the MDN
   #   If either argument is greater than stringName.length,
@@ -92,13 +81,6 @@ parseFrontMatter = (templateString) ->
 
       frontMatterParsed = yaml.load(frontMatter + "\n", 'utf8')
       log.debug "parsed frontmatter: %j", frontMatterParsed
-
-      roles = frontMatterParsed?.executionMasks?['jwt-role-glg']
-
-      if roles and not _.isNumber(roles)  #non-numeric role-def needs to be parsed and applied
-        frontMatterParsed.executionMasks['jwt-role-glg'] = _.reduce(roles.split(','), (acc,v) ->
-          return acc + ( roleMapping[_.trim(v.toUpperCase())] or 0 )
-        , 0)
 
       # strip off the front matter, running past the leng of string with the end pos
       # simply results in the whole string
