@@ -8,6 +8,21 @@ config    = require './config.coffee'
 util      = require 'util'
 yaml      = require 'js-yaml'
 
+
+# looks up the role name to int values for bitmasking
+# from the env vars for role execution masks defined in the templates
+roleMappingsByType = {}
+getRoleMappingsFromEnvironment = (prefix) ->
+  prefix = "#{prefix.toUpperCase()}_".replace(/-/g,'_')
+  return roleMappingsByType[prefix] if roleMappingsByType[prefix]
+  return roleMappingsByType[prefix] = _.transform process.env, (roles, val, key) ->
+    key = key.toUpperCase()
+    return roles unless _.startsWith(key,prefix)
+    roleName = key.replace(prefix, "")
+    roles[roleName] = +val
+    roles
+
+
 getRelativeTemplatePath = (templatePath) ->
   # as per the MDN
   #   If either argument is greater than stringName.length,
@@ -45,7 +60,7 @@ renderers[".mustache"] = (templatePath, context, cb) ->
   context = _.extend(context, mustacheLambdas)
   if template
     renderedTemplate = template.render(context, hoganTemplates)
-    # yes we parse out the config ( via frontmatter ) every time, this is because it's theoretically 
+    # yes we parse out the config ( via frontmatter ) every time, this is because it's theoretically
     # desirable to template out your frontmatter as well. If you think this overhead is too much, you're probably
     # wrong, and if you've proven you're not we can do something about it then
     [templateConfig, renderedTemplateWithoutFrontMatter] = parseFrontMatter(renderedTemplate)
@@ -81,6 +96,18 @@ parseFrontMatter = (templateString) ->
 
       frontMatterParsed = yaml.load(frontMatter + "\n", 'utf8')
       log.debug "parsed frontmatter: %j", frontMatterParsed
+
+      for roleType,executionMask of frontMatterParsed?.executionMasks || {}
+        # if an execution mask was provided that isn't in it's raw bitmasked integer format
+        # we pull the role name:val mappings from the environment variables
+        # and bitwise OR the associated values to provide the integer
+        if executionMask and not _.isNumber(executionMask)
+          roleMappings = getRoleMappingsFromEnvironment(roleType)
+          console.log("Role mappings are ", roleMappings)
+          frontMatterParsed.executionMasks[roleType] = _.reduce(executionMask.split(','), (acc,v) ->
+            roleValue = roleMappings[_.trim(v.toUpperCase())] or 0
+            return acc | roleValue
+          , 0)
 
       # strip off the front matter, running past the leng of string with the end pos
       # simply results in the whole string
