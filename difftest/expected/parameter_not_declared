@@ -1,0 +1,7 @@
+{
+  "events":[
+  {queryid,"message":"beginquery"},
+  {"message":"error","errorDetail":{"message":"Must declare the scalar variable \"@myParam\".","code":"EREQUEST","number":137,"state":2,"class":15,"serverName":"WIN-9D2AH7VSCSL","procName":"","lineNumber":7},"error":"Must declare the scalar variable \"@myParam\"."},
+  {queryid,"message":"endquery"}
+  ]
+}
