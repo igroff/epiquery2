@@ -59,11 +59,7 @@ renderers[""] = (templatePath, _, cb) ->
 # <"as is" renderers>
 # first .sproc, you know for fun
 renderers[".sproc"] = renderers[""]
-# then, .executesql because this is ultimately what tedious will do for MS SQL 
-renderers[".executesql"] = renderers[""]
-# finally .rpc because the TDS spec defines an RPC method by which 
-# tedious implements our execSql
-renderers[".rpc"] = renderers[""]
+renderers[".sql"] = renderers[""]
 # </"as is" renderers>
 
 getRendererForTemplate = (templatePath) ->
