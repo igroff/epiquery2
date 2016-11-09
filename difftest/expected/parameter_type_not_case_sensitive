@@ -1,0 +1,9 @@
+{
+  "events":[
+  {queryid,"message":"beginquery"},
+  {queryid,"message":"beginrowset"},
+  {queryid,"columns":[{"value":"pants","name":"param"}],"message":"row"},
+  {queryid,"message":"endrowset"},
+  {queryid,"message":"endquery"}
+  ]
+}

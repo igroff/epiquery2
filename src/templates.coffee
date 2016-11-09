@@ -30,10 +30,10 @@ mustacheLambdas = null
 renderers[".dot"] = (templatePath, context, cb) ->
   log.debug "rendering #{templatePath} with dot renderer"
   fs.readFile templatePath, {encoding: 'utf8'}, (err, templateString) ->
-    templateFn = dot.template templateString
     if err
       cb(err)
     else
+      templateFn = dot.template templateString
       cb(null, templateString, templateFn(context))
 
 renderers[".mustache"] = (templatePath, context, cb) ->
@@ -55,6 +55,12 @@ renderers[""] = (templatePath, _, cb) ->
       cb(err)
     else
       cb(null, templateString, templateString)
+
+# <"as is" renderers>
+# first .sproc, you know for fun
+renderers[".sproc"] = renderers[""]
+renderers[".sql"] = renderers[""]
+# </"as is" renderers>
 
 getRendererForTemplate = (templatePath) ->
   renderer = renderers[path.extname templatePath]

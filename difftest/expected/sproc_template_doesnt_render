@@ -1,0 +1,9 @@
+{
+  "events":[
+  {queryid,"message":"beginquery"},
+  {queryid,"message":"beginrowset"},
+  {queryid,"columns":[{"value":"{{{shouldStay}}}","name":"That Should Look Like a Mustache Thing"}],"message":"row"},
+  {queryid,"message":"endrowset"},
+  {queryid,"message":"endquery"}
+  ]
+}
