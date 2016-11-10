@@ -4,11 +4,21 @@ _               = require 'lodash-contrib'
 tedious         = require 'tedious'
 os              = require 'os'
 
+lowerCaseTediousTypeMap = {}
+
+# to make it so folks don't have to learn tedious' crazy casing of 
+# data types, we'll keep a map of lower cased type names for comparison
+# to the inbound parameter type names ( in the case of a parameterized 
+# query request )
+for propertyName in Object.getOwnPropertyNames(tedious.TYPES)
+  type = tedious.TYPES[propertyName]
+  lowerCaseTediousTypeMap[type.name.toLowerCase()] = type
+
 class MSSQLDriver extends events.EventEmitter
   constructor: (@config) ->
     @valid = false
 
-  escape: (context) ->
+  escapeTemplateContext: (context) ->
     _.walk.preorder context, (value, key, parent) ->
       if parent
         parent[key] = value.replace(/'/g, "''") if _.isString(value)
@@ -25,9 +35,13 @@ class MSSQLDriver extends events.EventEmitter
       varName = varName.replace('@','')
       type = type.replace /\(.*\)/
 
+      # here we can use the unescaped context because
+      # parameter values are not subject to the sql injection problems that
+      # raw sql is, and our escaping would render parmeter values incorrect e.g.
+      # duplicating 's
       value = _.reduce value.split('.'), (doc,prop) ->
         doc[prop]
-      , context.templateContext
+      , context.unEscapedTemplateContext
 
       { varName, type, value }
 
@@ -91,7 +105,10 @@ class MSSQLDriver extends events.EventEmitter
         @emit 'error', error
     else
       parameters.forEach (param) =>
-        request.addParameter(param.varName, tedious.TYPES[param.type], parseInt(param.value || 0))
+        lowerCaseTypeName = param.type.toLowerCase()
+        tediousType = lowerCaseTediousTypeMap[lowerCaseTypeName]
+        log.debug "adding parameter #{param.varName}, value #{param.value} as type #{tediousType.name}"
+        request.addParameter(param.varName, tediousType, param.value)
       @conn.execSql request
 
 module.exports.DriverClass = MSSQLDriver
