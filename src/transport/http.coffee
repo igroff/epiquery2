@@ -83,7 +83,7 @@ attachEpiqueryResponder = (context, res) ->
       responseData.push "]"
     res
       .status(status)
-      .header('Content-Type', 'application/javascript')
+      .header('Content-Type', 'application/json')
       .end(responseData.join(''))
 
   writeResultElement = (obj) ->
