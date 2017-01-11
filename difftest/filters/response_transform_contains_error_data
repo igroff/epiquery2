@@ -1,0 +1,1 @@
+cat | grep -v 'serverName": "WIN-'

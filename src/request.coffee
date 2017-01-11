@@ -16,7 +16,7 @@ transformer = require './transformer.coffee'
 special_characters = {
   "8220": regex: new RegExp(String.fromCharCode(8220), "gi"), "replace": '"'
   "8221": regex: new RegExp(String.fromCharCode(8221), "gi"), "replace": '"'
-  "8216": regex:  new RegExp(String.fromCharCode(8216), "gi"), "replace": "'"
+  "8216": regex: new RegExp(String.fromCharCode(8216), "gi"), "replace": "'"
   "8217": regex: new RegExp(String.fromCharCode(8217), "gi"), "replace": "'"
   "8211": regex: new RegExp(String.fromCharCode(8211), "gi"), "replace": "-"
   "8212": regex: new RegExp(String.fromCharCode(8212), "gi"), "replace": "--"
@@ -148,8 +148,10 @@ sanitizeInput = (context, callback) ->
   _.walk.preorder context.templateContext, (value, key, parent) ->
     if _.isString value
       _.each Object.keys(special_characters), (keyCode) ->
+        return if key is 'json' # do not escape our JSON data since it's JSON and does it's own thing
         def = special_characters[keyCode]
-        parent[key] = value.replace def.regex, def.replace
+        value = value.replace def.regex, def.replace
+      parent[key] = value
   context.unEscapedTemplateContext = _.cloneDeep context.templateContext
   if context.driver.class.prototype.escapeTemplateContext
     context.driver.class.prototype.escapeTemplateContext(context.templateContext)

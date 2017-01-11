@@ -1,1 +1,1 @@
-normalize_queryid
+cat | jq . | grep -v 'serverName": "WIN-'
