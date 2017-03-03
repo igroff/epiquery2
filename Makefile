@@ -2,7 +2,7 @@ SHELL=/bin/bash
 .PHONY: watch test pass lint clean start
 
 watch:
-	supervisor -e ".litcoffee|.coffee|.js" --exec make -- run-server
+	./node_modules/.bin/supervisor -e ".litcoffee|.coffee|.js" --exec make -- run-server
 
 start: run-server
 

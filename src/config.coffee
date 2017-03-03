@@ -22,6 +22,7 @@ URL_BASED_API_KEY=process.env.URL_BASED_API_KEY # use second env var for backwar
 # this is the default timeout that matches node's HTTP library default and thus
 # matches epiquery1
 HTTP_REQUEST_TIMEOUT_IN_SECONDS=process.env.HTTP_REQUEST_TIMEOUT_IN_SECONDS || 120
+USER_IDENTITY_HEADER=process.env.USER_IDENTITY_HEADER || ''
 
 for conn_name in CONNECTION_VAR_NAMES.split(" ")
   try
@@ -56,6 +57,7 @@ config =
   urlBasedApiKey: URL_BASED_API_KEY
   isDevelopmentMode: () -> NODE_ENV isnt "production"
   httpRequestTimeoutInSeconds: HTTP_REQUEST_TIMEOUT_IN_SECONDS
+  userIdentityHeader: USER_IDENTITY_HEADER.toLowerCase()
 
 
 module.exports = config

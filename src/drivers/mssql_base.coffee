@@ -3,6 +3,7 @@ log             = require 'simplog'
 _               = require 'lodash-contrib'
 tedious         = require 'tedious'
 os              = require 'os'
+config          = require '../config'
 
 lowerCaseTediousTypeMap = {}
 
@@ -18,6 +19,9 @@ class MSSQLDriver extends events.EventEmitter
   constructor: (@config) ->
     @valid = false
 
+  buildSetContextStatementForCaller: (callerIdentifier) ->
+    "declare @callerId as varbinary(128) = cast(N'#{callerIdentifier}' as varbinary); set CONTEXT_INFO @callerId;"
+    
   escapeTemplateContext: (context) ->
     _.walk.preorder context, (value, key, parent) ->
       if parent
@@ -78,7 +82,9 @@ class MSSQLDriver extends events.EventEmitter
     rowSetStarted = false
     # in an attempt to make thing easier to track down on the SQL server side
     # we're going to insert the name of the template that we're executing
-    query = "-- #{context.templateName}\n#{query}"
+    # as well as inject our identity information so we can have some row level security
+    userId = context.templateContext[config.userIdentityHeader]
+    query = "-- #{context.templateName}\n#{this.buildSetContextStatementForCaller(userId)};\n#{query}"
     log.debug "query as sent to server:\n#{query}"
     request = new tedious.Request query, (err,rowCount) =>
       return @emit('error', err) if err
