@@ -36,7 +36,7 @@ if config.isDevelopmentMode()
     res.header 'Access-Control-Allow-Origin', req.get('Origin') ? '*'
     res.header 'Access-Control-Allow-Credentials', true
     res.header 'Access-Control-Allow-Headers', 'Content-Type'
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS')
+    res.header 'Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS'
     next()
   app.use set_cors_headers
   app.all '*', set_cors_headers
