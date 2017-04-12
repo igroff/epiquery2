@@ -36,7 +36,7 @@ if config.isDevelopmentMode()
     res.header 'Access-Control-Allow-Origin', req.get('Origin') ? '*'
     res.header 'Access-Control-Allow-Credentials', true
     res.header 'Access-Control-Allow-Headers', 'Content-Type'
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS')
     next()
   app.use set_cors_headers
   app.all '*', set_cors_headers
@@ -56,7 +56,7 @@ app.get '/templates', (req, res) ->
 
 app.get '/stats', (req, res) ->
   stats =
-    # execution time data is a object contiaining 
+    # execution time data is a object contiaining
     # "templateName": <CircularBuffer of recent exedution times>
     # properties
     recentExecutionTimes: _.map core.getQueryExecutionTimes, (v, k, l) ->
@@ -124,7 +124,7 @@ socketServer.on 'error', (e) ->
 
 app.get /\/(.+)$/, httpRequestHandler
 app.post /\/(.+)$/, httpRequestHandler
-  
+
 log.debug "server worker process starting with configuration"
 log.info "%j", config
 log.debug "node version", process.version
