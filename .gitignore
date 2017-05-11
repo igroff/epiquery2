@@ -5,3 +5,5 @@ difftest/results/*
 ./templates/
 node_modules/
 pids/
+
+npm-debug.log

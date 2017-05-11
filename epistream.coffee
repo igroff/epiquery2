@@ -33,9 +33,10 @@ core.init()
 if config.isDevelopmentMode()
   log.warn "epiquery2 running in development mode, this will cause requests to be slower"
   set_cors_headers = (req, res, next) ->
-    res.header 'Access-Control-Allow-Origin', '*'
+    res.header 'Access-Control-Allow-Origin', req.get('Origin') ? '*'
+    res.header 'Access-Control-Allow-Credentials', true
     res.header 'Access-Control-Allow-Headers', 'Content-Type'
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    res.header 'Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS'
     next()
   app.use set_cors_headers
   app.all '*', set_cors_headers
@@ -55,7 +56,7 @@ app.get '/templates', (req, res) ->
 
 app.get '/stats', (req, res) ->
   stats =
-    # execution time data is a object contiaining 
+    # execution time data is a object contiaining
     # "templateName": <CircularBuffer of recent exedution times>
     # properties
     recentExecutionTimes: _.map core.getQueryExecutionTimes, (v, k, l) ->
@@ -123,7 +124,7 @@ socketServer.on 'error', (e) ->
 
 app.get /\/(.+)$/, httpRequestHandler
 app.post /\/(.+)$/, httpRequestHandler
-  
+
 log.debug "server worker process starting with configuration"
 log.info "%j", config
 log.debug "node version", process.version
@@ -136,5 +137,5 @@ prefix.prefix = "/#{apiKey}/sockjs" if apiKey && config.urlBasedApiKey
 socketServer.installHandlers(server, prefix)
 
 Cluster = require 'cluster2'
-cluster = new Cluster(port: config.port, noWorkers:config.forks, timeout:config.httpRequestTimeoutInSeconds * 1000)
+cluster = new Cluster(port: config.port, monPort: config.monPort, noWorkers:config.forks, timeout:config.httpRequestTimeoutInSeconds * 1000)
 cluster.listen (cb) -> cb(server)
