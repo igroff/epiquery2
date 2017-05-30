@@ -13,6 +13,8 @@ lowerCaseTediousTypeMap = {}
 for propertyName in Object.getOwnPropertyNames(tedious.TYPES)
   type = tedious.TYPES[propertyName]
   lowerCaseTediousTypeMap[type.name.toLowerCase()] = type
+  _.forEach type.aliases, (alias) =>
+    lowerCaseTediousTypeMap[alias.toLowerCase()] = type
 
 class MSSQLDriver extends events.EventEmitter
   constructor: (@config) ->
