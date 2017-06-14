@@ -149,7 +149,9 @@ sanitizeInput = (context, callback) ->
     if _.isString value
       _.each Object.keys(special_characters), (keyCode) ->
         # do not escape our JSON data since it's JSON and does it's own thing
-        return if key.toLowerCase().startsWith 'json'
+        # oh, and don't try to lower case things that don't have the toLowerCase
+        # method, such as numbers which are the 'keys' of arrays
+        return if key.toLowerCase and key.toLowerCase().startsWith 'json'
         def = special_characters[keyCode]
         value = value.replace def.regex, def.replace
       parent[key] = value
