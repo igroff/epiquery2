@@ -83,7 +83,7 @@ selectConnection = (context, callback) ->
 
 getTemplatePath = (context, callback) ->
   log.debugRequest context.debug, "[q:#{context.queryId}] getting template path for #{context.templateName}"
-  # first we make sure that, if we are whitelisting templates, that 
+  # first we make sure that, if we are whitelisting templates, that
   # our requested template is in a whitelisted directory
   if config.allowedTemplates isnt null
     templateDir = path.dirname context.templateName
@@ -148,7 +148,10 @@ sanitizeInput = (context, callback) ->
   _.walk.preorder context.templateContext, (value, key, parent) ->
     if _.isString value
       _.each Object.keys(special_characters), (keyCode) ->
-        return if key is 'json' # do not escape our JSON data since it's JSON and does it's own thing
+        # do not escape our JSON data since it's JSON and does it's own thing
+        # oh, and don't try to lower case things that don't have the toLowerCase
+        # method, such as numbers which are the 'keys' of arrays
+        return if key.toLowerCase and key.toLowerCase().startsWith 'json'
         def = special_characters[keyCode]
         value = value.replace def.regex, def.replace
       parent[key] = value
