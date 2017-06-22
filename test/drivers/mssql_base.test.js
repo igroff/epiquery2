@@ -13,12 +13,11 @@ describe('MSSQL base', function() {
 --@valid bit valid
 --@foo catpants bar
 
-select * from tasks.task;`;
+select * from meh;`;
       const context = {
         templateName: 'templateName',
         unEscapedTemplateContext: query
       };
-      const db = this.db;
 
       expect(() => {
         this.db.execute(query, context);

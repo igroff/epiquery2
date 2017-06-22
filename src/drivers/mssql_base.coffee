@@ -6,9 +6,9 @@ os              = require 'os'
 
 lowerCaseTediousTypeMap = {}
 
-# to make it so folks don't have to learn tedious' crazy casing of 
+# to make it so folks don't have to learn tedious' crazy casing of
 # data types, we'll keep a map of lower cased type names for comparison
-# to the inbound parameter type names ( in the case of a parameterized 
+# to the inbound parameter type names ( in the case of a parameterized
 # query request )
 for propertyName in Object.getOwnPropertyNames(tedious.TYPES)
   type = tedious.TYPES[propertyName]
@@ -109,6 +109,9 @@ class MSSQLDriver extends events.EventEmitter
       parameters.forEach (param) =>
         lowerCaseTypeName = param.type.toLowerCase()
         tediousType = lowerCaseTediousTypeMap[lowerCaseTypeName]
+
+        throw new TypeError("Unknown parameter type (#{param.type}) for #{param.varName}") if not tediousType
+
         log.debug "adding parameter #{param.varName}, value #{param.value} as type #{tediousType.name}"
         request.addParameter(param.varName, tediousType, param.value)
       @conn.execSql request
