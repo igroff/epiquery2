@@ -110,7 +110,10 @@ class MSSQLDriver extends events.EventEmitter
         lowerCaseTypeName = param.type.toLowerCase()
         tediousType = lowerCaseTediousTypeMap[lowerCaseTypeName]
         log.debug "adding parameter #{param.varName}, value #{param.value} as type #{tediousType.name}"
-        request.addParameter(param.varName, tediousType, param.value)
+        if lowerCaseTypeName.startsWith('datetime')
+          request.addParameter(param.varName, tediousType, new Date(param.value))
+        else
+          request.addParameter(param.varName, tediousType, param.value)
       # so, I really don't think it should but there are cases (in v1.13.0) where the execSql method can
       # raise an exception, so we'll attempt to handle that gracefully
       try
