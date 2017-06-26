@@ -111,6 +111,12 @@ class MSSQLDriver extends events.EventEmitter
         tediousType = lowerCaseTediousTypeMap[lowerCaseTypeName]
         log.debug "adding parameter #{param.varName}, value #{param.value} as type #{tediousType.name}"
         request.addParameter(param.varName, tediousType, param.value)
-      @conn.execSql request
+      # so, I really don't think it should but there are cases (in v1.13.0) where the execSql method can
+      # raise an exception, so we'll attempt to handle that gracefully
+      try
+        @conn.execSql request
+      catch e
+        log.error "Exception raised by execSql: \n#{e.stack}"
+        @emit 'error', e
 
 module.exports.DriverClass = MSSQLDriver
