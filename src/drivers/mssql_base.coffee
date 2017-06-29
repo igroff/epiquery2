@@ -15,6 +15,39 @@ for propertyName in Object.getOwnPropertyNames(tedious.TYPES)
   lowerCaseTediousTypeMap[type.name.toLowerCase()] = type
   _.forEach type.aliases, (alias) =>
     lowerCaseTediousTypeMap[alias.toLowerCase()] = type
+  # add some type helpers to cast things appropriately
+  _.forEach lowerCaseTediousTypeMap, (value, key) ->
+    # default transform does nothing, just returns what it was
+    # given
+    transformValue = (providedValue) -> providedValue
+    #  our specialized value transformers for types that need that sort of thing
+    if key is "bit"
+      transformValue = (providedValue) ->
+        if providedValue
+          providedValue = providedValue.toLowerCase()
+        else
+          providedValue = ""
+        # 'cast' to bit, this is sort of a specialization of the normal javascript rules
+        if not isNaN(new Number(providedValue))
+          providedValue = new Number(providedValue).valueOf()
+          if providedValue is 0
+            return false
+          else
+            return true
+        else if typeof(providedValue) is "string"
+          if providedValue is "false"
+            return false
+          else if providedValue is "true"
+            return true
+          else
+            throw new Error "unexpected value (#{providedValue}) for bit type"
+        else if typeof(providedValue) is 'boolean'
+          return providedValue
+      transformValue = transformValue
+    else if key.startsWith("datetime")
+      # make it a date object
+      transformValue = (providedValue) -> new Date(providedValue)
+    value.transformValue = transformValue
 
 class MSSQLDriver extends events.EventEmitter
   constructor: (@config) ->
@@ -36,6 +69,10 @@ class MSSQLDriver extends events.EventEmitter
       [varName,type,value] = line.split /\s+/
       varName = varName.replace('@','')
       type = type.replace /\(.*\)/
+
+      # as a convenience, we'll let you omit the value declaration in which case we'll use the name of the parametr
+      # as the name of the value
+      value = varName unless value
 
       # here we can use the unescaped context because
       # parameter values are not subject to the sql injection problems that
@@ -106,11 +143,20 @@ class MSSQLDriver extends events.EventEmitter
         log.error "[q:#{context.queryId}, t:#{context.templateName}] connect failed %j", error
         @emit 'error', error
     else
-      parameters.forEach (param) =>
-        lowerCaseTypeName = param.type.toLowerCase()
-        tediousType = lowerCaseTediousTypeMap[lowerCaseTypeName]
-        log.debug "adding parameter #{param.varName}, value #{param.value} as type #{tediousType.name}"
-        request.addParameter(param.varName, tediousType, param.value)
-      @conn.execSql request
+      # so, I really don't think it should but there are cases (in v1.13.0 at least) where the execSql method can
+      # raise an exception, so we'll attempt to handle that gracefully by catching errors, we'll also 
+      # take advantage of the fact that we have to do this to allow creation of errors in the 'transformValue' 
+      # functions
+      try
+        parameters.forEach (param) =>
+          lowerCaseTypeName = param.type.toLowerCase()
+          tediousType = lowerCaseTediousTypeMap[lowerCaseTypeName]
+          transformedValue = tediousType.transformValue(param.value)
+          log.debug "adding parameter #{param.varName}, value (#{param.value}) as type #{tediousType.name} with lowerCaseTypeName #{lowerCaseTypeName}, transformed value: #{transformedValue}"
+          request.addParameter(param.varName, tediousType, transformedValue)
+        @conn.execSql request
+      catch e
+        log.error "Exception raised by execSql: \n#{e.stack}"
+        @emit 'error', e
 
 module.exports.DriverClass = MSSQLDriver

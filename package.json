@@ -30,7 +30,7 @@
     "q": "0.9.2",
     "simplog": "0.2.2",
     "sockjs": "0.3.8",
-    "tedious": "1.13.0",
+    "tedious": "2.0.0",
     "underscore": "1.4.4",
     "xmla4js": "git+https://github.com/glg/xmla4js.git"
   },
