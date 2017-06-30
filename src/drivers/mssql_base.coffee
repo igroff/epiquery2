@@ -151,6 +151,7 @@ class MSSQLDriver extends events.EventEmitter
         parameters.forEach (param) =>
           lowerCaseTypeName = param.type.toLowerCase()
           tediousType = lowerCaseTediousTypeMap[lowerCaseTypeName]
+          throw new TypeError("Unknown parameter type (#{param.type}) for #{param.varName}") if not tediousType
           transformedValue = tediousType.transformValue(param.value)
           log.debug "adding parameter #{param.varName}, value (#{param.value}) as type #{tediousType.name} with lowerCaseTypeName #{lowerCaseTypeName}, transformed value: #{transformedValue}"
           request.addParameter(param.varName, tediousType, transformedValue)
