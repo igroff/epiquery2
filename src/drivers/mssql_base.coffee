@@ -6,9 +6,9 @@ os              = require 'os'
 
 lowerCaseTediousTypeMap = {}
 
-# to make it so folks don't have to learn tedious' crazy casing of 
+# to make it so folks don't have to learn tedious' crazy casing of
 # data types, we'll keep a map of lower cased type names for comparison
-# to the inbound parameter type names ( in the case of a parameterized 
+# to the inbound parameter type names ( in the case of a parameterized
 # query request )
 for propertyName in Object.getOwnPropertyNames(tedious.TYPES)
   type = tedious.TYPES[propertyName]
@@ -144,13 +144,16 @@ class MSSQLDriver extends events.EventEmitter
         @emit 'error', error
     else
       # so, I really don't think it should but there are cases (in v1.13.0 at least) where the execSql method can
-      # raise an exception, so we'll attempt to handle that gracefully by catching errors, we'll also 
-      # take advantage of the fact that we have to do this to allow creation of errors in the 'transformValue' 
+      # raise an exception, so we'll attempt to handle that gracefully by catching errors, we'll also
+      # take advantage of the fact that we have to do this to allow creation of errors in the 'transformValue'
       # functions
       try
         parameters.forEach (param) =>
           lowerCaseTypeName = param.type.toLowerCase()
           tediousType = lowerCaseTediousTypeMap[lowerCaseTypeName]
+
+          throw new TypeError("Unknown parameter type (#{param.type}) for #{param.varName}") if not tediousType
+
           transformedValue = tediousType.transformValue(param.value)
           log.debug "adding parameter #{param.varName}, value (#{param.value}) as type #{tediousType.name} with lowerCaseTypeName #{lowerCaseTypeName}, transformed value: #{transformedValue}"
           request.addParameter(param.varName, tediousType, transformedValue)

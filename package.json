@@ -3,10 +3,12 @@
   "version": "0.0.13",
   "description": "run templated queries from the http's using learnings from 1",
   "devDependencies": {
+    "chai": "^4.0.2",
     "coffeelint": "0.6.1",
-    "jshint": "2.3.0",
-    "sockjs-client": "0.1.3",
     "difftest-runner": "0.0.9",
+    "jshint": "2.3.0",
+    "mocha": "^3.4.2",
+    "sockjs-client": "0.1.3",
     "ws": "~0.4.31"
   },
   "dependencies": {
@@ -36,6 +38,7 @@
   },
   "scripts": {
     "start": "make start",
+    "test": "mocha",
     "watch": "make watch"
   },
   "engines": {
