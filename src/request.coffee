@@ -115,6 +115,19 @@ executeQuery = (context, callback) ->
   queryCompleteCallback = (err, data) ->
     context.Stats.endDate = new Date()
     if err
+      # epiquery prepends the name of the template before passing to the server
+      # making line counts off by one, accomodate this by prepending an empty line...
+      lines = [''].concat context.renderedTemplate?.split '\n', -1
+      buffer = ['\n']
+      for line, number in lines
+        if number+1 is err.lineNumber
+          buffer.push "*#{number+1}*\t#{line}"
+        else
+          buffer.push "[#{number+1}]\t#{line}"
+      log.debug "RENDERED TEMPLATE" + buffer.join '\n'
+
+      errorIndex = err.lineNumber - 1
+      err.invalidLine = lines[errorIndex] if errorIndex < lines.length
       log.error "[q:#{context.queryId}, t:#{context.templateName}] error executing query #{err}"
       context.emit 'error', err, data
 
