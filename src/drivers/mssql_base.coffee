@@ -60,10 +60,10 @@ class MSSQLDriver extends events.EventEmitter
 
   parseQueryParameters: (query, context) ->
 
-    lines = query.match ///^--@.*$///mg
+    lines = query.match ///^--\s*@.*$///mg
 
     _.map lines, (line) =>
-      line = line.replace '--', ''
+      line = line.replace /--\s*/, ''
       line = line.replace '=', ''
 
       [varName,type,value] = line.split /\s+/
