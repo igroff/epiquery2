@@ -47,6 +47,8 @@ app.get '/diagnostic', (req, res) ->
   response =
     message: "ok"
     connections: _.pluck(config.connections, 'name')
+  if config.isDevelopmentMode
+    response.aclsEnabled = config.enableTemplateAcls
   res.send response
 
 app.get '/templates', (req, res) ->
@@ -56,7 +58,7 @@ app.get '/templates', (req, res) ->
 
 app.get '/stats', (req, res) ->
   stats =
-    # execution time data is a object contiaining 
+    # execution time data is a object contiaining
     # "templateName": <CircularBuffer of recent exedution times>
     # properties
     recentExecutionTimes: _.map core.getQueryExecutionTimes, (v, k, l) ->
@@ -109,6 +111,7 @@ socketServer.on 'connection', (conn) ->
       connectionName: message.connectionName
       queryId: message.queryId
       templateContext: message.data
+      requestHeaders: conn.headers
     ctxParms.debug if message.debug
     context = new Context(ctxParms)
     log.debug "[q:#{context.queryId}] starting processing"
@@ -124,7 +127,7 @@ socketServer.on 'error', (e) ->
 
 app.get /\/(.+)$/, httpRequestHandler
 app.post /\/(.+)$/, httpRequestHandler
-  
+
 log.debug "server worker process starting with configuration"
 log.info "%j", config
 log.debug "node version", process.version

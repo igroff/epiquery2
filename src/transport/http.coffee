@@ -17,9 +17,9 @@ attachResponder = (context, res) ->
 
 attachTransformationResponder = (context, res) ->
   currentRowset = null
-  # response will always contain rowsets, even if they are 
+  # response will always contain rowsets, even if they are
   # empty, however it can optionally contain errors and data
-  # elements depending on how things go and what was requested 
+  # elements depending on how things go and what was requested
   response =
     rowSets: []
     # errors: []
@@ -44,7 +44,7 @@ attachTransformationResponder = (context, res) ->
         catch e
           log.error "error during transformation of response\n #{e.stack}"
           res.status(500).send(error: "error during transformation of response #{e.message}").end()
-    
+
   context.on 'row', (row) ->
     currentRowset.push(row.columns)
 
@@ -76,7 +76,7 @@ attachEpiqueryResponder = (context, res) ->
   completeResponse = () ->
     # epiquery "helpfully" sent only one array in the case tat the query
     # contained only a single result set, otherwise it returned an array of
-    # arrays.  So we'll only make the response and array of arrays if we 
+    # arrays.  So we'll only make the response and array of arrays if we
     # have more than a single resultSet
     if rowSetCount > 1
       responseData.unshift "["
@@ -187,7 +187,7 @@ attachSimpleResponder = (context, res) ->
     if didBeginRowSet then writeResponseObjectElement ']'
 
   context.once 'completequeryexecution', completeResponse
-  
+
   # open our response. no matter what, we're gonna write a json response
   # and our return will be 200 with any actual information about the query provided
   # within the response JSON structure
@@ -281,6 +281,7 @@ getQueryRequestInfo = (req, useSecure) ->
     responseFormat: format
     responseTransform: transformName
     debug: req.query.debug is "true"
+    requestHeaders: req.headers || {}
 
 module.exports.attachResponder = attachResponder
 module.exports.getQueryRequestInfo = getQueryRequestInfo

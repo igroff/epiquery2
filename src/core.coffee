@@ -63,6 +63,16 @@ getInflightQueries = () ->
 process.on 'SIGHUP', () ->
   templates.init()
   transformer.init()
+
+process.on 'SIGUSR1', () ->
+  #disable ACLs only in development mode
+  return unless config.isDevelopmentMode
+  config.enableTemplateAcls = 'DISABLED'
+ 
+process.on 'SIGUSR2', () ->
+  #enable ACLs only in development mode
+  return unless config.isDevelopmentMode
+  config.enableTemplateAcls = true
   
 module.exports.init = init
 module.exports.loadDrivers = loadDrivers

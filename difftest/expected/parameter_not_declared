@@ -13,7 +13,7 @@
         "state": 2,
         "class": 15,
         "procName": "",
-        "lineNumber": 7
+        "lineNumber": 3
       },
       "error": "Must declare the scalar variable \"@myParam\"."
     },

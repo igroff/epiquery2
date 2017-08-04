@@ -6,6 +6,7 @@ path      = require 'path'
 _         = require 'lodash'
 config    = require './config.coffee'
 util      = require 'util'
+yaml      = require 'js-yaml'
 
 getRelativeTemplatePath = (templatePath) ->
   # as per the MDN
@@ -33,8 +34,9 @@ renderers[".dot"] = (templatePath, context, cb) ->
     if err
       cb(err)
     else
-      templateFn = dot.template templateString
-      cb(null, templateString, templateFn(context))
+      renderedTemplate = dot.template(templateString)(context)
+      [templateConfig, renderedTemplateWithoutFrontMatter] = parseFrontMatter(renderedTemplate)
+      cb(null, templateString, renderedTemplateWithoutFrontMatter, templateConfig)
 
 renderers[".mustache"] = (templatePath, context, cb) ->
   log.debug "rendering #{templatePath} with mustache renderer"
@@ -42,7 +44,12 @@ renderers[".mustache"] = (templatePath, context, cb) ->
   template = hoganTemplates[relativeTemplatePath]
   context = _.extend(context, mustacheLambdas)
   if template
-    cb(null, template.text, template.render(context, hoganTemplates))
+    renderedTemplate = template.render(context, hoganTemplates)
+    # yes we parse out the config ( via frontmatter ) every time, this is because it's theoretically
+    # desirable to template out your frontmatter as well. If you think this overhead is too much, you're probably
+    # wrong, and if you've proven you're not we can do something about it then
+    [templateConfig, renderedTemplateWithoutFrontMatter] = parseFrontMatter(renderedTemplate)
+    cb(null, template.text, renderedTemplateWithoutFrontMatter, templateConfig)
   else
     cb(new Error("could not find template: #{relativeTemplatePath}"))
 
@@ -54,7 +61,8 @@ renderers[""] = (templatePath, _, cb) ->
     if err
       cb(err)
     else
-      cb(null, templateString, templateString)
+      [templateConfig, templateWithoutFrontMatter] = parseFrontMatter(templateString)
+      cb(null, templateString, templateWithoutFrontMatter, templateConfig)
 
 # <"as is" renderers>
 # first .sproc, you know for fun
@@ -69,6 +77,29 @@ getRendererForTemplate = (templatePath) ->
     return renderer
   else
     return renderers[""]
+
+parseFrontMatter = (templateString) ->
+  if templateString?.indexOf("/*\n") is 0
+    try
+      endOfFrontMatter = templateString.indexOf("*/\n", 2)
+      frontMatter = templateString.substring(2, endOfFrontMatter)
+      log.debug "parsing frontmatter\n#{frontMatter}"
+
+      frontMatterParsed = yaml.load(frontMatter + "\n", 'utf8')
+      log.debug "parsed frontmatter: %j", frontMatterParsed
+
+      # strip off the front matter, running past the leng of string with the end pos
+      # simply results in the whole string
+      templateStringWithoutFrontMatter = templateString.substring(endOfFrontMatter + 2, 999999)
+      # just making sure we're not leading off with a dangling newline from the frontmatter
+      if templateStringWithoutFrontMatter.substring(0,1) is "\n"
+        templateStringWithoutFrontMatter = templateStringWithoutFrontMatter.substring(1, 999999)
+      return [frontMatterParsed, templateStringWithoutFrontMatter]
+    catch error
+      log.debug "Could not parse front matter: %s", error
+
+  return [undefined, templateString]
+
 
 getMustacheFiles = (templateDirectory, fileList=[]) ->
   names = fs.readdirSync(templateDirectory)
@@ -86,8 +117,8 @@ getMustacheFiles = (templateDirectory, fileList=[]) ->
 initialize = () ->
   # allows for any initialization a template provider needs to do
   # in this case we'll be compiling all the mustache templates so that
-  # we can use partials. Any state created by this process will be 
-  # swapped with existing state when initialize is complete, this 
+  # we can use partials. Any state created by this process will be
+  # swapped with existing state when initialize is complete, this
   # will allow initialize to be run while epiquery is active
   ############################################
   # first we load our templates
@@ -124,6 +155,6 @@ initialize = () ->
 module.exports.init = initialize
 module.exports.renderTemplate = (templatePath, context, cb) ->
   renderer = getRendererForTemplate(templatePath)
-  templateCallback = (err, templateUnrendered, templateRendered) ->
-    cb(err, templateUnrendered, templateRendered)
+  templateCallback = (err, templateUnrendered, templateRendered, templateConfig) ->
+    cb(err, templateUnrendered, templateRendered, templateConfig)
   renderer(templatePath, context, templateCallback)
