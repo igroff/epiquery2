@@ -1,0 +1,7 @@
+#! /usr/bin/env bash
+exec 2>&1
+# enable ACLs
+for pid in $(ps aux | grep epistream.coffee | grep -v grep | awk '{print($2)}'); do kill -SIGUSR2 ${pid}; done
+curl -s -H "jwt-test: 2" http://localhost:8080/epiquery1/mssql/test/acl_tests.mustache
+# disable ACLs
+for pid in $(ps aux | grep epistream.coffee | grep -v grep | awk '{print($2)}'); do kill -SIGUSR1 ${pid}; done
