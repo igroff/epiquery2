@@ -23,18 +23,21 @@ for propertyName in Object.getOwnPropertyNames(tedious.TYPES)
     #  our specialized value transformers for types that need that sort of thing
     if key is "bit"
       transformValue = (providedValue) ->
-        if providedValue
+        log.debug "transforming bit value #{providedValue} with type #{typeof(providedValue)}"
+        # lowercase any string values so we can do case insensitive string values
+        if providedValue and (typeof(providedValue) is "string")
           providedValue = providedValue.toLowerCase()
-        else
-          providedValue = ""
-        # 'cast' to bit, this is sort of a specialization of the normal javascript rules
+        # 'cast' to number, this is sort of a specialization of the normal javascript rules
         if not isNaN(new Number(providedValue))
+          log.debug "transforming bit value (#{providedValue}) as number with type #{typeof(providedValue)}"
           providedValue = new Number(providedValue).valueOf()
+          log.debug "providedValue: #{providedValue}"
           if providedValue is 0
             return false
           else
             return true
         else if typeof(providedValue) is "string"
+          log.debug "transforming bit value (#{providedValue}) as string with type #{typeof(providedValue)}"
           if providedValue is "false"
             return false
           else if providedValue is "true"
