@@ -226,6 +226,8 @@ will source a file `~/.epiquery2/config` in which the variables can be specified
 the templates will be put into a directory named 'templates' within epiquery's working directory.
 * `CONNECTIONS` - A space delimited list of names of environment variables which contain
 the JSON encoded information needed to configure the various drivers.  Ya, gnarly.  We'll do this one through examples.
+* `ENABLE_TEMPLATE_ACLS` - (optional) ACLs are enabled by default, however it's possible to disable them by setting
+this to the string 'DISABLED'
 
 #### Sample Configuration (~/.epiquery2/config)
         export TEMPLATE_REPO_URL=https://github.com/intimonkey/epiquery-templates.git
