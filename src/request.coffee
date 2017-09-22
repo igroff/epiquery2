@@ -9,6 +9,10 @@ config      = require './config.coffee'
 query       = require './query.coffee'
 templates   = require './templates.coffee'
 transformer = require './transformer.coffee'
+fs          = require 'fs'
+
+# we track the requests as they come in so we can create unique identifiers for things
+queryRequestCounter = 0
 
 # regex to replace MS special charactes, these are characters that are known to
 # cause issues in storage and retrieval so we're going to switch 'em wherever
@@ -33,6 +37,9 @@ setupContext = (context, callback) ->
   context.Stats = {}
   context.Stats.startDate = new Date()
   context.Stats.templateName = context.templateName
+  # this query identifier is used by the client to corellate events from
+  # simultaneously executing query requests
+  context.queryId = context.queryId || "#{process.pid}_#{queryRequestCounter++}"
   callback null, context
 
 initializeRequest = (context, callback) ->
@@ -111,6 +118,13 @@ renderTemplate = (context, callback) ->
       callback err, context
   )
 
+storeRenderedTemplate = (context, callback) ->
+  return unless config.storeRenderedTemplates
+  # The file to which we'll be writing the full rendered template
+  context.renderedTemplateFileName = ""
+  fs.writeFile
+  
+
 testExecutionPermissions = (context, callback) ->
   # we make it possible to disable ACL checking but make it kind of hard, you must be running in
   # development mode AND explicitly set ENABLE_TEMPLATE_ACLS to 'DISABLED', this is only a concession
@@ -152,10 +166,7 @@ collectStats = (context, callback) ->
   core.QueryStats.buffer.store stats
   # storing the exec time for this query so we can track recent query
   # times by template
-  core.storeQueryExecutionTime(
-    context.templateName
-    stats.executionTimeInMillis
-  )
+  core.storeQueryExecutionTime(context.templateName, stats.executionTimeInMillis)
   # supporting pooling is optional, so some drivers won't have pool details
   if context.connectionPoolKey
     log.info "[EXECUTION STATS] template: '#{context.templateName}', duration: #{stats.executionTimeInMillis}ms, connWait: #{context.connectionAcquisitionDuration}ms, pool: #{context.connectionPoolKey}"
