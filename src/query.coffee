@@ -1,8 +1,6 @@
 log       = require 'simplog'
 {Pool}    = require 'generic-pool'
 
-queryRequestCounter = 0
-
 DRIVER_POOL={}
 
 #https://github.com/pekim/tedious/issues/19

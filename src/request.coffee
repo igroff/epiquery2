@@ -9,7 +9,6 @@ config      = require './config.coffee'
 query       = require './query.coffee'
 templates   = require './templates.coffee'
 transformer = require './transformer.coffee'
-fs          = require 'fs'
 
 # we track the requests as they come in so we can create unique identifiers for things
 queryRequestCounter = 0
@@ -117,13 +116,6 @@ renderTemplate = (context, callback) ->
       log.debugRequest context.debug, "rendered template: \n #{context.renderedTemplate}"
       callback err, context
   )
-
-storeRenderedTemplate = (context, callback) ->
-  return unless config.storeRenderedTemplates
-  # The file to which we'll be writing the full rendered template
-  context.renderedTemplateFileName = ""
-  fs.writeFile
-  
 
 testExecutionPermissions = (context, callback) ->
   # we make it possible to disable ACL checking but make it kind of hard, you must be running in
