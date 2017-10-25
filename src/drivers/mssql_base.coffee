@@ -49,7 +49,11 @@ for propertyName in Object.getOwnPropertyNames(tedious.TYPES)
       transformValue = transformValue
     else if key.startsWith("datetime")
       # make it a date object
-      transformValue = (providedValue) -> new Date(providedValue)
+      transformValue = (providedValue) ->
+        if providedValue is null or providedValue is undefined or providedValue is 'null' or providedValue is 'undefined'
+          providedValue = null
+        else
+          new Date(providedValue)
     value.transformValue = transformValue
 
 class MSSQLDriver extends events.EventEmitter
