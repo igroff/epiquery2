@@ -1,8 +1,6 @@
 log       = require 'simplog'
 {Pool}    = require 'generic-pool'
 
-queryRequestCounter = 0
-
 DRIVER_POOL={}
 
 #https://github.com/pekim/tedious/issues/19
@@ -74,13 +72,9 @@ execute = (driver, context, cb) ->
 
 attachAndExecute = (driverInstance, context, cb) ->
   query = context.renderedTemplate
-  # this query identifier is used by the client to corellate events from
-  # simultaneously executing query requests
-  queryId = context.queryId || "#{process.pid}_#{queryRequestCounter++}"
-  context.queryId = queryId
-  log.debug "using #{context.connection.name}, queryId: #{queryId} to execute query '#{query}', with connection %j", context.connection
+  log.debug "using #{context.connection.name}, queryId: #{context.queryId} to execute query '#{query}', with connection %j", context.connection
 
-  context.emit 'beginquery', queryId: queryId
+  context.emit 'beginquery', queryId: context.queryId
 
   endqueryHandler = ->
     pool = DRIVER_POOL[context.connection.name]
@@ -100,26 +94,26 @@ attachAndExecute = (driverInstance, context, cb) ->
       .removeListener('error', errorHandler)
       .removeListener('endquery', endqueryHandler)
 
-    cb(null, {queryId: queryId})
+    cb(null, {queryId: context.queryId})
 
   beginrowsetHandler = ->
-    context.emit 'beginrowset', {queryId: queryId}
+    context.emit 'beginrowset', {queryId: context.queryId}
 
   endrowsetHandler = ->
-    context.emit 'endrowset', {queryId: queryId}
+    context.emit 'endrowset', {queryId: context.queryId}
 
   rowHandler = (row) ->
-    context.emit 'row', {queryId: queryId, columns: row}
+    context.emit 'row', {queryId: context.queryId, columns: row}
 
   dataHandler = (data) ->
-    context.emit 'data', {queryId: queryId, data: data}
+    context.emit 'data', {queryId: context.queryId, data: data}
 
   errorHandler = (err) ->
     log.error "[q:#{context.queryId}, t:#{context.templateName}] te %j", err
     pool = DRIVER_POOL[context.connection.name]
     pool.destroy(driverInstance) if pool
 
-    cb(err, {queryId: queryId})
+    cb(err, {queryId: context.queryId})
 
   driverInstance
     .on('beginrowset', beginrowsetHandler)

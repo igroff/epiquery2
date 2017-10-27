@@ -1,0 +1,29 @@
+{
+  "results": [
+    [
+      {
+        "datetime2": "2017-10-25T18:19:40.000Z"
+      }
+    ],
+    [
+      {
+        "nullDatetime2": null
+      }
+    ],
+    [
+      {
+        "undefinedDatetime2": null
+      }
+    ],
+    [
+      {
+        "stringNullDatetime2": null
+      }
+    ],
+    [
+      {
+        "stringUndefinedDatetime2": null
+      }
+    ]
+  ]
+}

@@ -10,6 +10,9 @@ query       = require './query.coffee'
 templates   = require './templates.coffee'
 transformer = require './transformer.coffee'
 
+# we track the requests as they come in so we can create unique identifiers for things
+queryRequestCounter = 0
+
 # regex to replace MS special charactes, these are characters that are known to
 # cause issues in storage and retrieval so we're going to switch 'em wherever
 # we find 'em
@@ -33,6 +36,9 @@ setupContext = (context, callback) ->
   context.Stats = {}
   context.Stats.startDate = new Date()
   context.Stats.templateName = context.templateName
+  # this query identifier is used by the client to corellate events from
+  # simultaneously executing query requests
+  context.queryId = context.queryId || "#{process.pid}_#{queryRequestCounter++}"
   callback null, context
 
 initializeRequest = (context, callback) ->
@@ -152,10 +158,7 @@ collectStats = (context, callback) ->
   core.QueryStats.buffer.store stats
   # storing the exec time for this query so we can track recent query
   # times by template
-  core.storeQueryExecutionTime(
-    context.templateName
-    stats.executionTimeInMillis
-  )
+  core.storeQueryExecutionTime(context.templateName, stats.executionTimeInMillis)
   # supporting pooling is optional, so some drivers won't have pool details
   if context.connectionPoolKey
     log.info "[EXECUTION STATS] template: '#{context.templateName}', duration: #{stats.executionTimeInMillis}ms, connWait: #{context.connectionAcquisitionDuration}ms, pool: #{context.connectionPoolKey}"

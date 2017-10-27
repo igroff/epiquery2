@@ -88,12 +88,11 @@ parseFrontMatter = (templateString) ->
       frontMatterParsed = yaml.load(frontMatter + "\n", 'utf8')
       log.debug "parsed frontmatter: %j", frontMatterParsed
 
-      # strip off the front matter, running past the leng of string with the end pos
-      # simply results in the whole string
-      templateStringWithoutFrontMatter = templateString.substring(endOfFrontMatter + 2, 999999)
+      # strip off the front matter
+      templateStringWithoutFrontMatter = templateString.substring(endOfFrontMatter + 2)
       # just making sure we're not leading off with a dangling newline from the frontmatter
       if templateStringWithoutFrontMatter.substring(0,1) is "\n"
-        templateStringWithoutFrontMatter = templateStringWithoutFrontMatter.substring(1, 999999)
+        templateStringWithoutFrontMatter = templateStringWithoutFrontMatter.substring(1)
       return [frontMatterParsed, templateStringWithoutFrontMatter]
     catch error
       log.debug "Could not parse front matter: %s", error
