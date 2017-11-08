@@ -12,6 +12,8 @@ attachResponder = (context, res) ->
     attachEpiqueryResponder(context, res)
   else if context.responseFormat is 'transform'
     attachTransformationResponder(context, res)
+  else if context.responseFormat is 'csv'
+    attachCSVResponder(context, res)
   else # the original format, matching the socket protocol
     attachStandardResponder(context, res)
 
@@ -127,6 +129,64 @@ attachEpiqueryResponder = (context, res) ->
     #check if we hit beginrowset - if so add a closing ']' since we won't hit endrowset
     #and only if we hit beginroset because it is possible an error occurs prior to getting there.
     if didBeginRowSet then writeResponseObjectElement ']'
+
+  context.once 'completequeryexecution', completeResponse
+
+attachCSVResponder = (context, res) ->
+  didWriteHeaders = false
+  res.status(200)
+  res.header('Content-Type', 'application/javascript')
+
+  completeResponse = () ->
+    res.end()
+
+  writeCSVRow = (obj) ->
+    # if we have not yet written our headers for this result set
+    # write them
+    if not didWriteHeaders
+      # track the first item so that we can write out commas as needed
+      firstItem = true
+      _.map(obj, (v,k,_) ->
+        res.write(",") unless firstItem
+        res.write("\"#{k}\"")
+        firstItem = false
+      )
+      res.write("\n")
+      didWriteHeaders = true
+    # write out our values, tracking the first value so that we can
+    # appropriately add commas
+    firstValue = true
+    _.map(obj, (v,k,_) ->
+      res.write(",") unless firstValue
+      if typeof(v) is "string"
+        res.write("\"#{v.replace(/"/g, '""')}\"")
+      else
+        res.write("#{v}")
+      firstValue = false
+    )
+    res.write("\n")
+
+  context.on 'row', (row) ->
+    delete(row['queryId'])
+    columns = {}
+    # this is a bit gruesome, unfortunately, the underlying driver can either return
+    # an array of objects, or an array of name/value pairs
+    if _.isArray(row.columns)
+      _.map(row.columns, (v, i, l) -> columns[l[i].name || 'undefined'] = l[i].value)
+    else
+      _.map(row.columns, (v, k, o) -> columns[k || 'undefined'] = v)
+    writeCSVRow columns
+
+  context.on 'beginrowset', () ->
+    didWriteHeaders = false
+
+  context.on 'endrowset', () ->
+    res.write "\n"
+
+  context.on 'error', (err) ->
+    log.error "Error during generation of CSV response: #{err}"
+    status = 500
+    res.write "An error occurred: #{err}"
 
   context.once 'completequeryexecution', completeResponse
 
@@ -256,6 +316,8 @@ getQueryRequestInfo = (req, useSecure) ->
 
   # pick out any requested response formats
   if pathParts[0] is 'epiquery1'
+    format = pathParts.shift()
+  else if pathParts[0] is 'csv'
     format = pathParts.shift()
   else if req.query['transform']
     format = 'transform'
