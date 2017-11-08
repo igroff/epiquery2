@@ -158,11 +158,13 @@ attachCSVResponder = (context, res) ->
     firstValue = true
     _.map(obj, (v,k,_) ->
       res.write(",") unless firstValue
+      firstValue = false
       if typeof(v) is "string"
         res.write("\"#{v.replace(/"/g, '""')}\"")
+      else if v is null
+        return
       else
         res.write("#{v}")
-      firstValue = false
     )
     res.write("\n")
 
