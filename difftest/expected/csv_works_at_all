@@ -29,3 +29,10 @@
 ,"this one has","a null id"
 4,"this one has a null final column",
 
+"id","value","value"
+1,"no nulls","on this line"
+2,,"this line has a null"
+3,"","this line has an empty string"
+,"this one has","a null id"
+4,"this one has a null final column",
+

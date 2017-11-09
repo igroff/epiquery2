@@ -140,15 +140,15 @@ attachCSVResponder = (context, res) ->
   completeResponse = () ->
     res.end()
 
-  writeCSVRow = (obj) ->
+  writeCSVRow = (columnNames, values) ->
     # if we have not yet written our headers for this result set
     # write them
     if not didWriteHeaders
       # track the first item so that we can write out commas as needed
       firstItem = true
-      _.map(obj, (v,k,_) ->
+      _.map(columnNames, (v,k,_) ->
         res.write(",") unless firstItem
-        res.write("\"#{k}\"")
+        res.write("\"#{v}\"")
         firstItem = false
       )
       res.write("\n")
@@ -156,7 +156,7 @@ attachCSVResponder = (context, res) ->
     # write out our values, tracking the first value so that we can
     # appropriately add commas
     firstValue = true
-    _.map(obj, (v,k,_) ->
+    _.map(values, (v,k,_) ->
       res.write(",") unless firstValue
       firstValue = false
       if typeof(v) is "string"
@@ -170,14 +170,25 @@ attachCSVResponder = (context, res) ->
 
   context.on 'row', (row) ->
     delete(row['queryId'])
-    columns = {}
+    columnNames = []
+    values = []
     # this is a bit gruesome, unfortunately, the underlying driver can either return
     # an array of objects, or an array of name/value pairs
+    require('util').log(row.columns)
     if _.isArray(row.columns)
-      _.map(row.columns, (v, i, l) -> columns[l[i].name || 'undefined'] = l[i].value)
+      _.map(row.columns, (v, i, l) ->
+        columnNames.push(l[i].name || 'undefined')
+        values.push(l[i].value)
+      )
     else
-      _.map(row.columns, (v, k, o) -> columns[k || 'undefined'] = v)
-    writeCSVRow columns
+      # this is sort of a best attempt here, because the underlying driver will eat
+      # identically named columns, so the output from this path will only be as good
+      # as the underlying driver
+      _.map(row.columns, (v, k, o) ->
+        columnNames.push(k || 'undefined')
+        values.push(v)
+      )
+    writeCSVRow columnNames, values
 
   context.on 'beginrowset', () ->
     didWriteHeaders = false

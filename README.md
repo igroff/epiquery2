@@ -104,9 +104,55 @@ The final format is *epiquery1* and is intended to be identical to the response 
           }
         ]
 
+##### csv
+
+There is an response format that returns data formatted using CSV. This format returns each individual recordset in the response in CSV format separated by a blank line.  A header line is always included, and all string values (including headers) are quoted. Below is a sample of a response containing four result sets having varying data.
+
+Things to note are that you'll want to call a connection using the mssql driver and _not_ the mssql_o driver, as the mssql_o driver will lose identically named columns, thus you will actually not get all the data as you do in that last document if you chose a connection using the mssql_o driver.
+
+````
+"Number","SomeValue","AnotherValue","ANumberColumn"
+1,"some value","anothe value",3
+2,"some value","anothe value",3
+3,"some value","anothe value",3
+4,"some value","anothe value",3
+5,"some value","anothe value",3
+6,"some value","anothe value",3
+7,"some value","anothe value",3
+8,"some value","anothe value",3
+9,"some value","anothe value",3
+10,"some value","anothe value",3
+
+"Number","SomeValue2","AnotherValue2","ANumberColumn2"
+1,"some value","anothe value",3
+2,"some value","anothe value",3
+3,"some value","anothe value",3
+4,"some value","anothe value",3
+5,"some value","anothe value",3
+6,"some value","anothe value",3
+7,"some value","anothe value",3
+8,"some value","anothe value",3
+9,"some value","anothe value",3
+10,"some value","anothe value",3
+
+"id","value","value2"
+1,"no nulls","on this line"
+2,,"this line has a null"
+3,"","this line has an empty string"
+,"this one has","a null id"
+4,"this one has a null final column",
+
+"id","value","value"
+1,"no nulls","on this line"
+2,,"this line has a null"
+3,"","this line has an empty string"
+,"this one has","a null id"
+4,"this one has a null final column",
+````
+
 ##### Gotchas
 
-It's worth noting that only the *standard* format supports multiple columns having the same name. The simple and epiquery1 formats the last column encountered with a given name will overwrite any previous column data. For example, given the template */test/same_column_name* containing:
+It's worth noting that only the *standard and csv* formats support multiple columns having the same name. With the simple and epiquery1 formats the last column encountered with a given name will overwrite any previous column data. For example, given the template */test/same_column_name* containing:
 
         select 'one' [col1], 'two' [col1]
 
