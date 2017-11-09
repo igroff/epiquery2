@@ -12,6 +12,8 @@ attachResponder = (context, res) ->
     attachEpiqueryResponder(context, res)
   else if context.responseFormat is 'transform'
     attachTransformationResponder(context, res)
+  else if context.responseFormat is 'csv'
+    attachCSVResponder(context, res)
   else # the original format, matching the socket protocol
     attachStandardResponder(context, res)
 
@@ -127,6 +129,77 @@ attachEpiqueryResponder = (context, res) ->
     #check if we hit beginrowset - if so add a closing ']' since we won't hit endrowset
     #and only if we hit beginroset because it is possible an error occurs prior to getting there.
     if didBeginRowSet then writeResponseObjectElement ']'
+
+  context.once 'completequeryexecution', completeResponse
+
+attachCSVResponder = (context, res) ->
+  didWriteHeaders = false
+  res.status(200)
+  res.header('Content-Type', 'application/javascript')
+
+  completeResponse = () ->
+    res.end()
+
+  writeCSVRow = (columnNames, values) ->
+    # if we have not yet written our headers for this result set
+    # write them
+    if not didWriteHeaders
+      # track the first item so that we can write out commas as needed
+      firstItem = true
+      _.map(columnNames, (v,k,_) ->
+        res.write(",") unless firstItem
+        res.write("\"#{v}\"")
+        firstItem = false
+      )
+      res.write("\n")
+      didWriteHeaders = true
+    # write out our values, tracking the first value so that we can
+    # appropriately add commas
+    firstValue = true
+    _.map(values, (v,k,_) ->
+      res.write(",") unless firstValue
+      firstValue = false
+      if typeof(v) is "string"
+        res.write("\"#{v.replace(/"/g, '""')}\"")
+      else if v is null
+        return
+      else
+        res.write("#{v}")
+    )
+    res.write("\n")
+
+  context.on 'row', (row) ->
+    delete(row['queryId'])
+    columnNames = []
+    values = []
+    # this is a bit gruesome, unfortunately, the underlying driver can either return
+    # an array of objects, or an array of name/value pairs
+    require('util').log(row.columns)
+    if _.isArray(row.columns)
+      _.map(row.columns, (v, i, l) ->
+        columnNames.push(l[i].name || 'undefined')
+        values.push(l[i].value)
+      )
+    else
+      # this is sort of a best attempt here, because the underlying driver will eat
+      # identically named columns, so the output from this path will only be as good
+      # as the underlying driver
+      _.map(row.columns, (v, k, o) ->
+        columnNames.push(k || 'undefined')
+        values.push(v)
+      )
+    writeCSVRow columnNames, values
+
+  context.on 'beginrowset', () ->
+    didWriteHeaders = false
+
+  context.on 'endrowset', () ->
+    res.write "\n"
+
+  context.on 'error', (err) ->
+    log.error "Error during generation of CSV response: #{err}"
+    status = 500
+    res.write "An error occurred: #{err}"
 
   context.once 'completequeryexecution', completeResponse
 
@@ -256,6 +329,8 @@ getQueryRequestInfo = (req, useSecure) ->
 
   # pick out any requested response formats
   if pathParts[0] is 'epiquery1'
+    format = pathParts.shift()
+  else if pathParts[0] is 'csv'
     format = pathParts.shift()
   else if req.query['transform']
     format = 'transform'

@@ -1,0 +1,38 @@
+"Number","SomeValue","AnotherValue","ANumberColumn"
+1,"some value","anothe value",3
+2,"some value","anothe value",3
+3,"some value","anothe value",3
+4,"some value","anothe value",3
+5,"some value","anothe value",3
+6,"some value","anothe value",3
+7,"some value","anothe value",3
+8,"some value","anothe value",3
+9,"some value","anothe value",3
+10,"some value","anothe value",3
+
+"Number","SomeValue2","AnotherValue2","ANumberColumn2"
+1,"some value","anothe value",3
+2,"some value","anothe value",3
+3,"some value","anothe value",3
+4,"some value","anothe value",3
+5,"some value","anothe value",3
+6,"some value","anothe value",3
+7,"some value","anothe value",3
+8,"some value","anothe value",3
+9,"some value","anothe value",3
+10,"some value","anothe value",3
+
+"id","value","value2"
+1,"no nulls","on this line"
+2,,"this line has a null"
+3,"","this line has an empty string"
+,"this one has","a null id"
+4,"this one has a null final column",
+
+"id","value","value"
+1,"no nulls","on this line"
+2,,"this line has a null"
+3,"","this line has an empty string"
+,"this one has","a null id"
+4,"this one has a null final column",
+
