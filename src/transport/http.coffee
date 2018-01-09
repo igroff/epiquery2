@@ -174,7 +174,6 @@ attachCSVResponder = (context, res) ->
     values = []
     # this is a bit gruesome, unfortunately, the underlying driver can either return
     # an array of objects, or an array of name/value pairs
-    require('util').log(row.columns)
     if _.isArray(row.columns)
       _.map(row.columns, (v, i, l) ->
         columnNames.push(l[i].name || 'undefined')
