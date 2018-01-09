@@ -1,1 +1,1 @@
-cat | jq . | grep -v 'serverName": "WIN-'
+cat | jq . | grep -iv 'serverName": "'
