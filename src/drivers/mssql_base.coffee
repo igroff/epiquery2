@@ -166,7 +166,8 @@ class MSSQLDriver extends events.EventEmitter
           # param declarations, so we're gonna start by fixing nvarchar and varchar lengths if they're
           # under a threshold, then we'll come back and add first class support for length
           if lowerCaseTypeName is 'varchar' or lowerCaseTypeName is 'nvarchar'
-            paramOptions.length = 255 unless transformedValue.length > 255
+            if transformedValue
+              paramOptions.length = 255 unless transformedValue.length > 255
           request.addParameter(param.varName, tediousType, transformedValue, paramOptions)
         @conn.execSql request
       catch e
