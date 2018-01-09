@@ -1,1 +1,1 @@
-cat | grep -v 'serverName": "WIN-'
+cat | grep -v 'serverName": "'

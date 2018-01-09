@@ -161,7 +161,13 @@ class MSSQLDriver extends events.EventEmitter
           throw new TypeError("Unknown parameter type (#{param.type}) for #{param.varName}") if not tediousType
           transformedValue = tediousType.transformValue(param.value)
           log.debug "adding parameter #{param.varName}, value (#{param.value}) as type #{tediousType.name} with lowerCaseTypeName #{lowerCaseTypeName}, transformed value: #{transformedValue}"
-          request.addParameter(param.varName, tediousType, transformedValue)
+          paramOptions = {}
+          # we entered into this with the ability to not specify length, precision or scale in our
+          # param declarations, so we're gonna start by fixing nvarchar and varchar lengths if they're
+          # under a threshold, then we'll come back and add first class support for length
+          if lowerCaseTypeName is 'varchar' or lowerCaseTypeName is 'nvarchar'
+            paramOptions.length = 255 unless transformedValue.length > 255
+          request.addParameter(param.varName, tediousType, transformedValue, paramOptions)
         @conn.execSql request
       catch e
         log.error "Exception raised by execSql: \n#{e.stack}"
