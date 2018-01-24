@@ -54,6 +54,16 @@ for propertyName in Object.getOwnPropertyNames(tedious.TYPES)
           providedValue = null
         else
           new Date(providedValue)
+    # as a convenience, we'll allow you to pass an array in to a varchar or nvarchar param
+    # when this happens we'll convert the array to a string
+    else if key is 'varchar' or key is 'nvarchar'
+      transformValue = (providedValue) ->
+        if _.isArray(providedValue)
+          # return the string version of provided array
+          providedValue.toString()
+        else
+          # it wasn't an array, so we just go with the historical behavior
+          providedValue
     value.transformValue = transformValue
 
 class MSSQLDriver extends events.EventEmitter
@@ -160,7 +170,7 @@ class MSSQLDriver extends events.EventEmitter
           tediousType = lowerCaseTediousTypeMap[lowerCaseTypeName]
           throw new TypeError("Unknown parameter type (#{param.type}) for #{param.varName}") if not tediousType
           transformedValue = tediousType.transformValue(param.value)
-          log.debug "adding parameter #{param.varName}, value (#{param.value}) as type #{tediousType.name} with lowerCaseTypeName #{lowerCaseTypeName}, transformed value: #{transformedValue}"
+          log.debug "adding parameter #{param.varName}, length (#{transformedValue?.length}), value (#{param.value}) as type #{tediousType.name} with lowerCaseTypeName #{lowerCaseTypeName}, transformed value: #{transformedValue}"
           paramOptions = {}
           # we entered into this with the ability to not specify length, precision or scale in our
           # param declarations, so we're gonna start by fixing nvarchar and varchar lengths if they're
