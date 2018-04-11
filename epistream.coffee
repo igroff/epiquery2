@@ -1,6 +1,7 @@
 #! /usr/bin/env ./node_modules/.bin/coffee
 # vim:ft=coffee
 
+nr        = require('newrelic')
 cluster   = require 'cluster'
 express   = require 'express'
 _         = require 'underscore'

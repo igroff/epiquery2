@@ -30,6 +30,7 @@
     "optimist": "0.6.0",
     "q": "0.9.2",
     "simplog": "0.2.2",
+    "newrelic": "3.3.1",    
     "tedious": "2.0.0",
     "sockjs": "igroff/sockjs-node#pass-headers",
     "underscore": "1.4.4",
