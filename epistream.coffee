@@ -1,6 +1,7 @@
 #! /usr/bin/env ./node_modules/.bin/coffee
 # vim:ft=coffee
 
+newrelic  = require('newrelic')
 cluster   = require 'cluster'
 express   = require 'express'
 _         = require 'underscore'
@@ -73,6 +74,7 @@ app.get '/stats', (req, res) ->
 httpRequestHandler = (req, res) ->
   clientId = req.param 'client_id'
   c = new Context()
+  newrelic.setTransactionName(req.path.replace(/^\/+/g, ''))
   c.queryId = req.param 'queryId'
   _.extend c, httpClient.getQueryRequestInfo(req, !!apiKey)
   # Check that the client supplied key matches server key
@@ -114,6 +116,7 @@ socketServer.on 'connection', (conn) ->
       requestHeaders: conn.headers
     ctxParms.debug if message.debug
     context = new Context(ctxParms)
+    newrelic.setTransactionName(context.requestedTemplatePath.replace(/^\/+/g, ''))
     log.debug "[q:#{context.queryId}] starting processing"
     sockjsClient.attachResponder(context, conn)
     queryRequestHandler(context)
