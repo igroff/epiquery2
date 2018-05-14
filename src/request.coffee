@@ -9,6 +9,9 @@ config      = require './config.coffee'
 query       = require './query.coffee'
 templates   = require './templates.coffee'
 transformer = require './transformer.coffee'
+https       = require 'https'
+url         = require 'url'
+
 breaker     = require 'circuit-breaker'
 breaker_config = {
     window: 300,  # length of window in seconds
@@ -16,6 +19,7 @@ breaker_config = {
     request_timeout: 30, # seconds before request is considered failed
     cb_timeout: 300, # Amount of time that CB remains closed before changing to half open
 }
+
 # we track the requests as they come in so we can create unique identifiers for things
 queryRequestCounter = 0
 
@@ -123,6 +127,33 @@ renderTemplate = (context, callback) ->
       callback err, context
   )
 
+postToScreamer = (context) -> () ->
+  if not config.epiScreamerUrl
+    log.error 'You must set EPI_SCREAMER_URL in your config.'
+    return
+  contextString = JSON.stringify context
+  screamerUrl = url.parse config.epiScreamerUrl
+  options =
+    hostname: screamerUrl.hostname
+    path: screamerUrl.pathname
+    method: 'POST'
+    headers:
+      'Content-Type': 'application/json'
+      'Content-Length': Buffer.byteLength(contextString)
+
+  request = https.request options
+  request.on 'error', (e) -> log.error 'error when posting to epi-screamer', e
+  request.write(contextString)
+  request.end()
+
+
+logToScreamer = (context, callback) ->
+  # Only log if we're in development mode.
+  # Make request but don't block epiquery on this request.
+  process.nextTick postToScreamer(context) if config.isDevelopmentMode()
+  # Pass along the context regardless.
+  callback(null, context)
+
 testExecutionPermissions = (context, callback) ->
   # we make it possible to disable ACL checking but make it kind of hard, you must be running in
   # development mode AND explicitly set ENABLE_TEMPLATE_ACLS to 'DISABLED', this is only a concession
@@ -203,6 +234,7 @@ queryRequestHandler = (context) ->
     sanitizeInput,
     renderTemplate,
     testExecutionPermissions,
+    logToScreamer,
     executeQuery,
     collectStats
   ],

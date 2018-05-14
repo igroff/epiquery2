@@ -58,5 +58,6 @@ config =
   isDevelopmentMode: () -> NODE_ENV isnt "production"
   httpRequestTimeoutInSeconds: HTTP_REQUEST_TIMEOUT_IN_SECONDS
   enableTemplateAcls: ENABLE_TEMPLATE_ACLS
+  epiScreamerUrl: process.env.EPI_SCREAMER_URL
 
 module.exports = config
