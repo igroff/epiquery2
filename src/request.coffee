@@ -1,5 +1,5 @@
 # vim:ft=coffee
-
+newrelic    = require 'newrelic'
 async       = require 'async'
 log         = require './util/log.coffee'
 _           = require 'lodash-contrib'
@@ -11,6 +11,14 @@ templates   = require './templates.coffee'
 transformer = require './transformer.coffee'
 https       = require 'https'
 url         = require 'url'
+
+breaker     = require 'circuit-breaker'
+breaker_config = {
+    window: 300,  # length of window in seconds
+    threshold: 10, # errors and timouts tolerated within window
+    request_timeout: 30, # seconds before request is considered failed
+    cb_timeout: 300, # Amount of time that CB remains closed before changing to half open
+}
 
 # we track the requests as they come in so we can create unique identifiers for things
 queryRequestCounter = 0
@@ -172,11 +180,14 @@ executeQuery = (context, callback) ->
     context.emit 'endquery', data
     core.removeInflightQuery context.templateName
     callback null, context
-  query.execute(
-    context.driver,
-    context,
-    queryCompleteCallback
-  )
+  QueryCircuitBreaker = breaker.factory(context.templateName, query, query.execute, breaker_config )
+  status = QueryCircuitBreaker.execute(context.driver, context, queryCompleteCallback)
+  attribs = {
+    name: context.templateName,
+    status: status
+    connection: context.connection.name
+  }
+  newrelic.recordCustomEvent('Circuit_Breaker',attribs)
 
 collectStats = (context, callback) ->
   stats = context.Stats
