@@ -128,6 +128,9 @@ renderTemplate = (context, callback) ->
   )
 
 postToScreamer = (context) -> () ->
+  if not config.epiScreamerUrl
+    log.error 'You must set EPI_SCREAMER_URL in your config.'
+    return
   contextString = JSON.stringify context
   screamerUrl = url.parse config.epiScreamerUrl
   options =
