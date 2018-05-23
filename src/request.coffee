@@ -63,6 +63,7 @@ selectConnection = (context, callback) ->
     if not context.connection
       msg = "unable to find connection '#{context.connectionName}'"
       context.emit 'error', msg
+      newrelic.noticeError(new Error(msg), context)
       return callback msg
   else
     context.connection = connectionConfig

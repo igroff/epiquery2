@@ -13,6 +13,7 @@
     "async": "0.2.9",
     "awesome-websocket": "0.0.25",
     "browserify": "6.2.0",
+    "circuit-breaker": "git@github.com:glg/circuit-breaker.git#v1.0.1",
     "cluster2": "igroff/cluster2.git",
     "coffee-script": "1.9.1",
     "coffeeify": "0.6.0",

@@ -26,7 +26,7 @@ HTTP_REQUEST_TIMEOUT_IN_SECONDS=process.env.HTTP_REQUEST_TIMEOUT_IN_SECONDS || 1
 
 for conn_name in CONNECTION_VAR_NAMES.split(" ")
   try
-    conn_o = JSON.parse(process.env[conn_name])
+    conn_o = JSON.parse(process.env[conn_name])    
   catch e
     log.error "Unable to parse env var #{conn_name} as connection: #{process.env[conn_name]}"
     throw e
