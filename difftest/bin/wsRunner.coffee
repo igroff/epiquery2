@@ -22,18 +22,18 @@ PORT=process.env.PORT || 8080
 
 bc = new EpiBufferingClient "ws://localhost:8080/sockjs/websocket"
 bc.output = []
-bc.on 'beginquery', (msg) -> console.log(msg)
+bc.beginquery = {}
+bc.on 'beginquery', (msg) -> 
+  bc.beginquery[msg.queryId] = msg  
 bc.on 'error', (msg) -> console.log(msg)
 bc.on 'row', console.log
 pantsDone = Q.defer()
 morePantsDone = Q.defer()
 bc.on 'endquery', (msg) ->
-  if msg.queryId is "pants"
-    this.output.push('resultSet'+ JSON.stringify(bc.results["pants"].resultSets))
+  if msg.queryId is "pants"    
     pantsDone.resolve("pants")
-  if msg.queryId is "morePants"
-    this.output.push('resultSet'+ JSON.stringify(bc.results["morePants"].resultSets))
-    morePantsDone.resolve()
+  if msg.queryId is "morePants"    
+    morePantsDone.resolve("morePants")
 bc.query connectionName, template, data, "pants"
 bc.query connectionName, template, data, "morePants"
 res = {}
@@ -55,8 +55,10 @@ c.on 'error', (msg) -> console.log(msg)
 c.query connectionName, template, data, "nonBufferingClientQueryId"
 
 dumpOutput = () ->
-  for entry in bc.output
-    console.log entry
+  console.log(bc.beginquery["pants"])
+  console.log(bc.beginquery["morePants"])
+  console.log('resultSet'+ JSON.stringify(bc.results["morePants"].resultSets))
+  console.log('resultSet'+ JSON.stringify(bc.results["pants"].resultSets))
   console.log c.beginqueryOutput
   console.log c.endqueryOutput
   for row in c.rowOutput
