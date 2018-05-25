@@ -1,0 +1,7 @@
+#! /usr/bin/env bash
+# This fetches our DevDB info so we can set up our epi connections to it
+DEV_DB_INFO=$(curl -s 'http://services-internal.glgresearch.com/forkulator/2017-devdb-instance-info?user=RaulReynoso')
+EXPORTS=$(echo ${DEV_DB_INFO} | jq '.|to_entries|.[]|"export \"\(.key)=\(.value)\""' --raw-output)
+eval ${EXPORTS}
+docker-compose up -d --force-recreate
+
