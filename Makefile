@@ -4,6 +4,9 @@ SHELL=/bin/bash
 watch:
 	supervisor -e ".litcoffee|.coffee|.js" --exec make -- run-server
 
+start-container:
+	exec ./bin/start-docker-container
+
 start: run-server
 
 run-server: static/js/epiclient_v2.js static/js/epiclient_v3.js
@@ -15,6 +18,9 @@ difftest/templates:
 
 test: build lint difftest/templates
 	difftest run ${TEST_NAME}
+
+test-container:
+	docker-compose exec epiquery /bin/bash -c 'difftest run'
 
 pass/%:
 	cp difftest/results/$(subst pass/,,$@) difftest/expected/$(subst pass/,,$@)
