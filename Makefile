@@ -19,7 +19,7 @@ difftest/templates:
 test: build lint difftest/templates
 	difftest run ${TEST_NAME}
 
-test-container:
+test-container: start-container
 	docker-compose exec epiquery /bin/bash -c 'difftest run'
 
 pass/%:
