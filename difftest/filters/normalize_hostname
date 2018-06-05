@@ -1,2 +1,2 @@
 #! /usr/bin/env bash
-cat | sed -E -e 's[{"@@hostname":".*"}\][hostname\][g' -e 's[{"@@hostname":".*"},[hostname,[g'
+cat | sed -E -e 's[\{"@@hostname":".*"\}\][hostname\][g' -e 's[\{"@@hostname":".*"\},[hostname,[g'

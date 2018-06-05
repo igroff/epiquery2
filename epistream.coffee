@@ -82,10 +82,12 @@ httpRequestHandler = (req, res) ->
     if !(c.clientKey == apiKey)
       log.error "Unauthorized HTTP Access Attempted from IP: #{req.connection.remoteAddress}"
       log.error "Unauthorized Context: #{JSON.stringify(c.templateContext)}"
+      newrelic.noticeError(new Error("Unauthorized Socket Access Attempted"), c)
       res.send error: "Unauthorized Access"
       return
 
   if c.connectionName and not config.connections[c.connectionName]
+    newrelic.noticeError(new Error("Unable to find connection by name"), c)
     res.send error: "unable to find connection by name '#{c.connectionName}'"
     return
   httpClient.attachResponder c, res
@@ -94,12 +96,13 @@ httpRequestHandler = (req, res) ->
 
 socketServer.on 'connection', (conn) ->
   conn.on 'data', (message) ->
-
+    newrelic.startWebTransaction(message.templateName)
     if apiKey
       if !~ conn.url.indexOf apiKey
         conn.close()
         log.error "Unauthorized Socket Access Attempted from IP: #{conn.remoteAddress}"
         log.error "Unauthorized Context: #{JSON.stringify(message)}"
+        newrelic.noticeError(new Error("Unauthorized Socket Access Attempted"), message)
         return
 
     log.debug "inbound message #{message}"
@@ -117,16 +120,19 @@ socketServer.on 'connection', (conn) ->
     ctxParms.debug if message.debug
     context = new Context(ctxParms)
     newrelic.setTransactionName(context.requestedTemplatePath.replace(/^\/+/g, ''))
+    newrelic.addCustomAttributes(context)
     log.debug "[q:#{context.queryId}] starting processing"
     sockjsClient.attachResponder(context, conn)
     queryRequestHandler(context)
   conn.on 'error', (e) ->
     log.error "error on connection", e
+    newrelic.noticeError(e)
   conn.on 'close', () ->
-    log.debug "sockjs client disconnected"
+    log.debug "sockjs client disconnected" 
 
 socketServer.on 'error', (e) ->
   log.error "error on socketServer", e
+  newrelic.noticeError(e)
 
 app.get /\/(.+)$/, httpRequestHandler
 app.post /\/(.+)$/, httpRequestHandler
