@@ -116,6 +116,7 @@ socketServer.on 'connection', (conn) ->
       requestHeaders: conn.headers
     ctxParms.debug if message.debug
     context = new Context(ctxParms)
+    newrelic.setTransactionName(context.requestedTemplatePath.replace(/^\/+/g, ''))
     log.debug "[q:#{context.queryId}] starting processing"
     sockjsClient.attachResponder(context, conn)
     queryRequestHandler(context)

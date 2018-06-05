@@ -19,7 +19,6 @@ breaker_config = {
     request_timeout: 30, # seconds before request is considered failed
     cb_timeout: 300, # Amount of time that CB remains closed before changing to half open
 }
-
 # we track the requests as they come in so we can create unique identifiers for things
 queryRequestCounter = 0
 
@@ -178,13 +177,18 @@ executeQuery = (context, callback) ->
     context.Stats.endDate = new Date()
     if err
       log.error "[q:#{context.queryId}, t:#{context.templateName}] error executing query #{err}"
+      newrelic.noticeError(err, context)
       context.emit 'error', err, data
 
     context.emit 'endquery', data
     core.removeInflightQuery context.templateName
     callback null, context
   QueryCircuitBreaker = breaker.factory(context.templateName, query, query.execute, breaker_config )
+<<<<<<< HEAD
   status = QueryCircuitBreaker.execute(context.driver, context, queryCompleteCallback)
+=======
+  status = QueryCircuitBreaker.execute(context.driver,context,queryCompleteCallback)  
+>>>>>>> 1e2e90e9a4567ba7e951beb54051ec416b680d87
   attribs = {
     name: context.templateName,
     status: status
@@ -241,6 +245,7 @@ queryRequestHandler = (context) ->
   (err, results) ->
     if err
       log.error "[q:#{context.queryId}, t:#{context.templateName}] queryRequestHandler Error: #{err}"
+      newrelic.noticeError(err, context)
       context.emit 'error', err
     context.emit 'completequeryexecution'
 
