@@ -1,0 +1,5 @@
+/*
+executionMasks:
+  a_valid_bitmask: 1
+*/
+select ' name={{=it["name"]}}  callback={{=it["callback"]}}  user-agent={{=it["user-agent"]}}  host={{=it["host"]}}  accept={{=it["accept"]}} ' as everything

@@ -1,0 +1,19 @@
+declare @testTime datetime = getdate()
+declare @testUTCTime datetime = getutcdate()
+declare @easternDateTimeOffset datetimeoffset
+
+select @testTime [Test Time datetime direct from GETDATE]
+
+declare @dateString nvarchar(max)
+select @dateString = convert(varchar, @testUTCTime, 126) + '+00:00'
+
+declare @testTimeAsDTO datetimeoffset = cast(@dateString as datetimeoffset)
+-- select @testTimeAsDTO [Test Time as Datetimeoffset]
+
+select @easternDateTimeOffset = @testTimeAsDTO at time zone 'Eastern Standard Time'
+select @easternDateTimeOffset [Test Time as DTO Converted to EST]
+--select @easternDateTimeOffset at time zone 'Eastern Standard Time' [2 x Converted to EST]
+
+--select @dateString
+
+

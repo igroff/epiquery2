@@ -1,0 +1,5 @@
+/*
+executionMasks:
+  a_valid_bitmask: 1
+*/
+select person_id from pants.dbo.person where person_id in (157)

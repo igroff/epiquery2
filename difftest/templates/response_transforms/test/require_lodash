@@ -1,0 +1,5 @@
+// vim:ft=javascript
+var _ = require('lodash');
+module.exports = function(){
+  return {message: "totally required lodash", isArray: _.isArray([])};
+};

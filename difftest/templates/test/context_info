@@ -1,0 +1,1 @@
+select replace(cast(CONTEXT_INFO() as nvarchar(128)) COLLATE Latin1_General_BIN, NCHAR(0), '') [CONTEXT_INFO]

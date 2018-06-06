@@ -13,8 +13,8 @@ TEMPLATE_DIRECTORY=hack_tilde(process.env.TEMPLATE_DIRECTORY ||
 DRIVER_DIRECTORY=hack_tilde(process.env.DRIVER_DIRECTORY) || null
 PORT=process.env.PORT || 9090
 CONNECTIONS={}
-FORKS=process.env.FORKS || 8
-FORKS=2 unless FORKS > 1
+FORKS=Number.parseInt(process.env.FORKS) || 8
+FORKS=2 unless FORKS > 0
 TEMPLATE_CHANGE_FILE=process.env.TEMPLATE_CHANGE_FILE || path.join(TEMPLATE_DIRECTORY, ".change")
 NODE_ENV=process.env.NODE_ENV || "development"
 EPISTREAM_API_KEY=process.env.EPISTREAM_API_KEY
@@ -26,7 +26,7 @@ HTTP_REQUEST_TIMEOUT_IN_SECONDS=process.env.HTTP_REQUEST_TIMEOUT_IN_SECONDS || 1
 
 for conn_name in CONNECTION_VAR_NAMES.split(" ")
   try
-    conn_o = JSON.parse(process.env[conn_name])
+    conn_o = JSON.parse(process.env[conn_name])    
   catch e
     log.error "Unable to parse env var #{conn_name} as connection: #{process.env[conn_name]}"
     throw e

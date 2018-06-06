@@ -1,0 +1,5 @@
+/*
+executionMasks:
+  a_valid_bitmask: 1
+*/
+SELECT * FROM information_schema.session_variables WHERE variable_name = 'tx_isolation'

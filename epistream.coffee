@@ -82,10 +82,12 @@ httpRequestHandler = (req, res) ->
     if !(c.clientKey == apiKey)
       log.error "Unauthorized HTTP Access Attempted from IP: #{req.connection.remoteAddress}"
       log.error "Unauthorized Context: #{JSON.stringify(c.templateContext)}"
+      newrelic.noticeError(new Error("Unauthorized Socket Access Attempted"), c)
       res.send error: "Unauthorized Access"
       return
 
   if c.connectionName and not config.connections[c.connectionName]
+    newrelic.noticeError(new Error("Unable to find connection by name"), c)
     res.send error: "unable to find connection by name '#{c.connectionName}'"
     return
   httpClient.attachResponder c, res
@@ -94,12 +96,13 @@ httpRequestHandler = (req, res) ->
 
 socketServer.on 'connection', (conn) ->
   conn.on 'data', (message) ->
-
+    newrelic.startWebTransaction(message.templateName)
     if apiKey
       if !~ conn.url.indexOf apiKey
-        conn.close()
+        conn.close() 
         log.error "Unauthorized Socket Access Attempted from IP: #{conn.remoteAddress}"
         log.error "Unauthorized Context: #{JSON.stringify(message)}"
+        newrelic.noticeError(new Error("Unauthorized Socket Access Attempted"), message)
         return
 
     log.debug "inbound message #{message}"
@@ -116,16 +119,20 @@ socketServer.on 'connection', (conn) ->
       requestHeaders: conn.headers
     ctxParms.debug if message.debug
     context = new Context(ctxParms)
+    newrelic.setTransactionName(context.templateName.replace(/^\/+/g, ''))
+    newrelic.addCustomAttributes(context)
     log.debug "[q:#{context.queryId}] starting processing"
     sockjsClient.attachResponder(context, conn)
     queryRequestHandler(context)
   conn.on 'error', (e) ->
     log.error "error on connection", e
+    newrelic.noticeError(e)
   conn.on 'close', () ->
     log.debug "sockjs client disconnected"
 
 socketServer.on 'error', (e) ->
   log.error "error on socketServer", e
+  newrelic.noticeError(e)
 
 app.get /\/(.+)$/, httpRequestHandler
 app.post /\/(.+)$/, httpRequestHandler
@@ -142,5 +149,12 @@ prefix.prefix = "/#{apiKey}/sockjs" if apiKey && config.urlBasedApiKey
 socketServer.installHandlers(server, prefix)
 
 Cluster = require 'cluster2'
-cluster = new Cluster(port: config.port, noWorkers:config.forks, timeout:config.httpRequestTimeoutInSeconds * 1000)
+if config.isDevelopmentMode() and config.forks is 1
+  log.warn  "********************************************************************************"
+  log.warn "epiquery is running in development mode with a single fork specified, this results in a single process epiquery which will BE SLOW"
+  log.warn "********************************************************************************"
+  cluster = new Cluster(port: config.port, cluster:false, timeout:config.httpRequestTimeoutInSeconds * 1000)
+else
+  cluster = new Cluster(port: config.port, noWorkers:config.forks, timeout:config.httpRequestTimeoutInSeconds * 1000)
+
 cluster.listen (cb) -> cb(server)

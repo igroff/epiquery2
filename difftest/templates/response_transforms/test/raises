@@ -1,0 +1,4 @@
+// vim:ft=javascript
+module.exports = function(o){
+  throw new Error("I don't return anything, becaues I'm totally broken");
+}

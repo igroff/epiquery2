@@ -1,0 +1,12 @@
+/*
+  The goal here is a solution to our more complicated templates, that is
+  some way to effectively parameterize multiple statements within a single
+  template thus allowing for handling iteration constructs
+*/
+
+select {{firstParam}} [First Param]
+
+{{#listOfNames}}
+  select '{{.}}' [one]
+{{/listOfNames}}
+

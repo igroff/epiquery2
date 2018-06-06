@@ -1,0 +1,6 @@
+/*
+  executionMasks:
+    a_valid_bitmask: 1
+*/
+
+select @myParam [param]

@@ -19,7 +19,6 @@ breaker_config = {
     request_timeout: 30, # seconds before request is considered failed
     cb_timeout: 300, # Amount of time that CB remains closed before changing to half open
 }
-
 # we track the requests as they come in so we can create unique identifiers for things
 queryRequestCounter = 0
 
@@ -73,6 +72,7 @@ selectConnection = (context, callback) ->
     if not context.connection
       msg = "unable to find connection '#{context.connectionName}'"
       context.emit 'error', msg
+      newrelic.noticeError(new Error(msg), context)
       return callback msg
   else
     context.connection = connectionConfig
@@ -178,6 +178,7 @@ executeQuery = (context, callback) ->
     context.Stats.endDate = new Date()
     if err
       log.error "[q:#{context.queryId}, t:#{context.templateName}] error executing query #{err}"
+      newrelic.noticeError(err, context)
       context.emit 'error', err, data
 
     context.emit 'endquery', data
@@ -241,6 +242,7 @@ queryRequestHandler = (context) ->
   (err, results) ->
     if err
       log.error "[q:#{context.queryId}, t:#{context.templateName}] queryRequestHandler Error: #{err}"
+      newrelic.noticeError(err, context)
       context.emit 'error', err
     context.emit 'completequeryexecution'
 

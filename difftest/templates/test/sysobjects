@@ -1,0 +1,5 @@
+/*
+executionMasks:
+  a_valid_bitmask: 1
+*/
+select top 3 type from sysobjects where type = 'u'

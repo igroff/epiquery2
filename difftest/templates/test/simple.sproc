@@ -1,0 +1,6 @@
+declare @object_id int = 24295792
+declare @object_name nvarchar(255) = 'DF_PERSON_TEST_PERSON_IND'
+
+select * from sys.objects where object_id = @object_id
+
+select * from sys.objects where name = @object_name

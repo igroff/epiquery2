@@ -13,7 +13,9 @@ difftest/templates:
 	cd difftest/ && git clone https://github.com/igroff/epiquery-templates.git \
 		templates/
 
-test: build lint difftest/templates
+test: build difftest/templates
+	./bin/start-docker-container
+	./bin/wait-for-epi
 	difftest run ${TEST_NAME}
 
 pass/%:
@@ -42,3 +44,4 @@ node_modules/:
 
 clean:
 	rm -rf ./node_modules/
+	docker-compose build --no-cache

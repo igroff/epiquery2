@@ -1,0 +1,11 @@
+/*
+executionMasks:
+  a_valid_bitmask: 1
+*/
+select 
+  '{{#sql_date}}10/01/2015 12:24:32 PM{{/sql_date}}' as [sql_date],
+  '{{#sql_date_utc}}10/01/2015 12:24:32 PM{{/sql_date_utc}}' as [sql_date_utc],
+  '{{#sql_dte}}10/01/2015 12:24:32 PM{{/sql_dte}}' as [sql_dte],
+  '{{#sql_dte_utc}}10/01/2015 12:24:32 PM{{/sql_dte_utc}}' as [sql_dte_utc],
+  '{{#sql_str}}this is a string{{/sql_str}}' as [sql_str],
+  '{{#log_it}}log this{{/log_it}}' as [logged]
