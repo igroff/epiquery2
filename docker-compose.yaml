@@ -10,7 +10,7 @@ services:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=epiquery
   epiquery:
-    build: ../epiops/
+    build: .
     # tty and stdin_open create container in interactive mode.  
     # otherwise exits immediately b/c does not have long running process 
     tty: true         
@@ -19,18 +19,16 @@ services:
     ports:
       - "8080:8080"
     volumes: 
-      # mounting the current directory ( our epiquery2 repo ) so we can get to things and change them 
-      - .:/var/app 
+      - .:/var/app # mount the directory containing this file (the root of the epiquery2 repo) as /var/app in the container
     environment:
       - PORT=8080
       - TEMPLATE_DIRECTORY=/var/app/difftest/templates
       - CONNECTIONS=EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_FILE EPI_C_MYSQL EPI_C_RENDER SFDC NON_EXISTENT_SERVER EPI_C_TIMESOUT EPI_C_MYSQL_BULK
       - EPI_C_FILE={"driver":"file","config":{},"name":"file"}
       - EPI_C_RENDER={"driver":"render","config":{},"name":"render"}
-      - EPI_C_MSSQL={"driver":"mssql","name":"mssql","config":{"server":"172.27.6.84","password":"This_Password_Is_Super_Complicated_3828261","userName":"GLGROUP_LIVE","options":{"port":1433, "requestTimeout":0}}}
-      - EPI_C_MSSQL_O={"driver":"mssql_o","name":"mssql_o","config":{"server":"172.27.6.84","password":"This_Password_Is_Super_Complicated_3828261","userName":"GLGROUP_LIVE","options":{"port":1433, "requestTimeout":0}}}
-
-      - EPI_C_TIMESOUT={"driver":"mssql","name":"timesout","config":{"server":"localhost","password":"vagrant","userName":"vagrant","options":{"port":1433, "requestTimeout":1}}}      
+      - EPI_C_MSSQL={"driver":"mssql","name":"mssql","config":{"server":"${IPAddress}","password":"${MSSQLPassword}","userName":"${MSSQLUsername}","options":{"port":1433, "requestTimeout":0}}}
+      - EPI_C_MSSQL_O={"driver":"mssql_o","name":"mssql_o","config":{"server":"${IPAddress}","password":"${MSSQLPassword}","userName":"${MSSQLUsername}","options":{"port":1433, "requestTimeout":0}}}
+      - EPI_C_TIMESOUT={"driver":"mssql","name":"timesout","config":{"server":"localhost","password":"vagrant","userName":"vagrant","options":{"port":1433, "requestTimeout":1}}}
       - EPI_C_MYSQL={"name":"mysql","driver":"mysql","config":{"host":"mysql","user":"root","password":"mysql_root_password"}}
       - EPI_C_MYSQL_BULK={"name":"mysql_bulk", "type":"bulk","driver":"mysql","config":{"host":"mysql","user":"root","password":"mysql_root_password"}}
       - SFDC={"name":"sfdc","driver":"salesforce","config":{"userName":"financeintegration@glgroup.com","password":"GLgroup7890T9upWPVp4E7lCmong4oHrEqD","server":"https://login.salesforce.com"}}
