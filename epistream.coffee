@@ -99,7 +99,7 @@ socketServer.on 'connection', (conn) ->
     newrelic.startWebTransaction(message.templateName)
     if apiKey
       if !~ conn.url.indexOf apiKey
-        conn.close()
+        conn.close() 
         log.error "Unauthorized Socket Access Attempted from IP: #{conn.remoteAddress}"
         log.error "Unauthorized Context: #{JSON.stringify(message)}"
         newrelic.noticeError(new Error("Unauthorized Socket Access Attempted"), message)
@@ -119,7 +119,7 @@ socketServer.on 'connection', (conn) ->
       requestHeaders: conn.headers
     ctxParms.debug if message.debug
     context = new Context(ctxParms)
-    newrelic.setTransactionName(context.requestedTemplatePath.replace(/^\/+/g, ''))
+    newrelic.setTransactionName(context.templateName.replace(/^\/+/g, ''))
     newrelic.addCustomAttributes(context)
     log.debug "[q:#{context.queryId}] starting processing"
     sockjsClient.attachResponder(context, conn)
@@ -128,7 +128,7 @@ socketServer.on 'connection', (conn) ->
     log.error "error on connection", e
     newrelic.noticeError(e)
   conn.on 'close', () ->
-    log.debug "sockjs client disconnected" 
+    log.debug "sockjs client disconnected"
 
 socketServer.on 'error', (e) ->
   log.error "error on socketServer", e
@@ -149,5 +149,9 @@ prefix.prefix = "/#{apiKey}/sockjs" if apiKey && config.urlBasedApiKey
 socketServer.installHandlers(server, prefix)
 
 Cluster = require 'cluster2'
-cluster = new Cluster(port: config.port, noWorkers:config.forks, timeout:config.httpRequestTimeoutInSeconds * 1000)
+if config.isDevelopmentMode()
+  cluster = new Cluster(port: config.port, cluster:false, timeout:config.httpRequestTimeoutInSeconds * 1000)
+else
+  cluster = new Cluster(port: config.port, noWorkers:config.forks, timeout:config.httpRequestTimeoutInSeconds * 1000)
+
 cluster.listen (cb) -> cb(server)
