@@ -1,7 +1,7 @@
 #! /usr/bin/env bash
 exec 2>&1
 # enable ACLs
-docker kill --signal=SIGUSR1 epiquery > /dev/null 2>&1
+docker kill --signal=SIGUSR2 epiquery > /dev/null 2>&1
 curl -s http://localhost:8080/diagnostic | jq '.aclsEnabled'
 # disable ACLs
 docker kill --signal=SIGUSR1 epiquery > /dev/null 2>&1
