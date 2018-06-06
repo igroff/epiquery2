@@ -1,0 +1,43 @@
+Declare @start int, @end int
+Select @start=1, @end=10
+ 
+;With NumberSequence( Number ) as
+(
+    Select @start as Number
+        union all
+    Select Number + 1
+        from NumberSequence
+        where Number < @end
+)
+ 
+--select result
+Select *, 'some value' [SomeValue], 'anothe value' [AnotherValue], 3 [ANumberColumn] From NumberSequence Option (MaxRecursion 1000)
+
+;With NumberSequence( Number ) as
+(
+    Select @start as Number
+        union all
+    Select Number + 1
+        from NumberSequence
+        where Number < @end
+)
+--select result
+Select *, 'some value' [SomeValue2], 'anothe value' [AnotherValue2], 3 [ANumberColumn2] From NumberSequence Option (MaxRecursion 1000)
+
+
+declare @atable TABLE (
+  id int null,
+  value varchar(255) null,
+  value2 varchar(255) null
+)
+
+insert into @atable (id, value, value2) values (1, 'no nulls', 'on this line') 
+insert into @atable (id, value, value2) values (2, null, 'this line has a null') 
+insert into @atable (id, value, value2) values (3, '', 'this line has an empty string') 
+insert into @atable (id, value, value2) values (null, 'this one has', 'a null id') 
+insert into @atable (id, value, value2) values (4, 'this one has a null final column', null) 
+
+
+select * from @atable
+
+select id, value, value2 [value] from @atable

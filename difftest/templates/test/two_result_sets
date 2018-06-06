@@ -1,0 +1,6 @@
+/*
+executionMasks:
+  a_valid_bitmask: 1
+*/
+select 1 [Res1a], 2 [Res1b];
+select 1 [Res2a], 2 [Res2b];

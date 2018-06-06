@@ -1,0 +1,9 @@
+/*
+  executionMasks:
+    a_valid_bitmask: 1
+*/
+--@myParam varchar = rootObject.childObject.param1
+--@myParam2 varchar = rootObject.anotherChild.param2
+--@myParam3 varchar = secondRoot.secondRootsChild.param1
+
+select @myParam [param], @myParam2 [param2], @myParam3 [param3]

@@ -1,0 +1,12 @@
+{{#parent}}
+declare @test_table TABLE
+(
+  json nvarchar(max),
+  notjson nvarchar(max)
+)
+
+insert into @test_table (json) values('{{{json}}}')
+
+
+select json, notjson from @test_table
+{{/parent}}

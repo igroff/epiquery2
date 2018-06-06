@@ -1,0 +1,21 @@
+/*
+executionMasks:
+  a_valid_bitmask: 1
+*/
+declare @sql nvarchar(max)
+
+set @sql='
+declare @test_table TABLE
+(
+  id int,
+  name varchar(25)
+)
+
+insert into @test_table (id, name) values(1, "pants")
+insert into @test_table (id, name) values(2, "pants")
+
+
+select * from @test_table
+'
+
+exec sp_executesql @sql

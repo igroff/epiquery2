@@ -1,0 +1,18 @@
+/*
+executionMasks:
+  a_valid_bitmask: 1
+*/
+Declare @start int, @end int
+Select @start=1, @end=1000
+ 
+;With NumberSequence( Number ) as
+(
+    Select @start as Number
+        union all
+    Select Number + 1
+        from NumberSequence
+        where Number < @end
+)
+ 
+--select result
+Select *, 'some value' [SomeValue], 'anothe value' [AnotherValue], 3 [ANumberColumn] From NumberSequence Option (MaxRecursion 1000)

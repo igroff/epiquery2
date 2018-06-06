@@ -1,0 +1,13 @@
+declare @test_table TABLE
+(
+  json nvarchar(max)
+)
+
+insert into @test_table (json) values('{{{json}}}')
+
+
+select json,
+  '{{{normal}}}' [normal stuff],
+  '{{#child}}{{{json}}}{{/child}}' [child json],
+  '{{#child}}{{{normal}}}{{/child}}' [child normal]
+ from @test_table

@@ -1,0 +1,3 @@
+--@someString nvarchar
+
+select @someString

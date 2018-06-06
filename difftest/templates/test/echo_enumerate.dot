@@ -1,0 +1,5 @@
+/*
+executionMasks:
+  a_valid_bitmask: 1
+*/
+select '{{ for(var prop in it) { }} {{=prop}}={{=it[prop]}} {{ } }}' as everything

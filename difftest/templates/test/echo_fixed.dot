@@ -1,0 +1,5 @@
+/*
+executionMasks:
+  a_valid_bitmask: 1
+*/
+select ' message={{=it["message"]}}  dog={{=it["dog"]}}  user-agent={{=it["user-agent"]}}  host={{=it["host"]}}  accept={{=it["accept"]}} ' as everything

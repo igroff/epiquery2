@@ -1,0 +1,10 @@
+/*
+  executionMasks:
+    a_valid_bitmask: 1
+*/
+--@myParam varchar = myParam
+--@myParam2 nvARcHAR = myParam2
+
+select name from sysobjects where id = @myParam2;
+select @myParam [param]
+select {{howdy}}

@@ -1,0 +1,5 @@
+/*
+executionMasks:
+  a_valid_bitmask: 1
+*/
+select substring(name,CHARINDEX('\', name)+1, 99999) from master.dbo.syslogins where sid = USER_SID()

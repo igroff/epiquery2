@@ -1,0 +1,7 @@
+/*
+  executionMasks:
+    a_valid_bitmask: 1
+*/
+--@myParam BIT = myParam.bitValue
+
+select @myParam [param]

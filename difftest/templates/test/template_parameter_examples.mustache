@@ -1,0 +1,22 @@
+/*
+  executionMasks:
+    a_valid_bitmask: 1
+*/
+
+--@varcharParam varchar = aVarchar
+--@nvarcharParam nvarchar = aNVarchar
+--@intParam int = anInt
+--@bitParam bit = aBit
+--@tinyIntParam tinyint = aTinyInt
+--@dateTimeParam datetime = aDateTime
+
+--@myVarcharParam varchar
+
+select @varcharParam [aVarchar]
+select @intParam [anInt]
+select @bitParam [aBit]
+select @tinyIntParam [aTinyInt]
+select @dateTimeParam [aDateTime]
+select @nvarcharParam [aNVarchar]
+select @myVarcharParam [myVarcharParam]
+select '{{itsMustache}}' [fromMustache]

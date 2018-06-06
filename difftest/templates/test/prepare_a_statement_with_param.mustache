@@ -1,0 +1,26 @@
+/*
+executionMasks:
+  a_valid_bitmask: 1
+*/
+use tempdb;
+if exists (select 1 from sysobjects where name ='__epiquery_test_table' and type ='u') 
+begin
+  drop table tempdb.dbo.__epiquery_test_table
+end
+
+  create table tempdb.dbo.__epiquery_test_table(
+    id int identity not null,
+    name varchar(25) null
+  )
+
+  insert into tempdb.dbo.__epiquery_test_table (name) values ('pants')
+  declare @id int
+  declare @sql nvarchar(255)
+  set @sql = 'select * from tempdb.dbo.__epiquery_test_table where id=@id'
+  exec sp_executesql @sql, N'@id int', {{id}}
+
+if exists (select 1 from sysobjects where name ='__epiquery_test_table' and type ='u') 
+begin
+  drop table tempdb.dbo.__epiquery_test_table
+end
+
