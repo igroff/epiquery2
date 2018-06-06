@@ -16,4 +16,4 @@ ADD . /var/app
 RUN make build
 
 #ENTRYPOINT ["/bin/bash"]
-CMD ["make", "start"]
+CMD ["./epistream.coffee"]
