@@ -185,11 +185,7 @@ executeQuery = (context, callback) ->
     core.removeInflightQuery context.templateName
     callback null, context
   QueryCircuitBreaker = breaker.factory(context.templateName, query, query.execute, breaker_config )
-<<<<<<< HEAD
   status = QueryCircuitBreaker.execute(context.driver, context, queryCompleteCallback)
-=======
-  status = QueryCircuitBreaker.execute(context.driver,context,queryCompleteCallback)  
->>>>>>> 1e2e90e9a4567ba7e951beb54051ec416b680d87
   attribs = {
     name: context.templateName,
     status: status
