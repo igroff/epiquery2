@@ -1,3 +1,0 @@
-#! /usr/bin/env bash
-source ~/.epiquery2/config
-./difftest/bin/templateRunner.coffee --templatePath ${TEMPLATE_DIRECTORY}/test/echo.mustache --context '{"pants":"blue jeans","message":"Clint Rulez!!!"}'
