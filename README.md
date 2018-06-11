@@ -1,5 +1,5 @@
 ## Websockets suck. I use 'normal' HTTP
- 
+
 
 Ok, so websockets can kind of suck.  And lots of people are more comfortable
 with the request/response behavior of 'standard' HTTP as opposed to the asynch
@@ -207,7 +207,7 @@ legacy apps so they don't have to unwillingly take new functionality.
 ##### Simple Client Example
 
       <script src="http://some.epiquery.server/static/js/epiclient_v3.js"></script>
-      <script type="text/javascript">   
+      <script type="text/javascript">
       //an array of urls is required
       client = new EpiClient([
         "ws://some.epiquery2.server/sockjs/websocket",
@@ -274,9 +274,10 @@ the templates will be put into a directory named 'templates' within epiquery's w
 the JSON encoded information needed to configure the various drivers.  Ya, gnarly.  We'll do this one through examples.
 * `ENABLE_TEMPLATE_ACLS` - (optional) ACLs are enabled by default, however it's possible to disable them by setting
 this to the string 'DISABLED'
-* `HTTP_REQUEST_TIMEOUT_IN_SECONDS` - Number of seconds after which node will timeout connections, specifically this is used 
+* `HTTP_REQUEST_TIMEOUT_IN_SECONDS` - Number of seconds after which node will timeout connections, specifically this is used
 to set [server.setTimeout(x)](https://nodejs.org/docs/latest-v5.x/api/http.html#http_request_settimeout_timeout_callback) which
 defaults to 2 minutes both in node and here in epiquery2.
+* `EPI_SCREAMER_URL` - Set this to `https://services.glgresearch.com/epi-screamer/epiquery`. In development mode, we post every epiquery2 request context here to aid in debugging when it comes time to create pull requests against the GLG `epiquery-templates` repository.
 
 #### Sample Configuration (~/.epiquery2/config)
         export TEMPLATE_REPO_URL=https://github.com/intimonkey/epiquery-templates.git
@@ -368,7 +369,7 @@ very concise and simple, it should support a robust handling of that functionali
   this has some limitations (like not handling duplicate column names) but in
   many cases it's simpler to use.
 * mysql - uses the mysql npm package
-* file - Expects that the result of a template render will be a valid path.  
+* file - Expects that the result of a template render will be a valid path.
   Given the result of the rendered template, it attempts to open the file
   indicated and stream the results line-at-a-time to the caller.  Each line
   comes through as a 'row' event.
