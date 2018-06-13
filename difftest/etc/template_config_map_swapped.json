@@ -1,0 +1,4 @@
+{
+  "test/mssql_suser_a": "suser_b",
+  "test/mssql_suser_b": "suser_a"
+}
