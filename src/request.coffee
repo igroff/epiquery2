@@ -68,6 +68,14 @@ selectConnection = (context, callback) ->
     if not context.connectionName
       context.emit "no connection specified"
       return callback 'no connection specified'
+    # so if we have a specific connetion mapped to this template, we use it otherwise
+    # we use the one specified in the context. This means that the templateToConnectionMap
+    # overrides any specified inbound connection.
+    if config.templateToConnectionMap[context.templateName]
+      if config.connections[config.templateToConnectionMap[context.templateName]]
+        context.connectionName = config.templateToConnectionMap[context.templateName]
+      else
+        log.error "template to connection map maps template #{context.templateName} to invalid connection #{config.templateToConnectionMap[context.templateName]}"
     context.connection = config.connections[context.connectionName]
     if not context.connection
       msg = "unable to find connection '#{context.connectionName}'"
@@ -76,6 +84,7 @@ selectConnection = (context, callback) ->
       return callback msg
   else
     context.connection = connectionConfig
+  
   context.driver = core.selectDriver context.connection
 
   # Replica check here...

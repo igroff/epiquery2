@@ -52,6 +52,19 @@ app.get '/diagnostic', (req, res) ->
     response.aclsEnabled = config.enableTemplateAcls
   res.send response
 
+app.post '/templateToConnectionMap', (req, res) ->
+  try
+    config.templateToConnectionMap = req.body
+    log.warn "updated template to connetion map from runtime request: ", config.templateToConnectionMap
+    res.status(200).send({"msg": "ok"})
+  catch e
+    log.error "error setting template to connection map:", e
+    log.error req.body
+    res.status(500).send({"msg": "error setting template to connetion map"})
+
+app.get '/templateToConnectionMap', (req, res) ->
+  res.status(200).send(config.templateToConnectionMap)
+  
 app.get '/templates', (req, res) ->
   response =
     templates: []
