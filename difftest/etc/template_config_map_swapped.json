@@ -1,4 +1,6 @@
 {
   "test/mssql_suser_a": "suser_b",
-  "test/mssql_suser_b": "suser_a"
+  "test/mssql_suser_b": "suser_a",
+  "test/template_with_invalid_mapping": "invalid_connection_name",
+  "test/this_template_should_never_run": "/dev/null"
 }

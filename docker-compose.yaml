@@ -23,7 +23,8 @@ services:
     environment:
       - PORT=8080
       - TEMPLATE_DIRECTORY=/var/app/difftest/templates
-      - CONNECTIONS=EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_FILE EPI_C_MYSQL EPI_C_RENDER SFDC NON_EXISTENT_SERVER EPI_C_TIMESOUT EPI_C_MYSQL_BULK
+      - TEMPLATE_TO_CONNECTION_MAP_CONFIG_FILE=/var/app/difftest/etc/template_config_map_orig.json
+      - CONNECTIONS=EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_FILE EPI_C_MYSQL EPI_C_RENDER SFDC NON_EXISTENT_SERVER EPI_C_TIMESOUT EPI_C_MYSQL_BULK SUSER_A SUSER_B
       - EPI_C_FILE={"driver":"file","config":{},"name":"file"}
       - EPI_C_RENDER={"driver":"render","config":{},"name":"render"}
       - EPI_C_MSSQL={"driver":"mssql","name":"mssql","config":{"server":"${IPAddress}","password":"${MSSQLPassword}","userName":"${MSSQLUsername}","options":{"port":1433, "requestTimeout":0}}}
@@ -32,6 +33,8 @@ services:
       - EPI_C_MYSQL={"name":"mysql","driver":"mysql","config":{"host":"mysql","user":"root","password":"mysql_root_password"}}
       - EPI_C_MYSQL_BULK={"name":"mysql_bulk", "type":"bulk","driver":"mysql","config":{"host":"mysql","user":"root","password":"mysql_root_password"}}
       - SFDC={"name":"sfdc","driver":"salesforce","config":{"userName":"financeintegration@glgroup.com","password":"GLgroup7890T9upWPVp4E7lCmong4oHrEqD","server":"https://login.salesforce.com"}}
+      - SUSER_A={"driver":"mssql","name":"suser_a","config":{"server":"${IPAddress}","password":"shitbiscuits1234!","userName":"suser-test-a","options":{"port":1433, "requestTimeout":0}}}
+      - SUSER_B={"driver":"mssql","name":"suser_b","config":{"server":"${IPAddress}","password":"shitbiscuits1234!","userName":"suser-test-b","options":{"port":1433, "requestTimeout":0}}}
       - NON_EXISTENT_SERVER={"driver":"mssql","name":"no_server","config":{"server":"no_server.pants.monkey.underware","password":"vagrant","userName":"vagrant","options":{"port":1433}}}
       - LOCK_DIRECTORY=~/tmp
       - FORKS=1

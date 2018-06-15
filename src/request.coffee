@@ -74,6 +74,11 @@ selectConnection = (context, callback) ->
     if config.templateToConnectionMap[context.templateName]
       if config.connections[config.templateToConnectionMap[context.templateName]]
         context.connectionName = config.templateToConnectionMap[context.templateName]
+      else if config.templateToConnectionMap[context.templateName] is "/dev/null"
+        # this is a special configuration allowing us to just dump the execution of this template,
+        # this is intended to be a short term configuration used to avoid the penalty of bad or
+        # unexepected template behavior
+        callback(new Error("templateToConnectionMap specified explicit failure for this template (#{context.templateName})"))
       else
         log.error "template to connection map maps template #{context.templateName} to invalid connection #{config.templateToConnectionMap[context.templateName]}"
     context.connection = config.connections[context.connectionName]

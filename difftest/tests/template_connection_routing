@@ -4,7 +4,7 @@ curl -s http://localhost:8080/simple/mssql/test/mssql_suser_a
 echo
 curl -s http://localhost:8080/simple/mssql/test/mssql_suser_b
 echo
-curl http://localhost:8080/templateToConnectionMap \
+curl -s http://localhost:8080/templateToConnectionMap \
     -H 'Content-Type: application/json' \
     --data-binary "@${MY_DIR}/../etc/template_config_map_swapped.json"
 echo
@@ -12,6 +12,6 @@ curl -s http://localhost:8080/simple/mssql/test/mssql_suser_a
 echo
 curl -s http://localhost:8080/simple/mssql/test/mssql_suser_b
 echo
-curl http://localhost:8080/templateToConnectionMap \
+curl -s http://localhost:8080/templateToConnectionMap \
     -H 'Content-Type: application/json' \
     --data-binary "@${MY_DIR}/../etc/template_config_map_orig.json"

@@ -1,0 +1,1 @@
+{"results":[{"message":"error","errorDetail":{},"error":"templateToConnectionMap specified explicit failure for this template (test/this_template_should_never_run)"}]}

@@ -1,0 +1,10 @@
+{"results":[[{"undefined":"suser-test-a"}]]}
+{"results":[[{"undefined":"suser-test-b"}]]}
+{
+  "msg": "ok"
+}
+{"results":[[{"undefined":"suser-test-b"}]]}
+{"results":[[{"undefined":"suser-test-a"}]]}
+{
+  "msg": "ok"
+}

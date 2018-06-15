@@ -1,0 +1,4 @@
+#! /usr/bin/env bash
+# this has an invalid connection mapping specified in the routing config, it should thus
+# default to the one in the url
+curl -s http://localhost:8080/simple/mssql/test/template_with_invalid_mapping
