@@ -1,6 +1,6 @@
 - type: serial
   steps:
     - service: epiquerytest
-      name: "Step 1"
-      tag: "codeship"
+      name: "Run Difftests"
+      exclude: ^deploy.*
       command: make test/codeship

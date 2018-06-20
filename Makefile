@@ -19,7 +19,8 @@ test: build difftest/templates
 	
 
 test/codeship: build difftest/templates
-	jet steps --tag codeship
+	./bin/wait-for-epi
+	difftest run
 
 pass/%:
 	cp difftest/results/$(subst pass/,,$@) difftest/expected/$(subst pass/,,$@)
