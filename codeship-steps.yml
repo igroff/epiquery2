@@ -1,0 +1,6 @@
+- type: serial
+  steps:
+    - service: epiquerytest
+      name: "Step 1"
+      tag: "codeship"
+      command: make test/codeship
