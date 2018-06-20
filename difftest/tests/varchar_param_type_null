@@ -1,2 +1,2 @@
 #! /usr/bin/env bash
-curl -s 'http://localhost:8080/simple/mssql/test/template_parameter.executesql' -H 'Content-type: application/json' --data '{"myParam":null,"myParam2": 1}' | jq .
+curl -s http://${EPI_TEST_SERVER}:8080/simple/mssql/test/template_parameter.executesql -H 'Content-type: application/json' --data '{"myParam":null,"myParam2": 1}' | jq .
