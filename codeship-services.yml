@@ -31,7 +31,7 @@ services:
       - NEW_RELIC_APP_NAME=epiops-dev,services-dev
       - NEW_RELIC_NO_CONFIG_FILE=true
       - NEW_RELIC_LICENSE_KEY=bd51b51debfc060bba7f64f71e6dc22a41a6c3d6
-      - NEW_RELIC_LABELS=ENVIRONMENT:PROD;
+      - NEW_RELIC_LABELS=ENVIRONMENT:DEV;
       - ENABLE_TEMPLATE_ACLS=DISABLED
     depends_on:
       - mysql
@@ -57,7 +57,7 @@ services:
       - NEW_RELIC_APP_NAME=epiops-dev,services-dev
       - NEW_RELIC_NO_CONFIG_FILE=true
       - NEW_RELIC_LICENSE_KEY=bd51b51debfc060bba7f64f71e6dc22a41a6c3d6
-      - NEW_RELIC_LABELS=ENVIRONMENT:PROD;
+      - NEW_RELIC_LABELS=ENVIRONMENT:DEV;
       - EPI_TEST_SERVER=epiquery
       - ENABLE_TEMPLATE_ACLS=DISABLED
     add_docker: true
