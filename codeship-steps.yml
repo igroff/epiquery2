@@ -17,7 +17,7 @@
     - name: "Deploy to Prod"
       service: epiquery  
       type: push    
-      exclude: ^master_mock
+      tag: ^master_mock
       image_name: 054501475751.dkr.ecr.us-east-1.amazonaws.com/glg/epiquery2
       registry: https://054501475751.dkr.ecr.us-east-1.amazonaws.com
       dockercfg_service: dockercfg_generator
