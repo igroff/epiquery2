@@ -12,6 +12,7 @@
       image_name: 054501475751.dkr.ecr.us-east-1.amazonaws.com/glg/epiquery2
       registry: https://054501475751.dkr.ecr.us-east-1.amazonaws.com
       dockercfg_service: dockercfg_generator
+      image_tag: "{{ .CommitID }}"
 
     - name: "Deploy to Prod"
       service: epiquery  
