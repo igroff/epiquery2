@@ -1,4 +1,4 @@
-from node:5.5.0
+FROM node:5.5.0
 
 RUN apt-get update
 RUN apt-get install make 

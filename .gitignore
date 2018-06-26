@@ -5,3 +5,4 @@ difftest/results/*
 node_modules/
 pids/
 newrelic_agent.log
+codeship.aes

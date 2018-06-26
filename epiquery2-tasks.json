@@ -1,0 +1,39 @@
+{
+    "containerDefinitions": [ 
+       { 
+          "command": [
+             ""
+          ],
+          "entryPoint": [
+             "sh",
+             "-c"
+          ],
+          "essential": true,
+          "image": "node:5.5.0",
+          "logConfiguration": { 
+             "logDriver": "awslogs",
+             "options": { 
+                "awslogs-group" : "/ecs/fargate-epiquery2",
+                "awslogs-region": "us-east-1",
+                "awslogs-stream-prefix": "ecs"
+             }
+          },
+          "name": "epiquery2",
+          "portMappings": [ 
+             { 
+                "containerPort": 80,
+                "hostPort": 80,
+                "protocol": "tcp"
+             }
+          ]
+       }
+    ],
+    "cpu": "256",
+    "executionRoleArn": "arn:aws:iam::012345678910:role/ecsTaskExecutionRole",
+    "family": "epiqquery2-task-definition",
+    "memory": "512",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": [ 
+        "FARGATE" 
+     ]
+ }
