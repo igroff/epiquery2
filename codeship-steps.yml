@@ -2,22 +2,26 @@
   steps:
     - name: "Run Difftests"
       service: epiquerytest     
-      exclude: ^deploy.*
+      exclude: (^deploy.*|^master_mock$)
       command: make test/codeship
 
-    - name: "Push to Build to ECR"
+    - name: "Push to ECR"
       service: epiquery      
       type: push
-      exclude: ^deploy.* | ^master_mock
+      exclude: (^deploy.*|^master_mock$)
       image_name: 054501475751.dkr.ecr.us-east-1.amazonaws.com/glg/epiquery2
       registry: https://054501475751.dkr.ecr.us-east-1.amazonaws.com
       dockercfg_service: dockercfg_generator
       image_tag: "{{ .CommitID }}"
 
-    - name: "Deploy to Prod"
+    - name: "Tag build as Latest"
       service: epiquery  
       type: push    
       tag: ^master_mock
       image_name: 054501475751.dkr.ecr.us-east-1.amazonaws.com/glg/epiquery2
       registry: https://054501475751.dkr.ecr.us-east-1.amazonaws.com
       dockercfg_service: dockercfg_generator
+
+    - name: "Update Service"
+      service: awsdeployment
+      command: aws ecs update-service --cluster epistream --service epistream --force-new-deployment
