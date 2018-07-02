@@ -1,17 +1,20 @@
 version: "3"
 services:
   mysql:
+    container_name: mysqldoc
     image: mysql:5.7.11
     environment:
       - MYSQL_ROOT_PASSWORD=mysql_root_password
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=epiquery
   mssql:
+    container_name: mssql
     image: microsoft/mssql-server-linux:2017-latest
     environment:
       - ACCEPT_EULA=Y 
       - SA_PASSWORD=YourV3ryStrong!Passw0rd
   epiquery:
+    container_name: epiquery
     build: .
     environment:
       - PORT=8080
@@ -33,10 +36,12 @@ services:
       - NEW_RELIC_LICENSE_KEY=bd51b51debfc060bba7f64f71e6dc22a41a6c3d6
       - NEW_RELIC_LABELS=ENVIRONMENT:DEV;
       - ENABLE_TEMPLATE_ACLS=DISABLED
+      - STAGE=local
     depends_on:
       - mysql
       - mssql
   epiquerytest:
+    container_name: test_runner
     build: 
       dockerfile: ./Dockerfile
     environment:
@@ -60,6 +65,7 @@ services:
       - NEW_RELIC_LABELS=ENVIRONMENT:DEV;
       - EPI_TEST_SERVER=epiquery
       - ENABLE_TEMPLATE_ACLS=DISABLED
+      - STAGE=local
     add_docker: true
     depends_on:
       - epiquery

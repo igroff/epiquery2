@@ -23,5 +23,6 @@
       dockercfg_service: dockercfg_generator
 
     - name: "Update Service"
+      tag: ^master_mock
       service: awsdeployment
       command: aws ecs update-service --cluster epistream --service epistream --force-new-deployment

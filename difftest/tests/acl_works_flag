@@ -1,9 +1,9 @@
 #! /usr/bin/env bash
 exec 2>&1
 # enable ACLs
-EPI_CONAINER=$(docker ps | grep "./epistream.coffee" | awk '{print $1}')
+EPI_CONTAINER=$(docker ps | awk '{print $NF}' |grep -E "(epiquery-RunDifftests|epiquery$)")
 
-docker kill --signal=SIGUSR2 ${EPI_CONAINER} > /dev/null 2>&1
+docker kill --signal=SIGUSR2 ${EPI_CONTAINER} > /dev/null 2>&1
 curl -s -H "jwt-test: 2" http://${EPI_TEST_SERVER}:8080/epiquery1/mssql/test/acl_tests.mustache
 # disable ACLs
-docker kill --signal=SIGUSR1 ${EPI_CONAINER} > /dev/null 2>&1
+docker kill --signal=SIGUSR1 ${EPI_CONTAINER} > /dev/null 2>&1

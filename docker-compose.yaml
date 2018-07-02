@@ -1,6 +1,7 @@
 version: "3"
 services:
   mysql:
+    container_name: mysql
     image: mysql:5.7.22
     restart: always
     ports:
@@ -10,6 +11,7 @@ services:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=epiquery
   mssql:
+    container_name: mssql
     image: microsoft/mssql-server-linux:2017-latest
     ports:
       - "1433:1433"
@@ -51,6 +53,7 @@ services:
       - NEW_RELIC_LICENSE_KEY=bd51b51debfc060bba7f64f71e6dc22a41a6c3d6
       - NEW_RELIC_LABELS=ENVIRONMENT:PROD;
       - ENABLE_TEMPLATE_ACLS=DISABLED
+      - STAGE=local
     depends_on:
       - mysql 
       - mssql
