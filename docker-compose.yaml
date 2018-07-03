@@ -37,7 +37,7 @@ services:
       - SUSER_B={"driver":"mssql","name":"suser_b","config":{"server":"${IPAddress}","password":"shitbiscuits1234!","userName":"suser-test-b","options":{"port":1433, "requestTimeout":0}}}
       - NON_EXISTENT_SERVER={"driver":"mssql","name":"no_server","config":{"server":"no_server.pants.monkey.underware","password":"vagrant","userName":"vagrant","options":{"port":1433}}}
       - LOCK_DIRECTORY=~/tmp
-      - FORKS=1
+      - FORKS=2
       - NEW_RELIC_APP_NAME=epiops-dev,services-dev
       - NEW_RELIC_NO_CONFIG_FILE=true
       - NEW_RELIC_LICENSE_KEY=bd51b51debfc060bba7f64f71e6dc22a41a6c3d6

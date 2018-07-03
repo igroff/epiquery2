@@ -78,5 +78,6 @@ config =
   enableTemplateAcls: ENABLE_TEMPLATE_ACLS
   epiScreamerUrl: process.env.EPI_SCREAMER_URL
   templateToConnectionMap: TEMPLATE_TO_CONNECTION_MAP
+  templateToConnectionMapConfigFile: TEMPLATE_TO_CONNECTION_MAP_CONFIG_FILE
 
 module.exports = config

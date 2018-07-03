@@ -9,6 +9,9 @@ start: run-server
 run-server: static/js/epiclient_v2.js static/js/epiclient_v3.js
 	exec ./bin/npm-starter
 
+start-bare:
+	exec ./epistream.coffee
+
 difftest/templates:
 	cd difftest/ && git clone https://github.com/igroff/epiquery-templates.git \
 		templates/

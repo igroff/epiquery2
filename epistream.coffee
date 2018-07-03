@@ -17,6 +17,9 @@ httpClient          = require './src/transport/http.coffee'
 queryRequestHandler = require('./src/request.coffee').queryRequestHandler
 
 
+forks = {}
+cluster = {}
+
 app = express()
 app.use express.favicon()
 app.use express.bodyParser()
@@ -55,6 +58,7 @@ app.get '/diagnostic', (req, res) ->
 app.post '/templateToConnectionMap', (req, res) ->
   try
     config.templateToConnectionMap = req.body
+    cluster.notifyWorkers config.templateToConnectionMap
     log.warn "updated template to connetion map from runtime request: ", config.templateToConnectionMap
     res.status(200).send({"msg": "ok"})
   catch e
@@ -112,7 +116,7 @@ socketServer.on 'connection', (conn) ->
     newrelic.startWebTransaction(message.templateName)
     if apiKey
       if !~ conn.url.indexOf apiKey
-        conn.close() 
+        conn.close()
         log.error "Unauthorized Socket Access Attempted from IP: #{conn.remoteAddress}"
         log.error "Unauthorized Context: #{JSON.stringify(message)}"
         newrelic.noticeError(new Error("Unauthorized Socket Access Attempted"), message)
@@ -169,5 +173,13 @@ if config.isDevelopmentMode() and config.forks is 1
   cluster = new Cluster(port: config.port, cluster:false, timeout:config.httpRequestTimeoutInSeconds * 1000)
 else
   cluster = new Cluster(port: config.port, noWorkers:config.forks, timeout:config.httpRequestTimeoutInSeconds * 1000)
+
+# This is tracking of our worker pids so we can notifiy them of things
+# as needed
+cluster.on 'fork', (pid) ->
+  forks["pid_" + pid] = true
+
+cluster.on 'died', (pid) ->
+  delete(forks["pid_" + pid])
 
 cluster.listen (cb) -> cb(server)
