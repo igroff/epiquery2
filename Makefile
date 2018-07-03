@@ -14,7 +14,7 @@ difftest/templates:
 		templates/
 
 test: build difftest/templates
-	./bin/start-docker-container
+	docker-compose up --force-recreate -d
 	./bin/wait-for-epi
 	difftest run ${TEST_NAME}
 
