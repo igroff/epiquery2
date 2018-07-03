@@ -32,7 +32,6 @@ services:
       - EPI_C_TIMESOUT={"driver":"mssql","name":"timesout","config":{"server":"localhost","password":"vagrant","userName":"vagrant","options":{"port":1433, "requestTimeout":1}}}
       - EPI_C_MYSQL={"name":"mysql","driver":"mysql","config":{"host":"mysql","user":"root","password":"mysql_root_password"}}
       - EPI_C_MYSQL_BULK={"name":"mysql_bulk", "type":"bulk","driver":"mysql","config":{"host":"mysql","user":"root","password":"mysql_root_password"}}
-      - SFDC={"name":"sfdc","driver":"salesforce","config":{"userName":"financeintegration@glgroup.com","password":"GLgroup7890T9upWPVp4E7lCmong4oHrEqD","server":"https://login.salesforce.com"}}
       - SUSER_A={"driver":"mssql","name":"suser_a","config":{"server":"${IPAddress}","password":"shitbiscuits1234!","userName":"suser-test-a","options":{"port":1433, "requestTimeout":0}}}
       - SUSER_B={"driver":"mssql","name":"suser_b","config":{"server":"${IPAddress}","password":"shitbiscuits1234!","userName":"suser-test-b","options":{"port":1433, "requestTimeout":0}}}
       - NON_EXISTENT_SERVER={"driver":"mssql","name":"no_server","config":{"server":"no_server.pants.monkey.underware","password":"vagrant","userName":"vagrant","options":{"port":1433}}}
