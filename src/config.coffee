@@ -13,8 +13,6 @@ TEMPLATE_DIRECTORY=hack_tilde(process.env.TEMPLATE_DIRECTORY ||
 DRIVER_DIRECTORY=hack_tilde(process.env.DRIVER_DIRECTORY) || null
 PORT=process.env.PORT || 9090
 CONNECTIONS={}
-FORKS=Number.parseInt(process.env.FORKS) || 8
-FORKS=2 unless FORKS > 0
 TEMPLATE_CHANGE_FILE=process.env.TEMPLATE_CHANGE_FILE || path.join(TEMPLATE_DIRECTORY, ".change")
 NODE_ENV=process.env.NODE_ENV || "development"
 EPISTREAM_API_KEY=process.env.EPISTREAM_API_KEY
@@ -48,7 +46,6 @@ config =
   templateDirectory: TEMPLATE_DIRECTORY
   driverDirectory: DRIVER_DIRECTORY
   connections: CONNECTIONS
-  forks: FORKS
   allowedTemplates: allowedTemplates
   templateChangeFile: TEMPLATE_CHANGE_FILE
   responseTransformDirectory: path.join(TEMPLATE_DIRECTORY, 'response_transforms')

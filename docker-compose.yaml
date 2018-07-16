@@ -52,7 +52,6 @@ services:
       - SFDC={"name":"sfdc","driver":"salesforce","config":{"userName":"financeintegration@glgroup.com","password":"GLgroup7890T9upWPVp4E7lCmong4oHrEqD","server":"http://sfdc"}}
       - NON_EXISTENT_SERVER={"driver":"mssql","name":"no_server","config":{"server":"no_server.pants.monkey.underware","password":"vagrant","userName":"vagrant","options":{"port":1433}}}
       - LOCK_DIRECTORY=~/tmp
-      - FORKS=1
       - EPI_TEST_SERVER=localhost
       - NEW_RELIC_APP_NAME=epiops-dev,services-dev
       - NEW_RELIC_NO_CONFIG_FILE=true

@@ -2,7 +2,6 @@
 # vim:ft=coffee
 
 newrelic  = require 'newrelic'
-cluster   = require 'cluster'
 express   = require 'express'
 _         = require 'underscore'
 path      = require 'path'
