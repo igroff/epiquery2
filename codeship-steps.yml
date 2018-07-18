@@ -29,12 +29,12 @@
       image_name: 054501475751.dkr.ecr.us-east-1.amazonaws.com/glg/epiquery2
       registry: https://054501475751.dkr.ecr.us-east-1.amazonaws.com
       dockercfg_service: dockercfg_generator
-      image_tag: "deploy2"
+      image_tag: "deployB"
 
 - name: "Tag build as Deploy2"
       service: epiquery  
       type: push    
-      tag: ^master_mock_A
+      tag: ^master_mock_a
       image_name: 054501475751.dkr.ecr.us-east-1.amazonaws.com/glg/epiquery2
       registry: https://054501475751.dkr.ecr.us-east-1.amazonaws.com
       dockercfg_service: dockercfg_generator
