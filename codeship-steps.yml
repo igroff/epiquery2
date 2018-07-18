@@ -17,7 +17,7 @@
     - name: "Tag build as Latest"
       service: epiquery  
       type: push    
-      tag: ^master_mock
+      tag: ^master_mock_A
       image_name: 054501475751.dkr.ecr.us-east-1.amazonaws.com/glg/epiquery2
       registry: https://054501475751.dkr.ecr.us-east-1.amazonaws.com
       dockercfg_service: dockercfg_generator
@@ -25,11 +25,20 @@
     - name: "Tag build as Deploy2"
       service: epiquery  
       type: push    
-      tag: ^master_mock_2
+      tag: ^master_mock_B
       image_name: 054501475751.dkr.ecr.us-east-1.amazonaws.com/glg/epiquery2
       registry: https://054501475751.dkr.ecr.us-east-1.amazonaws.com
       dockercfg_service: dockercfg_generator
       image_tag: "deploy2"
+
+- name: "Tag build as Deploy2"
+      service: epiquery  
+      type: push    
+      tag: ^master_mock_A
+      image_name: 054501475751.dkr.ecr.us-east-1.amazonaws.com/glg/epiquery2
+      registry: https://054501475751.dkr.ecr.us-east-1.amazonaws.com
+      dockercfg_service: dockercfg_generator
+      image_tag: "deployA"
 
     - name: "Update Service"
       tag: ^master_mock
