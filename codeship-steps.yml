@@ -22,7 +22,7 @@
       registry: https://054501475751.dkr.ecr.us-east-1.amazonaws.com
       dockercfg_service: dockercfg_generator
 
-    - name: "Tag build as Deploy2"
+    - name: "Tag build as DeployB"
       service: epiquery  
       type: push    
       tag: ^master_mock_B
@@ -31,7 +31,7 @@
       dockercfg_service: dockercfg_generator
       image_tag: "deployB"
 
-    - name: "Tag build as Deploy2"
+    - name: "Tag build as DeployA"
       service: epiquery  
       type: push    
       tag: ^master_mock_a
