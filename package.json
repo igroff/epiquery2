@@ -6,7 +6,7 @@
     "coffeelint": "0.6.1",
     "jshint": "2.3.0",
     "sockjs-client": "0.1.3",
-    "difftest-runner": "0.0.9",
+    "difftest-runner": "igroff/difftest-runner.git",
     "ws": "~0.4.31"
   },
   "dependencies": {

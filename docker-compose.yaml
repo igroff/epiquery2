@@ -29,6 +29,7 @@ services:
       - "8080:8080"
     volumes: 
       - .:/var/app # mount the directory containing this file (the root of the epiquery2 repo) as /var/app in the container
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - PORT=8080
       - TEMPLATE_DIRECTORY=/var/app/difftest/templates
@@ -44,6 +45,11 @@ services:
       - NON_EXISTENT_SERVER={"driver":"mssql","name":"no_server","config":{"server":"no_server.pants.monkey.underware","password":"vagrant","userName":"vagrant","options":{"port":1433}}}
       - LOCK_DIRECTORY=~/tmp
       - FORKS=1
+      - EPI_TEST_SERVER=localhost
+      - NEW_RELIC_APP_NAME=epiops-dev,services-dev
+      - NEW_RELIC_NO_CONFIG_FILE=true
+      - NEW_RELIC_LICENSE_KEY=bd51b51debfc060bba7f64f71e6dc22a41a6c3d6
+      - NEW_RELIC_LABELS=ENVIRONMENT:PROD;
       - ENABLE_TEMPLATE_ACLS=DISABLED
     depends_on:
       - mysql 

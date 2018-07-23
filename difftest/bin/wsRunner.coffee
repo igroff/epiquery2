@@ -20,7 +20,7 @@ PORT=process.env.PORT || 8080
 
 
 
-bc = new EpiBufferingClient "ws://localhost:8080/sockjs/websocket"
+bc = new EpiBufferingClient "ws://#{SERVER}:8080/sockjs/websocket"
 bc.output = []
 bc.beginquery = {}
 bc.on 'beginquery', (msg) -> 
@@ -40,7 +40,7 @@ res = {}
 
 
 # capture our events so we can disply the results in a deterministic order
-c = new EpiClient "ws://localhost:8080/sockjs/websocket"
+c = new EpiClient "ws://#{SERVER}:8080/sockjs/websocket"
 nonBufferingClientDone = Q.defer()
 c.rowOutput = []
 c.on 'beginquery', (msg) ->
