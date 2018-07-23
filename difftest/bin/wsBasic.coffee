@@ -28,7 +28,7 @@ SERVER=process.env.EPI_TEST_SERVER || "localhost"
 PORT=process.env.PORT || 8080
 
 # capture our events so we can disply the results in a deterministic order
-c = new EpiClient "ws://localhost:8080/sockjs/websocket"
+c = new EpiClient "ws://#{SERVER}:8080/sockjs/websocket"
 c.rowOutput = []
 c.dataOutput = []
 c.errorOutput = []

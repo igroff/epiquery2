@@ -1,2 +1,2 @@
 #! /usr/bin/env bash
-curl -s 'http://localhost:8080/mssql/test/sproc_template_not_rendered.sproc'
+curl -s http://${EPI_TEST_SERVER}:8080/mssql/test/sproc_template_not_rendered.sproc

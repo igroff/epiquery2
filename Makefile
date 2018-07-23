@@ -12,11 +12,14 @@ run-server: static/js/epiclient_v2.js static/js/epiclient_v3.js
 difftest/templates:
 	cd difftest/ && git clone https://github.com/igroff/epiquery-templates.git \
 		templates/
-
 test: build difftest/templates
 	docker-compose up --force-recreate -d
 	./bin/wait-for-epi
-	difftest run ${TEST_NAME}
+	docker-compose exec epiquery difftest run ${TEST_NAME}
+
+test/codeship: build difftest/templates
+	./bin/wait-for-epi
+	difftest run
 
 start-container: build difftest/templates
 	docker-compose up --force-recreate -d
