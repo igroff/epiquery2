@@ -82,12 +82,12 @@ httpRequestHandler = (req, res) ->
     if !(c.clientKey == apiKey)
       log.error "Unauthorized HTTP Access Attempted from IP: #{req.connection.remoteAddress}"
       log.error "Unauthorized Context: #{JSON.stringify(c.templateContext)}"
-      newrelic.noticeError(new Error("Unauthorized Socket Access Attempted"), c)
+      newrelic.noticeError(new Error("Unauthorized Socket Access Attempted"))
       res.send error: "Unauthorized Access"
       return
 
   if c.connectionName and not config.connections[c.connectionName]
-    newrelic.noticeError(new Error("Unable to find connection by name"), c)
+    newrelic.noticeError(new Error("Unable to find connection by name"))
     res.send error: "unable to find connection by name '#{c.connectionName}'"
     return
   httpClient.attachResponder c, res
@@ -102,7 +102,7 @@ socketServer.on 'connection', (conn) ->
         conn.close() 
         log.error "Unauthorized Socket Access Attempted from IP: #{conn.remoteAddress}"
         log.error "Unauthorized Context: #{JSON.stringify(message)}"
-        newrelic.noticeError(new Error("Unauthorized Socket Access Attempted"), message)
+        newrelic.noticeError(new Error("Unauthorized Socket Access Attempted"))
         return
 
     log.debug "inbound message #{message}"
