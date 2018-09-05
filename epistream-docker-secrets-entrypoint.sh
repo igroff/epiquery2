@@ -12,7 +12,11 @@ if [ "$STAGE" != "local" ]; then
     # Load the S3 secrets file contents into the environment variables
     echo "LOADING SECRETS"
     exists=$(aws s3 ls s3://${SECRETS_BUCKET_NAME}/${DEPLOYMENT_CLUSTER}/${STAGE}/.secrets)
-    VARS=$(aws s3 cp s3://${SECRETS_BUCKET_NAME}/${DEPLOYMENT_CLUSTER}/${STAGE}/.secrets -)
+    if [ -z "$exists" ]; then
+        echo "No Secrets file provided by HQ"
+    else
+        VARS=$(aws s3 cp s3://${SECRETS_BUCKET_NAME}/${DEPLOYMENT_CLUSTER}/${STAGE}/.secrets -)
+    fi
 
     #Load env var from s3 into environment
     echo "LOADING ENV VARS"

@@ -40,7 +40,7 @@
       dockercfg_service: dockercfg_generator
       image_tag: "deployA"
 
-    - name: "Update Service"
+    - name: "Update Epiops_Dest"
       tag: ^master_mock
       service: awsdeployment
-      command: aws ecs update-service --cluster epistream --service epistream --force-new-deployment
+      command: aws ecs update-service --cluster ecs-epiquery --service epiops_dest --force-new-deployment
