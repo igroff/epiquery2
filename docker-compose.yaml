@@ -40,6 +40,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - PORT=8080
+      - EPISTREAM_API_KEY=48BD02FF-8F7C-4C31-918B-4CE20455578A
+      - URL_BASED_API_KEY=true      
       - TEMPLATE_DIRECTORY=/var/app/difftest/templates
       - CONNECTIONS=EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_FILE EPI_C_MYSQL EPI_C_RENDER SFDC NON_EXISTENT_SERVER EPI_C_TIMESOUT EPI_C_MYSQL_BULK
       - EPI_C_FILE={"driver":"file","config":{},"name":"file"}
