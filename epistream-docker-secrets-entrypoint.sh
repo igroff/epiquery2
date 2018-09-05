@@ -16,6 +16,7 @@ if [ "$STAGE" != "local" ]; then
         echo "No Secrets file provided by HQ"
     else
         VARS=$(aws s3 cp s3://${SECRETS_BUCKET_NAME}/${DEPLOYMENT_CLUSTER}/${STAGE}/.secrets -)
+        eval "${VARS}"
     fi
 
     #Load env var from s3 into environment
