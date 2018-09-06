@@ -83,7 +83,9 @@ httpRequestHandler = (req, res) ->
     if !(c.clientKey == apiKey)
       log.error "Unauthorized HTTP Access Attempted from IP: #{req.connection.remoteAddress}"
       log.error "Unauthorized Context: #{JSON.stringify(c.templateContext)}"
-      newrelic.noticeError(new Error("Unauthorized Socket Access Attempted"), c)
+      log.error JSON.stringify({path:req.path, clientKey:c.clientKey})
+      
+      newrelic.noticeError(new Error("Unauthorized HTTP Access Attempted"), c)
       res.send error: "Unauthorized Access"
       return
 
