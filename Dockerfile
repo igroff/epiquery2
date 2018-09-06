@@ -23,7 +23,7 @@ RUN npm install -g coffee-script
 RUN mkdir /var/app
 WORKDIR /var/app
 ADD . /var/app
-
+RUN mkdir /var/config
 
 RUN make build
 

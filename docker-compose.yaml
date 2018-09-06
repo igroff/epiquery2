@@ -10,6 +10,9 @@ services:
       - MYSQL_ROOT_PASSWORD=mysql_root_password
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=epiquery
+    networks:
+        - local 
+
   mssql:
     container_name: mssql
     image: microsoft/mssql-server-linux:2017-latest
@@ -18,6 +21,8 @@ services:
     environment:
       - ACCEPT_EULA=Y 
       - SA_PASSWORD=YourV3ryStrong!Passw0rd
+    networks:
+        - local 
 
   sfdc:
     build: ./mock-salesforce
@@ -25,6 +30,8 @@ services:
       - ./mock-salesforce:/var/app
     ports: 
       - "3000:80" 
+    networks:
+        - local 
   
   epiquery:
     build: .
@@ -61,8 +68,15 @@ services:
       - NEW_RELIC_LABELS=ENVIRONMENT:PROD;
       - ENABLE_TEMPLATE_ACLS=DISABLED
       - STAGE=local
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_REGION=${AWS_REGION}
     depends_on:
       - mysql 
       - mssql
-      - sfdc
-  
+      - sfdc     
+    networks:
+        - local 
+networks:
+  local:
+    driver: bridge
