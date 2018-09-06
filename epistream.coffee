@@ -90,6 +90,8 @@ httpRequestHandler = (req, res) ->
       return
 
   if c.connectionName and not config.connections[c.connectionName]
+    log.error "Connection not found: '#{JSON.stringify(config)}'"
+    log.error "Environment: #{JSON.stringify(process.env)}"
     newrelic.noticeError(new Error("Unable to find connection by name"), c)
     res.send error: "unable to find connection by name '#{c.connectionName}'"
     return
