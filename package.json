@@ -17,6 +17,7 @@
     "cluster2": "igroff/cluster2.git",
     "coffee-script": "1.9.1",
     "coffeeify": "0.6.0",
+    "debug": "2.6.3",
     "dot": "1.0.1",
     "express": "3.1.0",
     "generic-pool": "2.2.0",
