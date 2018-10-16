@@ -37,7 +37,7 @@ services:
       - FORKS=1
       - NEW_RELIC_APP_NAME=epiops-dev,services-dev
       - NEW_RELIC_NO_CONFIG_FILE=true
-      - NEW_RELIC_LICENSE_KEY=bd51b51debfc060bba7f64f71e6dc22a41a6c3d6
+      - NEW_RELIC_LICENSE_KEY=14fa8937745e09115b19d04f2e968642c399d3a4
       - NEW_RELIC_LABELS=ENVIRONMENT:PROD;
       - ENABLE_TEMPLATE_ACLS=DISABLED
     depends_on:
