@@ -48,8 +48,8 @@ services:
       - EPI_TEST_SERVER=localhost
       - NEW_RELIC_APP_NAME=epiops-dev,services-dev
       - NEW_RELIC_NO_CONFIG_FILE=true
-      - NEW_RELIC_LICENSE_KEY=bd51b51debfc060bba7f64f71e6dc22a41a6c3d6
-      - NEW_RELIC_LABELS=ENVIRONMENT:PROD;
+      - NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY} # set NEW_RELIC_LICENSE_KEY in your environment before running docker-compose up
+      - NEW_RELIC_LABELS=ENVIRONMENT:DEV;
       - ENABLE_TEMPLATE_ACLS=DISABLED
     depends_on:
       - mysql 
