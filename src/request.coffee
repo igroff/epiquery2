@@ -136,6 +136,7 @@ postToScreamer = (context) -> () ->
   options =
     hostname: screamerUrl.hostname
     path: screamerUrl.pathname
+    port: screamerUrl.port
     method: 'POST'
     headers:
       'Content-Type': 'application/json'
