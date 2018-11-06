@@ -193,6 +193,9 @@ Whereas standard will provide:
 
 Notice the inclusion of both columns named *col1* only in the standard response.
 
+#### JSON values
+
+A few special characters or replaced/escaped during processing. This can interfere with JSON data. If you are passing JSON data to or from the database you should ensure the parameter name begins with `json`, which will disable all escaping and ensure your JSON is stored or retrieved with no changes.
 
 ## Websockets: I don't care, how do I use it.
 
