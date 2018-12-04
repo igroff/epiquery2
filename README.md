@@ -255,6 +255,7 @@ results to epiquery.
 ## Supported data sources
 * Microsoft SQL Server
 * MySQL
+* Postgres
 * Microsoft SQL Server Analysis Services (MDX)
 * File system
 
@@ -292,6 +293,7 @@ defaults to 2 minutes both in node and here in epiquery2.
         export CONNECTIONS="EPI_C_MSSQL EPI_C_FILE EPI_C_MYSQL EPI_C_RENDER EPI_C_MSSQL_RO"
         export EPI_C_FILE='{"driver":"file","config":{},"name":"file"}'
         export EPI_C_RENDER='{"driver":"render","config":{},"name":"render"}'
+        export MY_POSTGRES_DB="{\"name\":\"MY_POSTGRES_DB\",\"driver\":\"postgres\",\"config\":{\"userName\":\"postgres\",\"password\":\"postgres\",\"server\":\"localhost\",\"database_name\":\"postgres\",\"port\":\"5432\"}}"
         export EPI_C_MSSQL='{"driver":"mssql","name":"mssql","config":{"server":"10.211.55.5","password":"PASSWORD","userName":"USER","options":{"port":1433}}}'
         export EPI_C_MYSQL='{"name":"mysql","driver":"mysql","config":{"host":"localhost","user":"root","password":""}}'
         export EPI_C_MSSQL_RO="{\"driver\":\"mssql\",\"name\":\"db250\",\"config\":{\"server\":\"${DATABASE_READONLY_SERVER}\",\"password\":\"${DATABASE_READONLY_PASSWORD}\",\"userName\":\"${DATABASE_READONLY_USER}\",\"options\":{\"port\":1433}}}"
@@ -376,6 +378,7 @@ very concise and simple, it should support a robust handling of that functionali
   this has some limitations (like not handling duplicate column names) but in
   many cases it's simpler to use.
 * mysql - uses the mysql npm package
+* postgres - uses the pg npm package
 * file - Expects that the result of a template render will be a valid path.  
   Given the result of the rendered template, it attempts to open the file
   indicated and stream the results line-at-a-time to the caller.  Each line
