@@ -4,10 +4,12 @@ workflow "Build and Deploy" {
 }
 
 # Build
-
 action "Build Docker image" {
   uses = "actions/docker/cli@master"
-  args = ["build", "-t", "latest", "."]
+  env = {
+    IMAGE_NAME = "glg/epiquery"
+  }
+  args = "build -t $IMAGE_NAME ."
 }
 
 # Deploy Filter
@@ -20,6 +22,7 @@ action "Deploy branch filter" {
 # AWS
 
 action "Login to ECR" {
+  needs = ["Build Docker image"]
   uses = "actions/aws/cli@master"
   secrets = ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
   env = {
@@ -80,7 +83,7 @@ action "Push image to ECR" {
 #     "Push image to ECR",
 #     "Deploy to EKS",
 #   ]
-#   # :point_down: use this for self-contained kubectl config credentials 
+#   # :point_down: use this for self-contained kubectl config credentials
 #   #uses = "docker://gcr.io/cloud-builders/kubectl"
 #   uses = "./.github/actions/eks-kubectl"
 #   args = ["rollout status deployment/aws-example-octodex"]
