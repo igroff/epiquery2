@@ -1,6 +1,6 @@
 workflow "Build and Deploy" {
   on = "push"
-  resolves = ["Push Image to ECR"]
+  resolves = ["Push image to ECR"]
 }
 
 # Build
