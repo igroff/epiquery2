@@ -1,2 +1,2 @@
 #! /usr/bin/env bash
-curl -s http://${EPI_TEST_SERVER}:8080/simple/mssql/test/null_varchar_gets_fixed_width.sql -H 'Content-Type: application/json' --data '{"makeThisNvarcharNull":null,"makeThisVarcharNull":null}' | jq .
+curl -s http://localhost:8080/simple/mssql/test/null_varchar_gets_fixed_width.sql -H 'Content-Type: application/json' --data '{"makeThisNvarcharNull":null,"makeThisVarcharNull":null}' | jq .

@@ -38,8 +38,6 @@ if config.isDevelopmentMode()
     res.header 'Access-Control-Allow-Credentials', true
     res.header 'Access-Control-Allow-Headers', 'Content-Type'
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-    # allow preflight calls to cache for 1 hour
-    res.header 'Access-Control-Max-Age', '3600'
     next()
   app.use set_cors_headers
   app.all '*', set_cors_headers

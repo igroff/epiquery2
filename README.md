@@ -258,14 +258,6 @@ results to epiquery.
 * Microsoft SQL Server Analysis Services (MDX)
 * File system
 
-## Testing
-#### Local
-`make test` Runs tests locally in a docker container.  It also uses containers to run dependencies, mysql and mssql
-
-#### Simulate CI Tests
-You can simulate tests run by Codeship CI on your local environment with, `make test/codeship`
-This command uses a tool called `jet` install `jet` before running this.  More info here: https://documentation.codeship.com/pro/jet-cli/installation/
-
 ## Configuration
 
 Configuration of epiquery is done entirely through environment variables, this

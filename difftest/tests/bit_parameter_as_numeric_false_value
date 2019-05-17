@@ -1,2 +1,2 @@
 #! /usr/bin/env bash
-curl -s http://${EPI_TEST_SERVER}:8080/simple/mssql/test/template_parameter_bit.sproc -H 'content-type: application/json' --data '{"myParam":0}'
+curl -s 'http://localhost:8080/simple/mssql/test/template_parameter_bit.sproc' -H 'content-type: application/json' --data '{"myParam":0}'

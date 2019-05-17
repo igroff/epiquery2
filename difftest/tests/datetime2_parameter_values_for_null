@@ -1,3 +1,3 @@
 #! /usr/bin/env bash
 # vi: ft=sh
-curl -s http://${EPI_TEST_SERVER}:8080/simple/mssql/test/datetime2_parameter_values_for_null.sql -H 'Content-type:application/json' --data '{"datetime2":"Wed Oct 25 2017 13:19:40 GMT-0500 (CDT)", "nullDatetime2":null,"stringNullDatetime2":"null","stringUndefinedDatetime2":"undefined"}' | jq .
+curl -s 'http://localhost:8080/simple/mssql/test/datetime2_parameter_values_for_null.sql' -H 'Content-type:application/json' --data '{"datetime2":"Wed Oct 25 2017 13:19:40 GMT-0500 (CDT)", "nullDatetime2":null,"stringNullDatetime2":"null","stringUndefinedDatetime2":"undefined"}' | jq .

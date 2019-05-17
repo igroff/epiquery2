@@ -1,6 +1,0 @@
-- type: serial
-  steps:
-    - service: epiquerytest
-      name: "Run Difftests"
-      exclude: ^deploy.*
-      command: make test/codeship

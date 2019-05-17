@@ -2,10 +2,11 @@
 executionMasks:
   a_valid_bitmask: 1
 */
-create temporary table epiquery.test_table(
+create table if not exists epiquery.test_table(
   id int,
   name varchar(25)
 );
+delete from epiquery.test_table;
 
 insert into epiquery.test_table (id, name) values (1, "pants");
 insert into epiquery.test_table (id, name) values (2, "slacks");

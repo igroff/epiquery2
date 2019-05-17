@@ -1,2 +1,2 @@
 #! /usr/bin/env bash
-curl -s http://${EPI_TEST_SERVER}:8080/epiquery1/mssql/test/special_character_replacements.mustache --data '{"json":"{\"stuff\":\"“ ” ‘ ’ – — ½ ¼ ¾ © ® …\"}", "child":{"json":"{\"childStuff\":\"“ ” ‘ ’ – — ½ ¼ ¾ © ® …\"}","normal":"“ ” ‘ ’ – — ½ ¼ ¾ © ® …"},"normal":"“ ” ‘ ’ – — ½ ¼ ¾ © ® …"}' -H 'Content-Type: application/json'  | jq .
+curl -s http://localhost:8080/epiquery1/mssql/test/special_character_replacements.mustache --data '{"json":"{\"stuff\":\"“ ” ‘ ’ – — ½ ¼ ¾ © ® …\"}", "child":{"json":"{\"childStuff\":\"“ ” ‘ ’ – — ½ ¼ ¾ © ® …\"}","normal":"“ ” ‘ ’ – — ½ ¼ ¾ © ® …"},"normal":"“ ” ‘ ’ – — ½ ¼ ¾ © ® …"}' -H 'Content-Type: application/json'  | jq .
