@@ -191,7 +191,6 @@ executeQuery = (context, callback) ->
     status: status
     connection: context.connection.name
   }
-  newrelic.recordCustomEvent('Circuit_Breaker',attribs)
 
 collectStats = (context, callback) ->
   stats = context.Stats

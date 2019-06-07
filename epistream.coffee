@@ -138,7 +138,7 @@ app.get /\/(.+)$/, httpRequestHandler
 app.post /\/(.+)$/, httpRequestHandler
 
 log.debug "server worker process starting with configuration"
-log.info "%j", config
+log.debug "%j", config
 log.debug "node version", process.version
 server = http.createServer(app)
 
