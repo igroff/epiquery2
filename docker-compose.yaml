@@ -1,6 +1,7 @@
 version: "3"
 services:
   mysql:
+    container_name: mysql
     image: mysql:5.7.22
     restart: always
     ports:
@@ -9,6 +10,29 @@ services:
       - MYSQL_ROOT_PASSWORD=mysql_root_password
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=epiquery
+    networks:
+        - local 
+
+  mssql:
+    container_name: mssql
+    image: microsoft/mssql-server-linux:2017-latest
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y 
+      - SA_PASSWORD=YourV3ryStrong!Passw0rd
+    networks:
+        - local 
+
+  sfdc:
+    build: ./mock-salesforce
+    volumes:
+      - ./mock-salesforce:/var/app
+    ports: 
+      - "3001:80" 
+    networks:
+        - local 
+  
   epiquery:
     build: .
     # tty and stdin_open create container in interactive mode.  
@@ -19,26 +43,40 @@ services:
     ports:
       - "8080:8080"
     volumes: 
-      - .:/var/app # mount the directory containing this file (the root of the epiquery2 repo) as /var/app in the container
+      - .:/var/app 
+      - /var/app/node_modules
+      - /var/run/docker.sock:/var/run/docker.sock # mount docker socket so that we can control docker from within container (For sending SIGINT)
     environment:
       - PORT=8080
+      # - EPISTREAM_API_KEY=48BD02FF-8F7C-4C31-918B-4CE20455578A
+      - URL_BASED_API_KEY=true      
       - TEMPLATE_DIRECTORY=/var/app/difftest/templates
       - CONNECTIONS=EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_FILE EPI_C_MYSQL EPI_C_RENDER SFDC NON_EXISTENT_SERVER EPI_C_TIMESOUT EPI_C_MYSQL_BULK
       - EPI_C_FILE={"driver":"file","config":{},"name":"file"}
       - EPI_C_RENDER={"driver":"render","config":{},"name":"render"}
-      - EPI_C_MSSQL={"driver":"mssql","name":"mssql","config":{"server":"${IPAddress}","password":"${MSSQLPassword}","userName":"${MSSQLUsername}","options":{"port":1433, "requestTimeout":0}}}
-      - EPI_C_MSSQL_O={"driver":"mssql_o","name":"mssql_o","config":{"server":"${IPAddress}","password":"${MSSQLPassword}","userName":"${MSSQLUsername}","options":{"port":1433, "requestTimeout":0}}}
+      - EPI_C_MSSQL={"driver":"mssql","name":"mssql","config":{"server":"mssql","password":"YourV3ryStrong!Passw0rd","userName":"SA","options":{"port":1433, "requestTimeout":0}}}
+      - EPI_C_MSSQL_O={"driver":"mssql_o","name":"mssql_o","config":{"server":"mssql","password":"YourV3ryStrong!Passw0rd","userName":"SA","options":{"port":1433, "requestTimeout":0}}}
       - EPI_C_TIMESOUT={"driver":"mssql","name":"timesout","config":{"server":"localhost","password":"vagrant","userName":"vagrant","options":{"port":1433, "requestTimeout":1}}}
       - EPI_C_MYSQL={"name":"mysql","driver":"mysql","config":{"host":"mysql","user":"root","password":"mysql_root_password"}}
       - EPI_C_MYSQL_BULK={"name":"mysql_bulk", "type":"bulk","driver":"mysql","config":{"host":"mysql","user":"root","password":"mysql_root_password"}}
-      - SFDC={"name":"sfdc","driver":"salesforce","config":{"userName":"financeintegration@glgroup.com","password":"GLgroup7890T9upWPVp4E7lCmong4oHrEqD","server":"https://login.salesforce.com"}}
+      - SFDC={"name":"sfdc","driver":"salesforce","config":{"userName":"financeintegration@glgroup.com","password":"GLgroup7890T9upWPVp4E7lCmong4oHrEqD","server":"http://sfdc"}}
       - NON_EXISTENT_SERVER={"driver":"mssql","name":"no_server","config":{"server":"no_server.pants.monkey.underware","password":"vagrant","userName":"vagrant","options":{"port":1433}}}
       - LOCK_DIRECTORY=~/tmp
-      - FORKS=1
+      - EPI_TEST_SERVER=epiquery
       - NEW_RELIC_APP_NAME=epiops-dev,services-dev
       - NEW_RELIC_NO_CONFIG_FILE=true
-      - NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY} # Set NEW_RELIC_LICENSE_KEY in your host environment
-      - NEW_RELIC_LABELS=ENVIRONMENT:PROD;
+      - NEW_RELIC_ENABLED=false
+      - NEW_RELIC_LICENSE_KEY='key-goes-here'
+      - NEW_RELIC_LABELS=ENVIRONMENT:LOCAL;
       - ENABLE_TEMPLATE_ACLS=DISABLED
+      - DEBUG=false
+      - FORKS=1
     depends_on:
       - mysql 
+      - mssql
+      - sfdc     
+    networks:
+        - local 
+networks:
+  local:
+    driver: bridge
