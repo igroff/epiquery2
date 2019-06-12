@@ -26,26 +26,26 @@ The following are some examples
 
 /* You can call this template in various ways, the following examples use curl to do so
 
-curl -s 'http://localhost:8080/simple/mssql/test/template_parameter_examples.sql?aVarchar=jeans&anInt=3&aBit=0&aTinyInt=42&aDateTime=01/01/2018%2001:01:59&aNVarchar=something%20unicode&myVarcharParam=nice'
+curl -s "http://localhost:8080/simple/mssql/test/template_parameter_examples.sql?aVarchar=jeans&anInt=3&aBit=0&aTinyInt=42&aDateTime=01/01/2018%2001:01:59&aNVarchar=something%20unicode&myVarcharParam=nice"
 
   or 
 
-curl -s 'http://localhost:8080/simple/mssql/test/template_parameter_examples.sql' -H 'Content-Type: application/json' --data '{"aVarchar":"jeans","anInt":3,"aBit":0,"aTinyInt":42,"aDateTime":"01/01/2018 001:01:59","aNVarchar":"something unicdoe","myVarcharParam":"nice"}'
+curl -s "http://localhost:8080/simple/mssql/test/template_parameter_examples.sql" -H 'Content-Type: application/json' --data '{"aVarchar":"jeans","anInt":3,"aBit":0,"aTinyInt":42,"aDateTime":"01/01/2018 001:01:59","aNVarchar":"something unicdoe","myVarcharParam":"nice"}'
 
 
 Keep in mind, with a querystring all of the parameters are ... strings. The only way to get typing, if you expect it, is to pass a JSON object. For example, the following will pass a null for 'anInt'
 
-curl -s 'http://localhost:8080/simple/mssql/test/template_parameter_examples.sql' -H 'Content-Type: application/json' --data '{"aVarchar":"jeans","anInt":null,"aBit":0,"aTinyInt":42,"aDateTime":"01/01/2018 001:01:59","aNVarchar":"something unicdoe","myVarcharParam":"nice"}'
+curl -s "http://localhost:8080/simple/mssql/test/template_parameter_examples.sql" -H 'Content-Type: application/json' --data '{"aVarchar":"jeans","anInt":null,"aBit":0,"aTinyInt":42,"aDateTime":"01/01/2018 001:01:59","aNVarchar":"something unicdoe","myVarcharParam":"nice"}'
 
 If you want to set the same parameter to null but use the query string, you must _omit_ it.
 e.g.
-curl -s 'http://localhost:8080/simple/mssql/test/template_parameter_examples.sql?aVarchar=jeans&aBit=0&aTinyInt=42&aDateTime=01/01/2018%2001:01:59&aNVarchar=something%20unicode&myVarcharParam=nice'
+curl -s "http://localhost:8080/simple/mssql/test/template_parameter_examples.sql?aVarchar=jeans&aBit=0&aTinyInt=42&aDateTime=01/01/2018%2001:01:59&aNVarchar=something%20unicode&myVarcharParam=nice"
 
 If you specify 'null' in the querystring, the database will attempt to coerce the _string_ 'null' into an int which will fail.
 
 e.g.
 
-$ curl -s 'http://localhost:8080/simple/mssql/test/template_parameter_examples.sql?aVarchar=jeans&anInt=null&aBit=0&aTinyInt=42&aDateTime=01/01/2018%2001:01:59&aNVarchar=something%20unicode&myVarcharParam=nice' | jq .
+$ curl -s "http://localhost:8080/simple/mssql/test/template_parameter_examples.sql?aVarchar=jeans&anInt=null&aBit=0&aTinyInt=42&aDateTime=01/01/2018%2001:01:59&aNVarchar=something%20unicode&myVarcharParam=nice" | jq .
 {
   "results": [
     {
