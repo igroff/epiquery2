@@ -11,7 +11,7 @@ services:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=epiquery
     networks:
-        - local 
+      - local 
 
   mssql:
     container_name: mssql
@@ -22,7 +22,7 @@ services:
       - ACCEPT_EULA=Y 
       - SA_PASSWORD=YourV3ryStrong!Passw0rd
     networks:
-        - local 
+      - local 
 
   sfdc:
     build: ./mock-salesforce
@@ -31,7 +31,7 @@ services:
     ports: 
       - "3001:80" 
     networks:
-        - local 
+      - local 
   
   epiquery:
     build: .
@@ -76,7 +76,7 @@ services:
       - mssql
       - sfdc     
     networks:
-        - local 
+      - local 
 networks:
   local:
     driver: bridge
