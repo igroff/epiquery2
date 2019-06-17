@@ -1,2 +1,2 @@
 #! /usr/bin/env bash
- curl -s http://localhost:8080/no_server/test/servername
+ curl -s http://${EPI_TEST_SERVER}:8080/no_server/test/servername

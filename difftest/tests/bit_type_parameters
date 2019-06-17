@@ -1,1 +1,1 @@
-curl -s 'http://localhost:8080/simple/mssql/test/bit_parameter.sql?zeroIsFalse=0&oneIsTrue=1&stringFalseIsFalse=false&stringTrueIsTrue=true&stringFalseIsFalseNoCase=FALSE&stringTrueIsTrueNoCase=TrUE&arbitraryStringIsTrue=thisaintnobit'
+curl -s "http://${EPI_TEST_SERVER}:8080/simple/mssql/test/bit_parameter.sql?zeroIsFalse=0&oneIsTrue=1&stringFalseIsFalse=false&stringTrueIsTrue=true&stringFalseIsFalseNoCase=FALSE&stringTrueIsTrueNoCase=TrUE&arbitraryStringIsTrue=thisaintnobit"
