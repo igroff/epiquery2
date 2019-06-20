@@ -6,9 +6,9 @@ os              = require 'os'
 
 lowerCaseTediousTypeMap = {}
 
-# to make it so folks don't have to learn tedious' crazy casing of 
+# to make it so folks don't have to learn tedious' crazy casing of
 # data types, we'll keep a map of lower cased type names for comparison
-# to the inbound parameter type names ( in the case of a parameterized 
+# to the inbound parameter type names ( in the case of a parameterized
 # query request )
 for propertyName in Object.getOwnPropertyNames(tedious.TYPES)
   type = tedious.TYPES[propertyName]
@@ -161,8 +161,8 @@ class MSSQLDriver extends events.EventEmitter
         @emit 'error', error
     else
       # so, I really don't think it should but there are cases (in v1.13.0 at least) where the execSql method can
-      # raise an exception, so we'll attempt to handle that gracefully by catching errors, we'll also 
-      # take advantage of the fact that we have to do this to allow creation of errors in the 'transformValue' 
+      # raise an exception, so we'll attempt to handle that gracefully by catching errors, we'll also
+      # take advantage of the fact that we have to do this to allow creation of errors in the 'transformValue'
       # functions
       try
         parameters.forEach (param) =>
@@ -176,15 +176,15 @@ class MSSQLDriver extends events.EventEmitter
           # param declarations, so we're gonna start by fixing nvarchar and varchar lengths if they're
           # under a threshold, then we'll come back and add first class support for length
           if lowerCaseTypeName is 'varchar' or lowerCaseTypeName is 'nvarchar'
-            # if we have a value, we want to set the param length to 255 UNLESS it's greater 
+            # if we have a value, we want to set the param length to 255 UNLESS it's greater
             # so we don't truncate anything
-            if transformedValue
-              paramOptions.length = 255 unless transformedValue.length > 255
+            # there is a check here for no transformed value. if we have no value, thus our parameter value is null, so we'll just fix all our varchar
+            # length to 255 UNLESS they are values (not null) greater than 255 which is handled above
+            if transformedValue and transformedValue.length > 255
+              paramOptions.length = 8001
             else
-              # so here we have no value, thus our parameter value is null, so we'll just fix all our varchar
-              # lengthst to 255 UNLESS they are values (not null) greater than 255 which is handled above
               paramOptions.length = 255
-              
+
           request.addParameter(param.varName, tediousType, transformedValue, paramOptions)
         @conn.execSql request
       catch e
