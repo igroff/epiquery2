@@ -1,0 +1,3 @@
+#! /usr/bin/env bash
+# vi: ft=sh
+curl -s "http://${EPI_TEST_SERVER}:8080/simple/mssql/test/varchar_length_test.sql?consultationIds=CrytXkwoFlszvSvgUIWyCnlT0PizVGaZAE3AzcvmC6dSHseC58TkUzJebAs7E7AFCmTCbfkl1XdKplbRZ8NN2x5tIrpXdMOXDoYlDQvwTIpC2vJKDEPttfRKogi4hSVkaXo7RgDy3kGkwEquMUuGmXMAJNENv34LwkvT7EKlwQ9Vl503AnXPJGktyLql98CroG1DNdSOGsQJI9QNAE6tuLZ08HPN8g3yIJwlfTbYmC4T92FEA39jVj8yu0km4gpr"
