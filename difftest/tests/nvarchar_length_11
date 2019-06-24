@@ -1,0 +1,3 @@
+#! /usr/bin/env bash
+# vi: ft=sh
+curl -s "http://${EPI_TEST_SERVER}:8080/simple/mssql/test/nvarchar_length_test.sql?consultationIds=thisisatest"
