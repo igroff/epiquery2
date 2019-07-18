@@ -5,3 +5,7 @@ difftest/results/*
 node_modules/
 pids/
 newrelic_agent.log
+env
+myenv
+codeship.aes
+
