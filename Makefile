@@ -15,7 +15,7 @@ difftest/templates:
 
 test: build difftest/templates
 	# docker-compose down
-	docker-compose up --force-recreate -d
+	docker-compose up -d
 	./bin/wait-for-epi
 	docker-compose exec epiquery difftest run ${TEST_NAME}
 	
