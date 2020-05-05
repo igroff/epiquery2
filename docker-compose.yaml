@@ -28,55 +28,12 @@ services:
     build: ./mock-salesforce
     volumes:
       - ./mock-salesforce:/var/app
+      - /var/big_pants
     ports: 
-      - "3001:80" 
+      - "80:80" 
     networks:
       - local 
   
-  epiquery:
-    build: .
-    # tty and stdin_open create container in interactive mode.  
-    # otherwise exits immediately b/c does not have long running process 
-    tty: true         
-    stdin_open: true
-    container_name: epiquery
-    ports:
-      - "8080:8080"
-    volumes: 
-      - .:/var/app 
-      - /var/app/node_modules
-      - /var/run/docker.sock:/var/run/docker.sock # mount docker socket so that we can control docker from within container (For sending SIGINT)
-    environment:
-      - PORT=8080
-      # - EPISTREAM_API_KEY=48BD02FF-8F7C-4C31-918B-4CE20455578A
-      - URL_BASED_API_KEY=true      
-      - TEMPLATE_DIRECTORY=/var/app/difftest/templates
-      - CONNECTIONS=EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_FILE EPI_C_MYSQL EPI_C_RENDER SFDC NON_EXISTENT_SERVER EPI_C_TIMESOUT EPI_C_MYSQL_BULK
-      - EPI_C_FILE={"driver":"file","config":{},"name":"file"}
-      - EPI_C_RENDER={"driver":"render","config":{},"name":"render"}
-      - EPI_C_MSSQL={"driver":"mssql","name":"mssql","config":{"server":"mssql","password":"YourV3ryStrong!Passw0rd","userName":"SA","options":{"port":1433, "requestTimeout":0}}}
-      - EPI_C_MSSQL_O={"driver":"mssql_o","name":"mssql_o","config":{"server":"mssql","password":"YourV3ryStrong!Passw0rd","userName":"SA","options":{"port":1433, "requestTimeout":0}}}
-      - EPI_C_TIMESOUT={"driver":"mssql","name":"timesout","config":{"server":"localhost","password":"vagrant","userName":"vagrant","options":{"port":1433, "requestTimeout":1}}}
-      - EPI_C_MYSQL={"name":"mysql","driver":"mysql","config":{"host":"mysql","user":"root","password":"mysql_root_password"}}
-      - EPI_C_MYSQL_BULK={"name":"mysql_bulk", "type":"bulk","driver":"mysql","config":{"host":"mysql","user":"root","password":"mysql_root_password"}}
-      - SFDC={"name":"sfdc","driver":"salesforce","config":{"userName":"financeintegration@glgroup.com","password":"GLgroup7890T9upWPVp4E7lCmong4oHrEqD","server":"http://sfdc"}}
-      - NON_EXISTENT_SERVER={"driver":"mssql","name":"no_server","config":{"server":"no_server.pants.monkey.underware","password":"vagrant","userName":"vagrant","options":{"port":1433}}}
-      - LOCK_DIRECTORY=~/tmp
-      - EPI_TEST_SERVER=epiquery
-      - NEW_RELIC_APP_NAME=epiops-dev,services-dev
-      - NEW_RELIC_NO_CONFIG_FILE=true
-      - NEW_RELIC_ENABLED=false
-      - NEW_RELIC_LICENSE_KEY='key-goes-here'
-      - NEW_RELIC_LABELS=ENVIRONMENT:LOCAL;
-      - ENABLE_TEMPLATE_ACLS=DISABLED
-      - DEBUG=false
-      - FORKS=1
-    depends_on:
-      - mysql 
-      - mssql
-      - sfdc     
-    networks:
-      - local 
 networks:
   local:
     driver: bridge
