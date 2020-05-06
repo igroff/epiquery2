@@ -1,2 +1,2 @@
 #! /usr/bin/env bash
-cat | sed -e 's/"queryId":"[0-9]*_[0-9]*"/queryid/g'
+cat | sed -e 's/"queryId":"[0-9]*_[0-9]*"/queryid/g' | sed -e "s[$(pwd)[REPOROOT[g"
