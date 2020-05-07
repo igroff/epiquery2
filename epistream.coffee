@@ -138,9 +138,15 @@ prefix.prefix = "/#{apiKey}/sockjs" if apiKey && config.urlBasedApiKey
 
 socketServer.installHandlers(server, prefix)
 
-if config.isDevelopmentMode() and config.forks is 1
+if config.isDevelopmentMode()
   log.warn "********************************************************************************"
-  log.warn "epiquery is running in development mode with a single fork specified, this results in a single process epiquery which will BE SLOW"
+  log.warn "epiquery is running in development mode, this will result in templates not being cached and thus"
+  log.warn "reloaded on every request, this will BE SLOW"
+  log.warn "********************************************************************************"
+
+if config.forks is 1
+  log.warn "********************************************************************************"
+  log.warn "epiquery is running in a single fork specified, this results in a single process epiquery which will BE SLOW"
   log.warn "running on port ", config.port
   log.warn "********************************************************************************"
   server.listen(config.port)
@@ -156,7 +162,7 @@ else
       if worker.suicide
         log.info "worker #{worker.process.pid} is shutting down"
       else
-        log.warn "unexpected worker death of worker pid: #{worker.process.pid} forking replacement worker"
+        log.warn "unexpected worker death of worker pid: #{worker.process.pid} forking replacement"
         newWorker = cluster.fork()
         log.info "replaced worker of pid #{worker.process.pid} with #{newWorker.process.pid}"
     )
