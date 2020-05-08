@@ -35,14 +35,14 @@
     "tough-cookie": "3.0.0",
     "sockjs": "igroff/sockjs-node#pass-headers",
     "underscore": "1.10.2",
-    "xmla4js": "git+https://github.com/glg/xmla4js.git"
+    "xmla4js": "glg/xmla4js"
   },
   "scripts": {
     "start": "make start",
     "watch": "make watch"
   },
   "engines": {
-    "node": "12.11.0"
+    "node": "12.16.3"
   },
   "browser": "src/clients/EpiClient.coffee",
   "browserify": {
