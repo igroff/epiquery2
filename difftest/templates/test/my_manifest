@@ -2,4 +2,4 @@
 executionMasks:
   a_valid_bitmask: 1
 */
-/var/app/difftest/test-data/manifest.yaml
+./difftest/test-data/manifest.yaml

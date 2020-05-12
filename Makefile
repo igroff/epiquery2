@@ -1,8 +1,8 @@
 SHELL=/bin/bash
 .PHONY: watch test pass lint clean start
 
-watch:
-	supervisor -e ".litcoffee|.coffee|.js" --exec make -- run-server
+watch: build
+	TZ=UTC ./node_modules/.bin/supervisor -e "litcoffee,coffee" --exec /bin/bash -- ./bin/npm-starter
 
 start: run-server
 
@@ -13,16 +13,9 @@ difftest/templates:
 	cd difftest/ && git clone https://github.com/igroff/epiquery-templates.git \
 		templates/
 
-test: build difftest/templates
-	# docker-compose down
-	docker-compose up --force-recreate -d
-	./bin/wait-for-epi
-	docker-compose exec epiquery difftest run ${TEST_NAME}
-	
-
-test/codeship: build difftest/templates
-	./bin/wait-for-epi
-	difftest run
+test: node_modules/ difftest/templates
+	docker-compose up -d
+	PATH=./node_modules/.bin:${PATH} ./node_modules/.bin/difftest run
 
 pass/%:
 	cp difftest/results/$(subst pass/,,$@) difftest/expected/$(subst pass/,,$@)
@@ -50,4 +43,3 @@ node_modules/:
 
 clean:
 	rm -rf ./node_modules/
-	docker-compose build --no-cache

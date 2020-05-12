@@ -1,3 +1,3 @@
 beginquery{"queryId":"basicSocketQueryId","message":"beginquery"}
 endquery{"queryId":"basicSocketQueryId","message":"endquery"}
-data{"queryId":"basicSocketQueryId","data":"/var/app/difftest/test-data/manifest.yaml\n","message":"data"}
+data{"queryId":"basicSocketQueryId","data":"./difftest/test-data/manifest.yaml\n","message":"data"}
