@@ -2,4 +2,4 @@
 executionMasks:
   a_valid_bitmask: 1
 */
-/Users/igroff/Development/glg/epiquery2/difftest/test-data/manifest.yaml
+./difftest/test-data/manifest.yaml
