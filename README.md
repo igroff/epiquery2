@@ -30,6 +30,14 @@ Example:
 ln -s {YOUR_PATH_TO_REPO}/epiquery2/difftest/etc/epi_test_config ~/.epiquery2/config
 ```
 
+ALSO... Add the following to your `/etc/hosts` file:
+
+```
+127.0.0.1 mssql
+127.0.0.1 sfdc
+127.0.0.1 mysql
+```
+
 #### HTTP Response Format Examples
 
 In our examples we'll assume a epiquery instance running locally with a connection named
