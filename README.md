@@ -21,6 +21,15 @@ So the following would execute the template */test/servername* against the conne
         http://epiquery.server.com/pants/test/servername
 
 
+#### Running Tests
+
+If you want to run the tests locally, you will need to symlink the test config to your ~/.epiquery2 directory.
+
+Example:
+```
+ln -s {YOUR_PATH_TO_REPO}/epiquery2/difftest/etc/epi_test_config ~/.epiquery2/config
+```
+
 #### HTTP Response Format Examples
 
 In our examples we'll assume a epiquery instance running locally with a connection named
