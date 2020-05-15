@@ -15,7 +15,7 @@ difftest/templates:
 
 test: node_modules/ difftest/templates
 	docker-compose up -d
-	PATH=./node_modules/.bin:${PATH} ./node_modules/.bin/difftest run
+	PATH=./node_modules/.bin:${PATH} ./node_modules/.bin/difftest run ${TEST_NAME}
 
 pass/%:
 	cp difftest/results/$(subst pass/,,$@) difftest/expected/$(subst pass/,,$@)
