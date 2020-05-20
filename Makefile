@@ -35,8 +35,8 @@ static/js/hunting-websocket.js: src/clients/hunting-websocket.litcoffee
 
 build: static/js/epiclient_v3.js node_modules/
 
-push/%:
-	git push origin master:$(@F)
+deploy/%:
+	git push --force origin master:deploy$(@F)
 
 node_modules/:
 	npm install .
