@@ -43,7 +43,7 @@
     "watch": "make watch"
   },
   "engines": {
-    "node": "12.16.3"
+    "node": "12.3.1"
   },
   "browser": "src/clients/EpiClient.coffee",
   "browserify": {
