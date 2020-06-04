@@ -8,7 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: hosts file
-        run: echo '127.0.0.1 mssql mysql sfdc' | sude tee --append /etc/hosts
+        run: echo '127.0.0.1 mssql mysql sfdc' | sudo tee --append /etc/hosts
       - name: make test
         env:
           PORT: 8080
