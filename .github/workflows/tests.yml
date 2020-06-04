@@ -9,6 +9,17 @@ jobs:
       - uses: actions/checkout@master
       - name: hosts file
         run: echo '127.0.0.1 mssql mysql sfdc' | sudo tee --append /etc/hosts
+      - name: cache docker images
+        id: cache-docker
+        with:
+          path: /var/lib/docker
+          ket: ${{ runner.os }}-docker
+      - name: pull images
+        if: steps.cache-docker.outputs.cache-hit != 'true'
+        run: |
+          docker pull mssql
+          docker pull mysql:5.7.2
+          docker pull node:5.5.0
       - name: make test
         env:
           PORT: 8080
