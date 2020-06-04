@@ -2,9 +2,7 @@
 exec 2>&1
 
 # enable ACLs
-pid=$(pgrep epistream.coffee)
-echo PHRED kill --signal USR2 $pid
-kill --signal USR2 $pid
+for pid in $(ps aux | grep epistream.coffee | grep -v grep | awk '{print($2)}'); do kill -SIGUSR2 ${pid}; done
 curl -s -H "jwt-test: 2" http://${EPI_TEST_SERVER}:8080/epiquery1/mssql/test/acl_tests.mustache
 # disable ACLs
-kill --signal USR1 $pid
+for pid in $(ps aux | grep epistream.coffee | grep -v grep | awk '{print($2)}'); do kill -SIGUSR1 ${pid}; done
