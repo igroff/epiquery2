@@ -3,6 +3,7 @@
 
 cluster   = require 'cluster'
 express   = require 'express'
+favicon   = require 'serve-favicon'
 _         = require 'underscore'
 path      = require 'path'
 log       = require 'simplog'
@@ -17,11 +18,12 @@ queryRequestHandler = require('./src/request.coffee').queryRequestHandler
 
 
 app = express()
-app.use express.favicon()
-app.use express.bodyParser()
+# app.use express.favicon()
+app.use express.json()
+app.use express.urlencoded({ extended: false })
 app.use '/static', express.static(path.join(__dirname, 'static'))
 app.use app.router
-app.use express.errorHandler()
+# app.use express.errorHandler()
 
 apiKey = config.epistreamApiKey
 
@@ -94,7 +96,7 @@ socketServer.on 'connection', (conn) ->
   conn.on 'data', (message) ->
     if apiKey
       if !~ conn.url.indexOf apiKey
-        conn.close() 
+        conn.close()
         log.error "Unauthorized Socket Access Attempted from IP: #{conn.remoteAddress}"
         log.error "Unauthorized Context: #{JSON.stringify(message)}"
         return
@@ -158,7 +160,7 @@ else
       log.info "preforked worker process #{worker.process.pid}"
     # our exit handler, this event is raised when a worker dies we want to go ahead and
     # for a new one unless it's been explicitly killed
-    cluster.on('exit', (worker, code, signal) => 
+    cluster.on('exit', (worker, code, signal) =>
       if worker.suicide
         log.info "worker #{worker.process.pid} is shutting down"
       else
@@ -167,4 +169,3 @@ else
         log.info "replaced worker of pid #{worker.process.pid} with #{newWorker.process.pid}"
     )
   else
-    server.listen(config.port)
