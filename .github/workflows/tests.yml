@@ -30,6 +30,7 @@ jobs:
           FORKS: 1
           NODE_ENV: development
           EPI_SCREAMER_URL: https://services.glgresearch.com/epi-screamer/epiquery
+          EPI_TEST_SERVER: localhost
         run: |
           make start &
           ./bin/wait-for-epi
