@@ -26,12 +26,11 @@ jobs:
           NON_EXISTENT_SERVER: '{"driver":"mssql","name":"no_server","config":{"server":"no_server.pants.monkey.underware","password":"vagrant","userName":"vagrant","options":{"port":1433}}}'
           LOCK_DIRECTORY: ~/tmp
           ENABLE_TEMPLATE_ACLS: DISABLED
-          DEBUG: true
           FORKS: 1
           NODE_ENV: development
           EPI_SCREAMER_URL: https://services.glgresearch.com/epi-screamer/epiquery
           EPI_TEST_SERVER: localhost
         run: |
-          make start > /dev/null 2>&1 &
+          make start &
           ./bin/wait-for-epi
           make test
