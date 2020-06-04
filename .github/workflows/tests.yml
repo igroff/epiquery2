@@ -32,6 +32,6 @@ jobs:
           EPI_SCREAMER_URL: https://services.glgresearch.com/epi-screamer/epiquery
           EPI_TEST_SERVER: localhost
         run: |
-          make start &
+          make start 2>&1 > /dev/null &
           ./bin/wait-for-epi
           make test
