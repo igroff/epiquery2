@@ -13,7 +13,7 @@ jobs:
         env:
           PORT: 8080
           URL_BASED_API_KEY: true
-          TEMPLATE_DIRECTORY: $(pwd)/difftest/templates/
+          TEMPLATE_DIRECTORY: $PWD/difftest/templates/
           CONNECTIONS: 'EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_FILE EPI_C_MYSQL EPI_C_RENDER SFDC NON_EXISTENT_SERVER EPI_C_TIMESOUT EPI_C_MYSQL_BULK'
           EPI_C_FILE: '{"driver":"file","config":{},"name":"file"}'
           EPI_C_RENDER: '{"driver":"render","config":{},"name":"render"}'
