@@ -2,7 +2,7 @@
 exec 2>&1
 # enable ACLs
 pid=$(pgrep epistream.coffee)
-kill -SIGUSER2 $pid
+kill -SIGUSR2 $pid
 curl -s -H "jwt-test: 2" http://${EPI_TEST_SERVER}:8080/epiquery1/mssql/test/acl_tests.mustache
 # disable ACLs
-KILL -SIGUSER1 $pid
+kill -SIGUSR1 $pid
