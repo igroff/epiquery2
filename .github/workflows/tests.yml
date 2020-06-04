@@ -10,6 +10,7 @@ jobs:
       - name: hosts file
         run: echo '127.0.0.1 mssql mysql sfdc' | sudo tee --append /etc/hosts
       - name: cache docker images
+        uses: actions/cache@v2
         id: cache-docker
         with:
           path: /var/lib/docker
