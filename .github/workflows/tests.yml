@@ -19,7 +19,7 @@ jobs:
         if: steps.cache-docker.outputs.cache-hit != 'true'
         run: |
           docker pull microsoft/mssql-server-linux:2017-latest
-          docker pull mysql:5.7.2
+          docker pull mysql:5.7.22
           docker pull node:5.5.0
       - name: make test
         env:
