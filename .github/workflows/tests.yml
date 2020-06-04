@@ -1,0 +1,32 @@
+name: diff test
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: hosts file
+        run: echo '127.0.0.1 mssql mysql  sfdc' | sude tee --append /etc/hosts
+      - name: make test
+        env:
+          PORT: 8080
+          URL_BASED_API_KEY: true
+          TEMPLATE_DIRECTORY: $(pwd)/difftest/templates/
+          CONNECTIONS: EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_FILE EPI_C_MYSQL EPI_C_RENDER SFDC NON_EXISTENT_SERVER EPI_C_TIMESOUT EPI_C_MYSQL_BULK
+          EPI_C_FILE: {"driver":"file","config":{},"name":"file"}
+          EPI_C_RENDER: {"driver":"render","config":{},"name":"render"}
+          EPI_C_MSSQL: {"driver":"mssql","name":"mssql","config":{"server":"mssql","password":"YourV3ryStrong!Passw0rd","userName":"SA","options":{"port":1433, "requestTimeout":0}}}
+          EPI_C_MSSQL_O: {"driver":"mssql_o","name":"mssql_o","config":{"server":"mssql","password":"YourV3ryStrong!Passw0rd","userName":"SA","options":{"port":1433, "requestTimeout":0}}}
+          EPI_C_TIMESOUT: {"driver":"mssql","name":"timesout","config":{"server":"localhost","password":"vagrant","userName":"vagrant","options":{"port":1433, "requestTimeout":1}}}
+          EPI_C_MYSQL: {"name":"mysql","driver":"mysql","config":{"host":"mysql","user":"root","password":"mysql_root_password"}}
+          EPI_C_MYSQL_BULK: {"name":"mysql_bulk", "type":"bulk","driver":"mysql","config":{"host":"mysql","user":"root","password":"mysql_root_password"}}
+          SFDC: {"name":"sfdc","driver":"salesforce","config":{"userName":"","password":"","server":"http://sfdc"}}
+          NON_EXISTENT_SERVER: {"driver":"mssql","name":"no_server","config":{"server":"no_server.pants.monkey.underware","password":"vagrant","userName":"vagrant","options":{"port":1433}}}
+          LOCK_DIRECTORY: ~/tmp
+          ENABLE_TEMPLATE_ACLS: DISABLED
+          DEBUG: true
+          FORKS: 1
+          NODE_ENV: development
+          EPI_SCREAMER_URL: https://services.glgresearch.com/epi-screamer/epiquery
