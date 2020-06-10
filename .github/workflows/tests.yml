@@ -24,6 +24,7 @@ jobs:
       - name: make test
         env:
           CONNECTIONS: 'EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_FILE EPI_C_MYSQL EPI_C_RENDER SFDC NON_EXISTENT_SERVER EPI_C_TIMESOUT EPI_C_MYSQL_BULK'
+          DIFFTEST_QUIET: true
           ENABLE_TEMPLATE_ACLS: DISABLED
           EPI_C_FILE: '{"driver":"file","config":{},"name":"file"}'
           EPI_C_MSSQL: '{"driver":"mssql","name":"mssql","config":{"server":"mssql","password":"YourV3ryStrong!Passw0rd","userName":"SA","options":{"port":1433, "requestTimeout":0}}}'
