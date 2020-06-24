@@ -48,4 +48,5 @@ jobs:
           ./bin/wait-for-epi
           pwd
           ls -l
+          ls -l $(npm bin)
           make test
