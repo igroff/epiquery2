@@ -7,6 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '12.3.1'
       - name: Update hosts file
         run: echo '127.0.0.1 mssql mysql sfdc' | sudo tee --append /etc/hosts
       - name: Cache Docker images
@@ -45,8 +48,6 @@ jobs:
           TEMPLATE_DIRECTORY: ${{ github.workspace }}/difftest/templates/
           URL_BASED_API_KEY: true
         run: |
-          nvm install 12.3.1
-          nvm use 12.3.1
           make start &
           ./bin/wait-for-epi
           make test
