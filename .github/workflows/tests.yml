@@ -37,7 +37,7 @@ jobs:
           EPI_TEST_SERVER: localhost
           FORKS: 1
           LOCK_DIRECTORY: ~/tmp
-          NODE_ENV: production
+          NODE_ENV: development
           NON_EXISTENT_SERVER: '{"driver":"mssql","name":"no_server","config":{"server":"no_server.pants.monkey.underware","password":"vagrant","userName":"vagrant","options":{"port":1433}}}'
           PORT: 8080
           SFDC: '{"name":"sfdc","driver":"salesforce","config":{"userName":"","password":"","server":"http://sfdc"}}'
