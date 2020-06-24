@@ -1,6 +1,6 @@
 FROM node:5.5.0
 
-ENV production
+ENV NODE_ENV production
 
 RUN npm install -g drakov
 
