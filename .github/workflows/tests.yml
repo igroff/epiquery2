@@ -45,6 +45,8 @@ jobs:
           TEMPLATE_DIRECTORY: ${{ github.workspace }}/difftest/templates/
           URL_BASED_API_KEY: true
         run: |
+          nvm install 12.3.1
+          nvm use 12.3.1
           make start &
           ./bin/wait-for-epi
           make test
