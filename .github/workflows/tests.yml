@@ -46,4 +46,6 @@ jobs:
         run: |
           make start &
           ./bin/wait-for-epi
+          pwd
+          ls -l
           make test
