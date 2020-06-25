@@ -21,9 +21,9 @@ jobs:
       - name: pull images
         if: steps.cache-docker.outputs.cache-hit != 'true'
         run: |
+          docker pull fearphage/sfdc-with-drakov:e04eea15
           docker pull microsoft/mssql-server-linux:2017-latest
           docker pull mysql:5.7.22
-          docker pull node:5.5.0
       - name: make test
         env:
           CONNECTIONS: 'EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_FILE EPI_C_MYSQL EPI_C_RENDER SFDC NON_EXISTENT_SERVER EPI_C_TIMESOUT EPI_C_MYSQL_BULK'
