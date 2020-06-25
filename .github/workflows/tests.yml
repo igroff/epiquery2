@@ -46,7 +46,4 @@ jobs:
           SFDC: '{"name":"sfdc","driver":"salesforce","config":{"userName":"","password":"","server":"http://sfdc"}}'
           TEMPLATE_DIRECTORY: ${{ github.workspace }}/difftest/templates/
           URL_BASED_API_KEY: true
-        run: |
-          make start &
-          ./bin/wait-for-epi
-          make test
+          run: echo hello
