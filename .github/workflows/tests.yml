@@ -39,6 +39,5 @@ jobs:
         run: |
           make start &
           ./bin/wait-for-epi
-          ps ax | grep epistream.coffee
-          pgrep epistream.cofee
+          echo "PID: $(ps aux | grep epistream.coffee | grep -v grep | awk '{print($2)}')"
           make test
