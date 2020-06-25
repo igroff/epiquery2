@@ -38,7 +38,7 @@ jobs:
           URL_BASED_API_KEY: true
         run: |
           make start &
+          ./bin/wait-for-epi
           ps ax | grep epistream.coffee
           pgrep epistream.cofee
-          ./bin/wait-for-epi
           make test
