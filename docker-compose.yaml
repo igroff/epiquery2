@@ -25,7 +25,7 @@ services:
       - local
 
   sfdc:
-    image: fearphage/sfdc-with-drakov:e04eea15
+    image: glgresearch/sfdc-with-drakov:e04eea15
     volumes:
       - ./mock-salesforce:/var/app
       - /var/big_pants
