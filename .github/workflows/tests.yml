@@ -12,6 +12,8 @@ jobs:
           node-version: '12.3.1'
       - name: Update hosts file
         run: echo '127.0.0.1 mssql mysql sfdc' | sudo tee --append /etc/hosts
+      - name: Confirm hosts file
+        run: cat /etc/hosts
       - name: pull images
         run: docker-compose pull
       - name: make test
