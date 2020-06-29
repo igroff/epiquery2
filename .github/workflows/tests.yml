@@ -16,7 +16,7 @@ jobs:
         run: cat /etc/hosts
       - name: pull images
         run: |
-          docker pull fearphage/sfdc-with-drakov:e04eea15
+          docker pull glgresearch/sfdc-with-drakov
           docker pull microsoft/mssql-server-linux:2017-latest
           docker pull mysql:5.7.22
       - name: make test
