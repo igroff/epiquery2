@@ -13,7 +13,10 @@ jobs:
       - name: Update hosts file
         run: echo '127.0.0.1 mssql mysql sfdc' | sudo tee --append /etc/hosts
       - name: pull images
-        run: docker-compose pull
+        run: |
+          docker pull glgresearch/sfdc-with-drakov:e04eea15
+          docker pull microsoft/mssql-server-linux:2017-latest
+          docker pull mysql:5.7.22
       - name: start docker containers
         run: docker-compose up --detach
       - name: make test
