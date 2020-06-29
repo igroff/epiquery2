@@ -12,9 +12,6 @@ jobs:
           node-version: '12.3.1'
       - name: Update hosts file
         run: echo '127.0.0.1 mssql mysql sfdc' | sudo tee --append /etc/hosts
-      # TODO: remove. We know hosts file is working properly, but can remove after debugging
-      - name: Confirm hosts file
-        run: cat /etc/hosts
       - name: pull images
         run: |
           docker pull glgresearch/sfdc-with-drakov
@@ -48,7 +45,4 @@ jobs:
         run: |
           TZ=UTC make start &
           ./bin/wait-for-epi
-          echo "PID: $(ps aux | grep epistream.coffee | grep -v grep | awk '{print($2)}')"
           DEBUG= make test
-      - name: debug
-        run: ls -l difftest/results
