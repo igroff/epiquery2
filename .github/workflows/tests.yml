@@ -46,7 +46,7 @@ jobs:
           TEMPLATE_DIRECTORY: ${{ github.workspace }}/difftest/templates/
           URL_BASED_API_KEY: true
         run: |
-          make start &
+          TZ=UTC make start &
           ./bin/wait-for-epi
           echo "PID: $(ps aux | grep epistream.coffee | grep -v grep | awk '{print($2)}')"
           make test
