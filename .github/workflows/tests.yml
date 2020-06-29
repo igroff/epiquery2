@@ -12,6 +12,7 @@ jobs:
           node-version: '12.3.1'
       - name: Update hosts file
         run: echo '127.0.0.1 mssql mysql sfdc' | sudo tee --append /etc/hosts
+      # TODO: remove. We know hosts file is working properly, but can remove after debugging
       - name: Confirm hosts file
         run: cat /etc/hosts
       - name: pull images
@@ -19,6 +20,8 @@ jobs:
           docker pull glgresearch/sfdc-with-drakov
           docker pull microsoft/mssql-server-linux:2017-latest
           docker pull mysql:5.7.22
+      - name: start docker containers
+        run: docker-compose up -d
       - name: make test
         env:
           CONNECTIONS: 'EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_FILE EPI_C_MYSQL EPI_C_RENDER SFDC NON_EXISTENT_SERVER EPI_C_TIMESOUT EPI_C_MYSQL_BULK'
