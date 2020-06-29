@@ -1,4 +1,4 @@
-name: diff test
+name: Build Verification
 
 on: [push]
 
