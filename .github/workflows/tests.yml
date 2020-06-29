@@ -50,3 +50,4 @@ jobs:
           ./bin/wait-for-epi
           echo "PID: $(ps aux | grep epistream.coffee | grep -v grep | awk '{print($2)}')"
           make test
+          ls -l difftest/results
