@@ -49,6 +49,6 @@ jobs:
           TZ=UTC make start &
           ./bin/wait-for-epi
           echo "PID: $(ps aux | grep epistream.coffee | grep -v grep | awk '{print($2)}')"
-          make test
+          DEBUG= make test
       - name: debug
         run: ls -l difftest/results
