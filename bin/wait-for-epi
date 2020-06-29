@@ -1,11 +1,7 @@
 #! /usr/bin/env bash
 
-for n in {1..12}
+for n in {1..10}
 do
-  if curl --silent http://${EPI_TEST_SERVER}:8080/diagnostic; then
-    echo '!! EPI is up'
-    break
-  else
-    sleep 5
-  fi
+  curl --silent http://${EPI_TEST_SERVER}:8080/diagnostic && break
+  sleep 5
 done
