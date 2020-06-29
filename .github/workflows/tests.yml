@@ -15,7 +15,10 @@ jobs:
       - name: Confirm hosts file
         run: cat /etc/hosts
       - name: pull images
-        run: docker-compose pull
+        run: |
+          docker pull fearphage/sfdc-with-drakov:e04eea15
+          docker pull microsoft/mssql-server-linux:2017-latest
+          docker pull mysql:5.7.22
       - name: make test
         env:
           CONNECTIONS: 'EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_FILE EPI_C_MYSQL EPI_C_RENDER SFDC NON_EXISTENT_SERVER EPI_C_TIMESOUT EPI_C_MYSQL_BULK'
