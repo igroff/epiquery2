@@ -10,7 +10,7 @@
   * [Standard](#standard)
   * [Simple](#simple)
   * [epiquery1](#epiquery1)
-  * [CSV](#scv)
+  * [CSV](#csv)
   * [Gotchas](#gotchas)
 * [How do I use it?](#websockets-i-dont-care-how-do-i-use-it)
 * [Definitions](#definitions)
