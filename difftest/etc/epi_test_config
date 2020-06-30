@@ -1,5 +1,5 @@
 export PORT=8080
-export URL_BASED_API_KEY=true
+export URL_BASED_API_KEY=true      
 export TEMPLATE_DIRECTORY=$(pwd)/difftest/templates/
 export CONNECTIONS="EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_FILE EPI_C_MYSQL EPI_C_RENDER SFDC NON_EXISTENT_SERVER EPI_C_TIMESOUT EPI_C_MYSQL_BULK"
 export EPI_C_FILE='{"driver":"file","config":{},"name":"file"}'
@@ -12,6 +12,7 @@ export EPI_C_MYSQL_BULK='{"name":"mysql_bulk", "type":"bulk","driver":"mysql","c
 export SFDC='{"name":"sfdc","driver":"salesforce","config":{"userName":"","password":"","server":"http://sfdc"}}'
 export NON_EXISTENT_SERVER='{"driver":"mssql","name":"no_server","config":{"server":"no_server.pants.monkey.underware","password":"vagrant","userName":"vagrant","options":{"port":1433}}}'
 export LOCK_DIRECTORY=~/tmp
+export ENABLE_TEMPLATE_ACLS=DISABLED
 export DEBUG=true
 export FORKS=${FORKS:-1}
 export NODE_ENV=${NODE_ENV:-development}
