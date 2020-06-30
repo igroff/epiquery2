@@ -2,10 +2,18 @@
 
  Table of Contents
 
- * [Development](#development)
+* [Development](#development)
+  * [Environment Setup](#environment-setup))
+  * [Running Tests](#running-tests)
+* [HTTP Response Format Examples](#http-response-format-examples)
+  * [Standard](#standard)
+  * [Simple](#standard)
+  * [epiquery1](#eqpiquery1)
+  * [<abbr title="Comma-Seprated Values">CSV</abbr>](#csv)
+* [Gotchas](#gotchas)
 
 Ok, so websockets can kind of suck.  And lots of people are more comfortable
-with the request/response behavior of 'standard' HTTP as opposed to the asynch
+with the request/response behavior of 'standard' HTTP as opposed to the async
 event based nature of websockets. To that end, we offer multiple transport
 formats for HTTP.
 
@@ -26,10 +34,11 @@ So the following would execute the template */test/servername* against the conne
 
 ## Development
 
-
-You need to run the server in the background or another tab before running the tests.
+You need to run the server in the background or another terminal window before running the tests.
 
 #### Environment Setup
+
+All of these need to be completed before you can run the tests reliably.
 
 * The server needs the time zone (`TZ`) set. This can be accomplished with the following:
 
@@ -40,24 +49,25 @@ You need to run the server in the background or another tab before running the t
 
     DEBUG= make test
 
+* You need to add the following to your `/etc/hosts` file:
+
+    127.0.0.1  mssql mysql sfdc
+
+* Create a symlink for the test configuration to the `~/.epiquery2` directory by running
+  the following at the root of the project:
+
+    ```shell
+    mkdir -p ~/.epiquery2
+    ln -s $(pwd)/difftest/etc/epi_test_config ~/.epiquery2/config
+    ```
+
 #### Running Tests
 
-If you want to run the tests locally, you will need to symlink the test config to your ~/.epiquery2 directory.
-
-Example:
-```
-ln -s {YOUR_PATH_TO_REPO}/epiquery2/difftest/etc/epi_test_config ~/.epiquery2/config
+```shell
+make test
 ```
 
-ALSO... Add the following to your `/etc/hosts` file:
-
-```
-127.0.0.1 mssql
-127.0.0.1 sfdc
-127.0.0.1 mysql
-```
-
-#### HTTP Response Format Examples
+### HTTP Response Format Examples
 
 In our examples we'll assume a epiquery instance running locally with a connection named
 *pants* to a local MSSQL instance named *PANTSDB*.
