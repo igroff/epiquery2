@@ -1,5 +1,8 @@
 ## Websockets suck. I use 'normal' HTTP
- 
+
+ Table of Contents
+
+ * [Development](#development)
 
 Ok, so websockets can kind of suck.  And lots of people are more comfortable
 with the request/response behavior of 'standard' HTTP as opposed to the asynch
@@ -20,6 +23,22 @@ So the following would execute the template */test/servername* against the conne
 
         http://epiquery.server.com/pants/test/servername
 
+
+## Development
+
+
+You need to run the server in the background or another tab before running the tests.
+
+#### Environment Setup
+
+* The server needs the time zone (`TZ`) set. This can be accomplished with the following:
+
+    TZ=UTC make start
+
+* If the `DEBUG` variable is set in the make test environment, it will break the tests. To remedy
+  this, use the following:
+
+    DEBUG= make test
 
 #### Running Tests
 
@@ -224,7 +243,7 @@ legacy apps so they don't have to unwillingly take new functionality.
 ##### Simple Client Example
 
       <script src="http://some.epiquery.server/static/js/epiclient_v3.js"></script>
-      <script type="text/javascript">   
+      <script type="text/javascript">
       //an array of urls is required
       client = new EpiClient([
         "ws://some.epiquery2.server/sockjs/websocket",
@@ -291,7 +310,7 @@ the templates will be put into a directory named 'templates' within epiquery's w
 the JSON encoded information needed to configure the various drivers.  Ya, gnarly.  We'll do this one through examples.
 * `ENABLE_TEMPLATE_ACLS` - (optional) ACLs are enabled by default, however it's possible to disable them by setting
 this to the string 'DISABLED'
-* `HTTP_REQUEST_TIMEOUT_IN_SECONDS` - Number of seconds after which node will timeout connections, specifically this is used 
+* `HTTP_REQUEST_TIMEOUT_IN_SECONDS` - Number of seconds after which node will timeout connections, specifically this is used
 to set [server.setTimeout(x)](https://nodejs.org/docs/latest-v5.x/api/http.html#http_request_settimeout_timeout_callback) which
 defaults to 2 minutes both in node and here in epiquery2.
 
@@ -385,7 +404,7 @@ very concise and simple, it should support a robust handling of that functionali
   this has some limitations (like not handling duplicate column names) but in
   many cases it's simpler to use.
 * mysql - uses the mysql npm package
-* file - Expects that the result of a template render will be a valid path.  
+* file - Expects that the result of a template render will be a valid path.
   Given the result of the rendered template, it attempts to open the file
   indicated and stream the results line-at-a-time to the caller.  Each line
   comes through as a 'row' event.
