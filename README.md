@@ -164,7 +164,7 @@ The final format is *epiquery1* and is intended to be identical to the response 
           }
         ]
 
-##### csv
+##### <abbr title="Comma-Seprated Values">CSV</abbr>
 
 There is an response format that returns data formatted using CSV. This format returns each individual recordset in the response in CSV format separated by a blank line.  A header line is always included, and all string values (including headers) are quoted. Below is a sample of a response containing four result sets having varying data.
 
