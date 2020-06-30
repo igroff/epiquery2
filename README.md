@@ -5,6 +5,7 @@
 * [Development](#development)
   * [Environment Setup](#environment-setup)
   * [Running Tests](#running-tests)
+  * [Adding Tests](#adding-tests)
 * [HTTP Response Format Examples](#http-response-format-examples)
   * [Standard](#standard)
   * [Simple](#standard)
@@ -47,16 +48,16 @@ All of these need to be completed before you can run the tests reliably.
 
 * The server needs the time zone (`TZ`) set. This can be accomplished with the following:
 
-        TZ=UTC make start
+      TZ=UTC make start
 
-* If the `DEBUG` variable is set in the make test environment, it will break the tests. To remedy
+* If the `DEBUG` variable is set when the tests run, it will break the tests. To remedy
   this, use the following:
 
-        DEBUG= make test
+      DEBUG= make test
 
 * You need to add the following to your `/etc/hosts` file:
 
-        127.0.0.1  mssql mysql sfdc
+      127.0.0.1  mssql mysql sfdc
 
 * Create a symlink for the test configuration to the `~/.epiquery2` directory by running
   the following at the root of the project:
@@ -71,6 +72,14 @@ All of these need to be completed before you can run the tests reliably.
 ```shell
 make test
 ```
+
+### Adding Tests
+
+The `difftest/tests` directory is where the tests are stored. Each test is a bash executable which
+generally makes network calls to epiquery via `curl`.
+
+The `difftest/expected` directory contains the hypothesis for your tests. They will be used to
+verify against the live result at runtime.
 
 ## HTTP Response Format Examples
 
