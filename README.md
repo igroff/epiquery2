@@ -8,7 +8,7 @@
   * [Adding Tests](#adding-tests)
 * [HTTP Response Format Examples](#http-response-format-examples)
   * [Standard](#standard)
-  * [Simple](#standard)
+  * [Simple](#simple)
   * [epiquery1](#epiquery1)
   * [<abbr title="Comma-Seprated Values">CSV</abbr>](#csv)
   * [Gotchas](#gotchas)
@@ -86,7 +86,7 @@ verify against the live result at runtime.
 In our examples we'll assume a epiquery instance running locally with a connection named
 *pants* to a local MSSQL instance named *PANTSDB*.
 
-#### Standard
+##### Standard
 
 First the 'standard' HTTP format, this format mirrors the websocket api and thus is fairly
 chatty showing all the events as elements in an array.  You're probably not interested, so you'll have to look way down below to see more detail about those events.
