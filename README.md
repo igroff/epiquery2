@@ -166,7 +166,7 @@ The final format is *epiquery1* and is intended to be identical to the response 
 
 ##### CSV
 
-There is an response format that returns data formatted using <abbr title="Comma-Seprated Values">CSV</abbr>. This format returns each individual recordset in the response in CSV format separated by a blank line.  A header line is always included, and all string values (including headers) are quoted. Below is a sample of a response containing four result sets having varying data.
+There is a response format that returns data formatted using comma-separated values (CSV). This format returns each individual recordset in the response in CSV format separated by a blank line.  A header line is always included, and all string values (including headers) are quoted. Below is a sample of a response containing four result sets having varying data.
 
 Things to note are that you'll want to call a connection using the mssql driver and _not_ the mssql_o driver, as the mssql_o driver will lose identically named columns, thus you will actually not get all the data as you do in that last document if you chose a connection using the mssql_o driver.
 
