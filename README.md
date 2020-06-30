@@ -1,16 +1,21 @@
 ## Websockets suck. I use 'normal' HTTP
 
- Table of Contents
+### Table of Contents
 
 * [Development](#development)
-  * [Environment Setup](#environment-setup))
+  * [Environment Setup](#environment-setup)
   * [Running Tests](#running-tests)
 * [HTTP Response Format Examples](#http-response-format-examples)
   * [Standard](#standard)
   * [Simple](#standard)
-  * [epiquery1](#eqpiquery1)
+  * [epiquery1](#epiquery1)
   * [<abbr title="Comma-Seprated Values">CSV</abbr>](#csv)
-* [Gotchas](#gotchas)
+  * [Gotchas](#gotchas)
+* [How do I use it?](#websockets-i-dont-care-how-do-i-use-it)
+* [Definitions](#definitions)
+* [Supported Data sources](#supported-data-sources)
+* [Configuration](#configuration)
+* [Interface](#interface)
 
 Ok, so websockets can kind of suck.  And lots of people are more comfortable
 with the request/response behavior of 'standard' HTTP as opposed to the async
@@ -36,22 +41,22 @@ So the following would execute the template */test/servername* against the conne
 
 You need to run the server in the background or another terminal window before running the tests.
 
-#### Environment Setup
+### Environment Setup
 
 All of these need to be completed before you can run the tests reliably.
 
 * The server needs the time zone (`TZ`) set. This can be accomplished with the following:
 
-    TZ=UTC make start
+        TZ=UTC make start
 
 * If the `DEBUG` variable is set in the make test environment, it will break the tests. To remedy
   this, use the following:
 
-    DEBUG= make test
+        DEBUG= make test
 
 * You need to add the following to your `/etc/hosts` file:
 
-    127.0.0.1  mssql mysql sfdc
+        127.0.0.1  mssql mysql sfdc
 
 * Create a symlink for the test configuration to the `~/.epiquery2` directory by running
   the following at the root of the project:
@@ -61,18 +66,18 @@ All of these need to be completed before you can run the tests reliably.
     ln -s $(pwd)/difftest/etc/epi_test_config ~/.epiquery2/config
     ```
 
-#### Running Tests
+### Running Tests
 
 ```shell
 make test
 ```
 
-### HTTP Response Format Examples
+## HTTP Response Format Examples
 
 In our examples we'll assume a epiquery instance running locally with a connection named
 *pants* to a local MSSQL instance named *PANTSDB*.
 
-##### Standard
+#### Standard
 
 First the 'standard' HTTP format, this format mirrors the websocket api and thus is fairly
 chatty showing all the events as elements in an array.  You're probably not interested, so you'll have to look way down below to see more detail about those events.
