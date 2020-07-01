@@ -7,7 +7,7 @@
     "jshint": "2.3.0",
     "supervisor": "igroff/node-supervisor",
     "sockjs-client": "0.1.3",
-    "difftest-runner": "0.0.9",
+    "difftest-runner": "igroff/difftest-runner",
     "ws": "~0.4.31"
   },
   "dependencies": {

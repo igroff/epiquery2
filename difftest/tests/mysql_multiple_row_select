@@ -1,3 +1,5 @@
 #! /usr/bin/env bash
 exec 2>&1
+# The theory is MySQL fails the first time when it's cold so we warm it up here
+./difftest/bin/wsBasic.coffee --connection mysql --template '/test/mysql_multiple_row_select' > /dev/null
 ./difftest/bin/wsBasic.coffee --connection mysql --template '/test/mysql_multiple_row_select'
