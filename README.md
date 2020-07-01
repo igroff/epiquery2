@@ -1,8 +1,25 @@
 ## Websockets suck. I use 'normal' HTTP
- 
+
+### Table of Contents
+
+* [Development](#development)
+  * [Environment Setup](#environment-setup)
+  * [Running Tests](#running-tests)
+  * [Adding Tests](#adding-tests)
+* [HTTP Response Format Examples](#http-response-format-examples)
+  * [Standard](#standard)
+  * [Simple](#simple)
+  * [epiquery1](#epiquery1)
+  * [CSV](#csv)
+  * [Gotchas](#gotchas)
+* [How do I use it?](#websockets-i-dont-care-how-do-i-use-it)
+* [Definitions](#definitions)
+* [Supported Data sources](#supported-data-sources)
+* [Configuration](#configuration)
+* [Interface](#interface)
 
 Ok, so websockets can kind of suck.  And lots of people are more comfortable
-with the request/response behavior of 'standard' HTTP as opposed to the asynch
+with the request/response behavior of 'standard' HTTP as opposed to the async
 event based nature of websockets. To that end, we offer multiple transport
 formats for HTTP.
 
@@ -21,24 +38,50 @@ So the following would execute the template */test/servername* against the conne
         http://epiquery.server.com/pants/test/servername
 
 
-#### Running Tests
+## Development
 
-If you want to run the tests locally, you will need to symlink the test config to your ~/.epiquery2 directory.
+You need to run the server in the background or another terminal window before running the tests.
 
-Example:
+### Environment Setup
+
+All of these need to be completed before you can run the tests reliably.
+
+* The server needs the time zone (`TZ`) set. This can be accomplished with the following:
+
+      TZ=UTC make start
+
+* If the `DEBUG` variable is set when the tests run, it will break the tests. To remedy
+  this, use the following:
+
+      DEBUG= make test
+
+* You need to add the following to your `/etc/hosts` file:
+
+      127.0.0.1  mssql mysql sfdc
+
+* Create a symlink for the test configuration to the `~/.epiquery2` directory by running
+  the following at the root of the project:
+
+    ```shell
+    mkdir -p ~/.epiquery2
+    ln -s $(pwd)/difftest/etc/epi_test_config ~/.epiquery2/config
+    ```
+
+### Running Tests
+
+```shell
+make test
 ```
-ln -s {YOUR_PATH_TO_REPO}/epiquery2/difftest/etc/epi_test_config ~/.epiquery2/config
-```
 
-ALSO... Add the following to your `/etc/hosts` file:
+### Adding Tests
 
-```
-127.0.0.1 mssql
-127.0.0.1 sfdc
-127.0.0.1 mysql
-```
+The `difftest/tests` directory is where the tests are stored. Each test is a bash executable which
+generally makes network calls to epiquery via `curl`.
 
-#### HTTP Response Format Examples
+The `difftest/expected` directory contains the hypothesis for your tests. They will be used to
+verify against the live result at runtime.
+
+## HTTP Response Format Examples
 
 In our examples we'll assume a epiquery instance running locally with a connection named
 *pants* to a local MSSQL instance named *PANTSDB*.
@@ -121,9 +164,9 @@ The final format is *epiquery1* and is intended to be identical to the response 
           }
         ]
 
-##### csv
+##### CSV
 
-There is an response format that returns data formatted using CSV. This format returns each individual recordset in the response in CSV format separated by a blank line.  A header line is always included, and all string values (including headers) are quoted. Below is a sample of a response containing four result sets having varying data.
+There is a response format that returns data formatted using comma-separated values (CSV). This format returns each individual recordset in the response in CSV format separated by a blank line.  A header line is always included, and all string values (including headers) are quoted. Below is a sample of a response containing four result sets having varying data.
 
 Things to note are that you'll want to call a connection using the mssql driver and _not_ the mssql_o driver, as the mssql_o driver will lose identically named columns, thus you will actually not get all the data as you do in that last document if you chose a connection using the mssql_o driver.
 
@@ -224,7 +267,7 @@ legacy apps so they don't have to unwillingly take new functionality.
 ##### Simple Client Example
 
       <script src="http://some.epiquery.server/static/js/epiclient_v3.js"></script>
-      <script type="text/javascript">   
+      <script type="text/javascript">
       //an array of urls is required
       client = new EpiClient([
         "ws://some.epiquery2.server/sockjs/websocket",
@@ -291,7 +334,7 @@ the templates will be put into a directory named 'templates' within epiquery's w
 the JSON encoded information needed to configure the various drivers.  Ya, gnarly.  We'll do this one through examples.
 * `ENABLE_TEMPLATE_ACLS` - (optional) ACLs are enabled by default, however it's possible to disable them by setting
 this to the string 'DISABLED'
-* `HTTP_REQUEST_TIMEOUT_IN_SECONDS` - Number of seconds after which node will timeout connections, specifically this is used 
+* `HTTP_REQUEST_TIMEOUT_IN_SECONDS` - Number of seconds after which node will timeout connections, specifically this is used
 to set [server.setTimeout(x)](https://nodejs.org/docs/latest-v5.x/api/http.html#http_request_settimeout_timeout_callback) which
 defaults to 2 minutes both in node and here in epiquery2.
 
@@ -385,7 +428,7 @@ very concise and simple, it should support a robust handling of that functionali
   this has some limitations (like not handling duplicate column names) but in
   many cases it's simpler to use.
 * mysql - uses the mysql npm package
-* file - Expects that the result of a template render will be a valid path.  
+* file - Expects that the result of a template render will be a valid path.
   Given the result of the rendered template, it attempts to open the file
   indicated and stream the results line-at-a-time to the caller.  Each line
   comes through as a 'row' event.
