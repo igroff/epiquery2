@@ -3,7 +3,6 @@
 
 cluster   = require 'cluster'
 express   = require 'express'
-favicon   = require 'serve-favicon'
 _         = require 'underscore'
 path      = require 'path'
 log       = require 'simplog'
