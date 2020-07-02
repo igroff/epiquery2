@@ -22,8 +22,6 @@ app = express()
 app.use express.json()
 app.use express.urlencoded({ extended: false })
 app.use '/static', express.static(path.join(__dirname, 'static'))
-app.use app.router
-# app.use express.errorHandler()
 
 apiKey = config.epistreamApiKey
 
