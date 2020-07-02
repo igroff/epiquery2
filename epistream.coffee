@@ -166,3 +166,4 @@ else
         log.info "replaced worker of pid #{worker.process.pid} with #{newWorker.process.pid}"
     )
   else
+    server.listen(config.port)
