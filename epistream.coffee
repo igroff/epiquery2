@@ -18,7 +18,7 @@ queryRequestHandler = require('./src/request.coffee').queryRequestHandler
 
 app = express()
 app.use express.json()
-app.use express.urlencoded({ extended: false })
+app.use express.urlencoded({ extended: true })
 app.use '/static', express.static(path.join(__dirname, 'static'))
 
 apiKey = config.epistreamApiKey
