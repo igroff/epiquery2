@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# 5K params test
+# output=$(mktemp /tmp/difftest.XXXXXX)
+# echo $output
+# array=()
+# for i in $(seq 1 6000000); do
+  # array+=($i)
+# done
+
+# data=$(IFS=, ; echo "${array[*]}")
+# echo '{"message":"catpants","array":['$data']}'> $output
+
+# ls -lh $output
+curl --silent http://localhost:8080/render/test/echo.mustache?queryId=1 \
+  --header 'Content-Type: application/json' \
+  --data @./difftest/test-data/45mb-of-json.json
