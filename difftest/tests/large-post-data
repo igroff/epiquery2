@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# 50mb of post data
+curl --silent http://localhost:8080/render/test/echo.mustache?queryId=1 --data @./difftest/test-data/50mb-of-post-data
