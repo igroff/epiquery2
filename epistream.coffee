@@ -18,7 +18,7 @@ queryRequestHandler = require('./src/request.coffee').queryRequestHandler
 
 app = express()
 # based on https://stackoverflow.com/a/19965089/2733
-app.use express.json()
+app.use express.json({ limit: '50mb' })
 app.use express.urlencoded({ extended: true, parameterLimit: 5000 })
 app.use '/static', express.static(path.join(__dirname, 'static'))
 
