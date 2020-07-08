@@ -2,4 +2,4 @@
 
 curl --silent http://localhost:8080/render/test/echo.mustache?queryId=1 \
   --header 'Content-Type: application/json' \
-  --data @./difftest/test-data/45mb-of-json.json
+  --data @./difftest/test-data/26mb-of-json
