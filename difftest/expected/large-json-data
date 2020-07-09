@@ -1,0 +1,7 @@
+{
+  "events":[
+  {"queryId":"1","message":"beginquery"},
+  {"queryId":"1","data":"select 'catpants' as message\n","message":"data"},
+  {"queryId":"1","message":"endquery"}
+  ]
+}

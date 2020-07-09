@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# 5K params test
+params=('message=catpants')
+limit=4999
+
+for i in $(seq 1 $limit); do
+  params+=("$i=$i")
+done
+
+output=$(mktemp /tmp/difftest.XXXXXX)
+data=$(IFS=\&; echo "${params[*]}")
+echo "$data" > $output
+curl --silent http://localhost:8080/render/test/echo.mustache?queryId=1 --data @$output
