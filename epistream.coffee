@@ -70,7 +70,6 @@ app.get '/stats', (req, res) ->
   res.send stats
 
 httpRequestHandler = (req, res) ->
-  clientId = req.param 'client_id'
   c = new Context()
   c.queryId = req.param 'queryId'
   _.extend c, httpClient.getQueryRequestInfo(req, !!apiKey)
