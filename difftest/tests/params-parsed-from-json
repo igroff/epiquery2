@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+curl --silent http://localhost:8080/render/test/echo.mustache \
+  --header 'Content-Type: application/json' \
+  --data '{"message":"parsed-from-json","queryId":3}'
