@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# body overrides query param
+curl --silent http://localhost:8080/render/test/echo.mustache?queryId=1 \
+  --header 'Content-Type: application/json' \
+  --data '{"message":"parsed-from-json","queryId":3}'

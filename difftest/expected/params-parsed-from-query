@@ -1,0 +1,7 @@
+{
+  "events":[
+  {"queryId":"4","message":"beginquery"},
+  {"queryId":"4","data":"select 'parsed-from-query' as message\n","message":"data"},
+  {"queryId":"4","message":"endquery"}
+  ]
+}
