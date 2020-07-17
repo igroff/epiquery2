@@ -1,4 +1,6 @@
 SHELL=/bin/bash
+
+export PATH := ./node_modules/.bin:$(PATH)
 .PHONY: watch test pass lint clean start
 
 watch: build
@@ -14,24 +16,24 @@ difftest/templates:
 		templates/
 
 test: node_modules/ difftest/templates
-	docker-compose up -d
-	PATH=./node_modules/.bin:${PATH} ./node_modules/.bin/difftest run ${TEST_NAME}
+	docker-compose up --detach
+	difftest run ${TEST_NAME}
 
 pass/%:
 	cp difftest/results/$(subst pass/,,$@) difftest/expected/$(subst pass/,,$@)
 
 lint:
-	find ./src -name '*.coffee' | xargs ./node_modules/.bin/coffeelint -f ./etc/coffeelint.conf
-	find ./src -name '*.js' | xargs ./node_modules/.bin/jshint 
+	find ./src -name '*.coffee' | xargs coffeelint --file ./etc/coffeelint.conf
+	find ./src -name '*.js' | xargs jshint
 
 static/js/sockjstest.js: static/js/src/wstest.coffee
-	./node_modules/.bin/browserify -t coffeeify static/js/src/wstest.coffee > static/js/sockjstest.js
+	browserify --transform coffeeify static/js/src/wstest.coffee > static/js/sockjstest.js
 
 static/js/epiclient_v3.js: src/clients/EpiClient.coffee
-	./node_modules/.bin/browserify -t coffeeify -r ./src/clients/EpiClient.coffee:epi-client --outfile $@
+	browserify --transform coffeeify --require ./src/clients/EpiClient.coffee:epi-client --outfile $@
 
 static/js/hunting-websocket.js: src/clients/hunting-websocket.litcoffee
-	./node_modules/.bin/browserify -t coffeeify src/clients/hunting-websocket.litcoffee --outfile $@
+	browserify --transform coffeeify src/clients/hunting-websocket.litcoffee --outfile $@
 
 build: static/js/epiclient_v3.js node_modules/
 
