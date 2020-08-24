@@ -1,0 +1,4 @@
+recursive: true
+require:
+  - coffee-script/register
+  - test/bootstrap.js
