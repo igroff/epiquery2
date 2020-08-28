@@ -9,7 +9,6 @@ class SnowflakeDriver extends events.EventEmitter
 
   execute: (query, context) ->
     log.debug "executing Snowflake query #{query}"
-    console.log(context)
     stream = @conn.execute({sqlText: query, binds: context.templateContext.binds}).streamRows()
     stream.on 'data', (record) =>
         @emit 'row', record
