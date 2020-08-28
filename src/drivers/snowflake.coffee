@@ -9,7 +9,8 @@ class SnowflakeDriver extends events.EventEmitter
 
   execute: (query, context) ->
     log.debug "executing Snowflake query #{query}"
-    stream = @conn.execute({sqlText: query}).streamRows()
+    console.log(context)
+    stream = @conn.execute({sqlText: query, binds: context.templateContext.binds}).streamRows()
     stream.on 'data', (record) =>
         @emit 'row', record
     stream.on 'end', (query) =>
@@ -33,9 +34,9 @@ class SnowflakeDriver extends events.EventEmitter
   # do nothing, but we need this so we can be pooled
   disconnect: ->
     @conn.destroy (err, conn) =>
-        log.debug "connection to %j closed", @config.account
+        log.debug "connection to snowflake account %s closed", @config.account
         if (err)
-            log.error("Error disconnecting from Snowflake\n#{err}")
+            log.error("Error disconnecting Snowflake account #{@config.account}\n#{err}")
         
   
   validate: ->
