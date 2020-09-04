@@ -1,1 +1,1 @@
-select * from WARS.BI.D_CLIENT limit 1
+select * from WARS_BKP.BI.D_PRODUCT limit 1
