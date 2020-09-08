@@ -11,11 +11,7 @@ start: run-server
 run-server: static/js/epiclient_v2.js static/js/epiclient_v3.js
 	exec ./bin/npm-starter
 
-difftest/templates:
-	cd difftest/ && git clone https://github.com/igroff/epiquery-templates.git \
-		templates/
-
-test: node_modules/ difftest/templates
+test: node_modules/
 	docker-compose up --detach
 	difftest run ${TEST_NAME}
 
