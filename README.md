@@ -67,6 +67,8 @@ All of these need to be completed before you can run the tests reliably.
     ln -s $(pwd)/difftest/etc/epi_test_config ~/.epiquery2/config
     ```
 
+* Confirm you are running at least GNU Make 4.3. A Mac OS X running version 3.81 won't work. This is required for the `make test` command in the [Makefile](./Makefile). More info on the issue [here](https://stackoverflow.com/questions/8941110/how-i-could-add-dir-to-path-in-makefile).
+
 ### Running Tests
 
 ```shell
