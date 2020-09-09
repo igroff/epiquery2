@@ -1,0 +1,6 @@
+// pass in multiple parameters to snowflake.
+// NOTE the colon is a bind
+select VAL
+from EPIQUERY.PUBLIC.TEST
+where ID IN (?, ?, ?)
+ORDER BY ID

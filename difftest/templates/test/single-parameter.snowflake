@@ -1,0 +1,5 @@
+// pass in one parameter to snowflake.
+// NOTE the colon is a bind
+select VAL
+from EPIQUERY.PUBLIC.TEST
+where ID = :1

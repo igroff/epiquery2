@@ -1,1 +1,5 @@
-select * from WARS_BKP.BI.D_PRODUCT limit 1
+// return a value at all to confirm we can connect to Snowflake
+select VAL 
+from EPIQUERY.PUBLIC.TEST
+where ID = 2
+limit 1
