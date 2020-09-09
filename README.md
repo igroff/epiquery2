@@ -422,3 +422,29 @@ very concise and simple, it should support a robust handling of that functionali
 
 ### Snowflake
 [snowflake Node.js Driver](https://docs.snowflake.com/en/user-guide/nodejs-driver-use.html#using-the-node-js-driver)
+
+#### Notes to be removed
+We should probably put these in the epiquery templates repo to keep it separated.
+
+"Multiple SQL statements in a single API call are not supported; use one API call per statement instead."
+``` 
+set (min, max)=(40, 70);
+select $min;
+```
+
+I used the below from the [web console](https://kma51753.us-east-1.snowflakecomputing.com/console#/internal/worksheet) to insert some test data into the dedicated epiquery snowflake database for integration testing.
+```
+//Get the layout of the table so I know what to insert
+desc table EPIQUERY.PUBLIC.TEST;
+
+//View current values
+select * from EPIQUERY.PUBLIC.TEST limit 10;
+
+//Plug in some additional test values
+//insert into EPIQUERY.PUBLIC.TEST
+//  values
+//  (4,'FOURTH_VAL'),
+//  (5,'FIFTH_VAL');
+```
+
+Binding values: https://docs.snowflake.com/en/sql-reference/stored-procedures-usage.html#binding-variables
