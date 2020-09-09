@@ -21,7 +21,7 @@ jobs:
         run: docker-compose up --detach
       - name: make test
         env:
-          CONNECTIONS: 'EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_FILE EPI_C_MYSQL EPI_C_RENDER SFDC NON_EXISTENT_SERVER EPI_C_TIMESOUT EPI_C_MYSQL_BULK'
+          CONNECTIONS: 'EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_FILE EPI_C_MYSQL EPI_C_RENDER SFDC NON_EXISTENT_SERVER EPI_C_TIMESOUT EPI_C_MYSQL_BULK EPI_C_SNOWFLAKE'
           DEBUG: true
           DIFFTEST_QUIET: false
           ENABLE_TEMPLATE_ACLS: DISABLED
@@ -32,6 +32,7 @@ jobs:
           EPI_C_MYSQL_BULK: '{"name":"mysql_bulk", "type":"bulk","driver":"mysql","config":{"host":"mysql","user":"root","password":"mysql_root_password"}}'
           EPI_C_RENDER: '{"driver":"render","config":{},"name":"render"}'
           EPI_C_TIMESOUT: '{"driver":"mssql","name":"timesout","config":{"server":"localhost","password":"vagrant","userName":"vagrant","options":{"port":1433, "requestTimeout":1}}}'
+          EPI_C_SNOWFLAKE: '{"driver":"snowflake","config":{"account":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_ACCOUNT_ID }}", "username":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_USERNAME }}", "password":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_PASSWORD }}"},"name":"snowflake"}'
           EPI_SCREAMER_URL: https://services.glgresearch.com/epi-screamer/epiquery
           EPI_TEST_SERVER: localhost
           FORKS: 1
