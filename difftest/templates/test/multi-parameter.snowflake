@@ -1,7 +1,5 @@
 // pass in multiple parameters to snowflake.
 // NOTE the colon is a bind
-USE WAREHOUSE EPIQUERY_PRODUCTION
-
 select VAL
 from EPIQUERY.PUBLIC.TEST
 where ID IN (?, ?, ?)

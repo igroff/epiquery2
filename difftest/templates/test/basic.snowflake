@@ -1,6 +1,4 @@
 // return a value at all to confirm we can connect to Snowflake
-USE WAREHOUSE EPIQUERY_PRODUCTION
-
 select VAL 
 from EPIQUERY.PUBLIC.TEST
 where ID = 2
