@@ -1,5 +1,5 @@
 ## Websockets suck. I use 'normal' HTTP
-Ok, so websockets can kind of suck.  And lots of people are more comfortable with the request/response behavior of 'standard' HTTP as opposed to the async event based nature of websockets. To that end, we offer multiple transport formats for HTTP.
+Ok, so websockets can kind of suck.  And lots of people are more comfortable with the request/response behavior of 'standard' HTTP as opposed to the async event based nature of websockets. To that end, we offer multiple transport formats for HTTP. The simplest purpose of epiquery2 is to turn a request and a template into a string to send somewhere else.
 
 ### Table of Contents
 * [Overview](#overview)
