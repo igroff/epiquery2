@@ -32,7 +32,7 @@ jobs:
           EPI_C_MYSQL: '{"driver":"mysql","name":"mysql","config":{"host":"mysql","user":"root","password":"mysql_root_password"}}'
           EPI_C_RENDER: '{"driver":"render","name":"render","config":{}}'
           EPI_C_SFDC: '{"driver":"salesforce","name":"sfdc","config":{"userName":"","password":"","server":"http://sfdc"}}'
-          EPI_C_SNOWFLAKE: '{"driver":"snowflake","name":"snowflake","config":{"account":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_ACCOUNT_ID }}", "username":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_USERNAME }}", "password":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_PASSWORD }}"}}'
+          EPI_C_SNOWFLAKE: '{"driver":"snowflake","name":"snowflake","config":{"account":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_ACCOUNT_ID }}", "warehouse":"EPIQUERY_PRODUCTION", "username":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_USERNAME }}", "password":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_PASSWORD }}"}}'
           EPI_C_TIMESOUT: '{"driver":"mssql","name":"timesout","config":{"server":"localhost","password":"vagrant","userName":"vagrant","options":{"port":1433, "requestTimeout":1}}}'
           EPI_SCREAMER_URL: https://services.glgresearch.com/epi-screamer/epiquery
           EPI_TEST_SERVER: localhost
