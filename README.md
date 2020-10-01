@@ -67,6 +67,8 @@ defaults to 2 minutes both in node and here in epiquery2.
 
 * Confirm you are running at least GNU Make 4.3. A Mac OS X running version 3.81 won't work. This is required for the `make test` command in the [Makefile](./Makefile). More info on the issue [here](https://stackoverflow.com/questions/8941110/how-i-could-add-dir-to-path-in-makefile).
 
+* You will need [secrets](https://services.glgresearch.com/secrets-docs) and [jq](https://stedolan.github.io/jq/) for the development environment, and aws credentials that grant you access to the `developmentglobal` namespace, which you can get [here.](https://services.glgresearch.com/aws-dev-creds)
+
 ### Get epiquery2 running!
 1. The server needs the time zone (`TZ`) set. This can be accomplished with the following:
     ```shell
@@ -81,7 +83,7 @@ defaults to 2 minutes both in node and here in epiquery2.
 You need to have an epiquery instance running in the background or another terminal window before running the tests. If the `DEBUG` variable is set when the tests run, it will break the tests, so we run like so:
 
 ```shell
-DEBUG= make test
+EPI_TEST_SERVER=localhost DEBUG= make test
 ```
 
 ### Adding Tests
