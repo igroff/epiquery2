@@ -319,12 +319,9 @@ attachStandardResponder = (context, res) ->
   c.once 'completequeryexecution', completeResponse
 
 
-getQueryRequestInfo = (req, useSecure) ->
+getQueryRequestInfo = (req) ->
   templatePath = req.path.replace(/\.\./g, '').replace(/^\//, '')
   pathParts = templatePath.split('/')
-  # If we're using a key secured client, the key must be before the connection name
-  if useSecure
-    clientKey = pathParts.shift()
 
   # pick out any requested response formats
   if pathParts[0] is 'epiquery1'
@@ -351,7 +348,6 @@ getQueryRequestInfo = (req, useSecure) ->
     connectionConfig: connection
     templateContext: _.extend({}, req.body, req.query, req.headers)
     templateName: templatePath
-    clientKey: clientKey
     responseFormat: format
     responseTransform: transformName
     debug: req.query.debug is "true"
