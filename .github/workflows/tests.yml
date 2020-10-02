@@ -42,7 +42,6 @@ jobs:
           NON_EXISTENT_SERVER: '{"driver":"mssql","name":"no_server","config":{"server":"no_server.pants.monkey.underware","password":"vagrant","userName":"vagrant","options":{"port":1433}}}'
           PORT: 8080
           TEMPLATE_DIRECTORY: ${{ github.workspace }}/difftest/templates/
-          URL_BASED_API_KEY: true
         run: |
           TZ=UTC make start &
           ./bin/wait-for-epi
