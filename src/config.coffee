@@ -17,8 +17,6 @@ FORKS=Number.parseInt(process.env.FORKS) || 8
 FORKS=2 unless FORKS > 0
 TEMPLATE_CHANGE_FILE=process.env.TEMPLATE_CHANGE_FILE || path.join(TEMPLATE_DIRECTORY, ".change")
 NODE_ENV=process.env.NODE_ENV || "development"
-EPISTREAM_API_KEY=process.env.EPISTREAM_API_KEY
-URL_BASED_API_KEY=process.env.URL_BASED_API_KEY # use second env var for backwards compatibility
 ENABLE_TEMPLATE_ACLS=process.env.ENABLE_TEMPLATE_ACLS
 # this is the default timeout that matches node's HTTP library default and thus
 # matches epiquery1
@@ -53,8 +51,6 @@ config =
   templateChangeFile: TEMPLATE_CHANGE_FILE
   responseTransformDirectory: path.join(TEMPLATE_DIRECTORY, 'response_transforms')
   nodeEnvironment: NODE_ENV
-  epistreamApiKey: EPISTREAM_API_KEY
-  urlBasedApiKey: URL_BASED_API_KEY
   isDevelopmentMode: () -> NODE_ENV isnt "production"
   httpRequestTimeoutInSeconds: HTTP_REQUEST_TIMEOUT_IN_SECONDS
   enableTemplateAcls: ENABLE_TEMPLATE_ACLS
