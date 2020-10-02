@@ -73,7 +73,7 @@ httpRequestHandler = (req, res) ->
   # the documentation for the deprecated request.params() method:
   # http://expressjs.com/en/api.html#req.param
   c.queryId = req.params.queryId || req.body?.queryId || req.query.queryId
-  _.extend c, httpClient.getQueryRequestInfo(req, false)
+  _.extend c, httpClient.getQueryRequestInfo(req)
 
   if c.connectionName and not config.connections[c.connectionName]
     res.send error: "unable to find connection by name '#{c.connectionName}'"
