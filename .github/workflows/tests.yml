@@ -24,7 +24,7 @@ jobs:
       sfdc:
         image: glgresearch/sfdc-with-drakov:e04eea15
         volumes:
-          - ./mock-salesforce:/var/app
+          - ${{ github.workspace }}/mock-salesforce:/var/app
           - /var/big_pants
         ports:
           - 80:80
