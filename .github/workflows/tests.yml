@@ -11,16 +11,16 @@ jobs:
         ports:
           - 1433:1433
         env:
-          - ACCEPT_EULA=Y
-          - SA_PASSWORD=YourV3ryStrong!Passw0rd
+          ACCEPT_EULA: Y
+          SA_PASSWORD: YourV3ryStrong!Passw0rd
       mysql:
         image: mysql:5.7.22
         ports:
           - 3306:3306
         env:
-          - MYSQL_ALLOW_EMPTY_PASSWORD=yes
-          - MYSQL_DATABASE=epiquery
-          - MYSQL_ROOT_PASSWORD=mysql_root_password
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: epiquery
+          MYSQL_ROOT_PASSWORD: mysql_root_password
       sfdc:
         image: glgresearch/sfdc-with-drakov:e04eea15
         volumes:
@@ -28,7 +28,6 @@ jobs:
           - /var/big_pants
         ports:
           - 80:80
-          - local
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-node@v2.1.2
