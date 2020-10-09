@@ -61,4 +61,4 @@ jobs:
         run: |
           TZ=UTC make start &
           ./bin/wait-for-epi
-          DEBUG= make test
+          DEBUG= difftest run
