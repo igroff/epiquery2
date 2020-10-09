@@ -61,4 +61,4 @@ jobs:
         run: |
           TZ=UTC make start &
           ./bin/wait-for-epi
-          DEBUG= PATH=./node_modules/.bin:$PATH difftest run
+          DEBUG= make ci

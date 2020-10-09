@@ -1,7 +1,7 @@
 SHELL=/bin/bash
 
 export PATH := ./node_modules/.bin:$(PATH)
-.PHONY: watch test pass lint clean start
+.PHONY: watch test pass lint clean start ci
 
 watch: build
 	TZ=UTC ./node_modules/.bin/supervisor -e "litcoffee,coffee" --exec /bin/bash -- ./bin/npm-starter
@@ -10,6 +10,9 @@ start: run-server
 
 run-server: static/js/epiclient_v2.js static/js/epiclient_v3.js
 	exec ./bin/npm-starter
+
+ci: node_modules/
+	difftest run ${TEST_NAME}
 
 test: node_modules/
 	docker-compose up --detach
