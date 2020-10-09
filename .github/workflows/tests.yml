@@ -25,16 +25,13 @@ jobs:
         image: glgresearch/sfdc-with-drakov:e04eea15
         volumes:
           - ${{ github.workspace }}/mock-salesforce:/var/app
-          - /var/big_pants
         ports:
           - 80:80
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
       - uses: actions/setup-node@v2.1.2
         with:
           node-version: 12.3.1
-      - name: Update hosts file
-        run: echo '127.0.0.1 mssql mysql sfdc' | sudo tee --append /etc/hosts
       - name: make test
         env:
           CONNECTIONS: 'EPI_C_FILE EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_MYSQL_BULK EPI_C_MYSQL EPI_C_RENDER EPI_C_SFDC EPI_C_SNOWFLAKE EPI_C_TIMESOUT NON_EXISTENT_SERVER'
