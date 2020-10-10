@@ -23,8 +23,6 @@ jobs:
           MYSQL_ROOT_PASSWORD: mysql_root_password
       sfdc:
         image: glgresearch/sfdc-with-drakov:e04eea15
-        volumes:
-          - ${{ github.workspace }}/mock-salesforce:/var/app
         ports:
           - 80:80
     steps:
@@ -58,6 +56,6 @@ jobs:
           PORT: 8080
           TEMPLATE_DIRECTORY: ${{ github.workspace }}/difftest/templates/
         run: |
-          TZ=UTC DEBUG= make start &
+          TZ=UTC DEBUG=false make start &
           ./bin/wait-for-epi
           DEBUG= make ci
