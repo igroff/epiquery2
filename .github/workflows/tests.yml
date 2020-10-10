@@ -32,11 +32,11 @@ jobs:
           node-version: 12.3.1
       - name: Update hosts file
         run: echo '127.0.0.1 mssql mysql sfdc' | sudo tee --append /etc/hosts
-      - name: make test
+      - name: make ci
         env:
           CONNECTIONS: 'EPI_C_FILE EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_MYSQL_BULK EPI_C_MYSQL EPI_C_RENDER EPI_C_SFDC EPI_C_SNOWFLAKE EPI_C_TIMESOUT NON_EXISTENT_SERVER'
           DEBUG: true
-          DIFFTEST_QUIET: true
+          DIFFTEST_QUIET: false
           ENABLE_TEMPLATE_ACLS: DISABLED
           EPI_C_FILE: '{"driver":"file","name":"file","config":{}}'
           EPI_C_MSSQL_O: '{"driver":"mssql_o","name":"mssql_o","config":{"server":"mssql","password":"YourV3ryStrong!Passw0rd","userName":"SA","options":{"port":1433, "requestTimeout":0}}}'
@@ -56,6 +56,6 @@ jobs:
           PORT: 8080
           TEMPLATE_DIRECTORY: ${{ github.workspace }}/difftest/templates/
         run: |
-          TZ=UTC DEBUG=false make start &
+          TZ=UTC make start &
           ./bin/wait-for-epi
           DEBUG= make ci
