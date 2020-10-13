@@ -1,0 +1,18 @@
+# vi:syntax=yaml
+name: Build Image and Push to ECR
+on:
+  push:
+    branches:
+    - master
+    - main
+    - gds
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@master
+    - uses: glg-public/build-and-deploy-ecr@main
+      with:
+        ecr_uri: ${{secrets.ECR_URI}}
+        access_key_id: ${{secrets.ECR_AWS_ACCESS_KEY_ID}}
+        secret_access_key: ${{secrets.ECR_AWS_SECRET_ACCESS_KEY}}
