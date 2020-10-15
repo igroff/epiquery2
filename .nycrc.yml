@@ -1,0 +1,7 @@
+extension:
+  - .coffee
+  - .js
+
+include:
+  - 'bin/**'
+  - 'src/**'
