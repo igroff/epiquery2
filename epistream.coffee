@@ -18,8 +18,6 @@ app.use express.json({ limit: '26mb' })
 app.use express.urlencoded({ extended: true, limit: '26mb', parameterLimit: 5000 })
 app.use '/static', express.static(path.join(__dirname, 'static'))
 
-apiKey = config.epistreamApiKey
-
 # initialize the core including driver loading, etc.
 core.init()
 
@@ -69,14 +67,7 @@ httpRequestHandler = (req, res) ->
   # the documentation for the deprecated request.params() method:
   # http://expressjs.com/en/api.html#req.param
   c.queryId = req.params.queryId || req.body?.queryId || req.query.queryId
-  _.extend c, httpClient.getQueryRequestInfo(req, !!apiKey)
-  # Check that the client supplied key matches server key
-  if apiKey
-    if !(c.clientKey == apiKey)
-      log.error "Unauthorized HTTP Access Attempted from IP: #{req.connection.remoteAddress}"
-      log.error "Unauthorized Context: #{JSON.stringify(c.templateContext)}"
-      res.send error: "Unauthorized Access"
-      return
+  _.extend c, httpClient.getQueryRequestInfo(req)
 
   if c.connectionName and not config.connections[c.connectionName]
     res.send error: "unable to find connection by name '#{c.connectionName}'"

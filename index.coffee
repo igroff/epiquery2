@@ -18,13 +18,6 @@ socketServer = sockjs.createServer(app, options: disconnect_delay: 900000)
 
 socketServer.on 'connection', (conn) ->
   conn.on 'data', (message) ->
-    if apiKey
-      if !~ conn.url.indexOf apiKey
-        conn.close()
-        log.error "Unauthorized Socket Access Attempted from IP: #{conn.remoteAddress}"
-        log.error "Unauthorized Context: #{JSON.stringify(message)}"
-        return
-
     log.debug "inbound message #{message}"
     if message == 'ping'
       conn.write 'pong'
@@ -52,9 +45,7 @@ socketServer.on 'error', (e) ->
 
 server = http.createServer(app)
 
-# use key based prefix if key is in url
 prefix = {prefix: '/sockjs'}
-prefix.prefix = "/#{apiKey}/sockjs" if apiKey && config.urlBasedApiKey
 
 socketServer.installHandlers(server, prefix)
 

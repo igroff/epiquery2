@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: actions/setup-node@v2.1.1
+      - uses: actions/setup-node@v2.1.2
         with:
           node-version: '12.3.1'
       - name: Update hosts file
@@ -33,7 +33,7 @@ jobs:
         run: docker-compose up --detach
       - name: make test
         env:
-          CONNECTION_CONFIG: '{"file":{"driver":"file","config":{},"name":"file"},"mssql":{"driver":"mssql","name":"mssql","config":{"server":"mssql","password":"YourV3ryStrong!Passw0rd","userName":"SA","options":{"port":1433, "requestTimeout":0}}},"mssql_o":{"driver":"mssql_o","name":"mssql_o","config":{"server":"mssql","password":"YourV3ryStrong!Passw0rd","userName":"SA","options":{"port":1433, "requestTimeout":0}}},"mysql":{"name":"mysql","driver":"mysql","config":{"host":"mysql","user":"root","password":"mysql_root_password"}},"mysql_bulk":{"name":"mysql_bulk", "type":"bulk","driver":"mysql","config":{"host":"mysql","user":"root","password":"mysql_root_password"}},"render":{"driver":"render","config":{},"name":"render"},"timeout":{"driver":"mssql","name":"timesout","config":{"server":"localhost","password":"vagrant","userName":"vagrant","options":{"port":1433, "requestTimeout":1}}},"no_server":{"driver":"mssql","name":"no_server","config":{"server":"no_server.pants.monkey.underware","password":"vagrant","userName":"vagrant","options":{"port":1433}}},"sfdc":{"name":"sfdc","driver":"salesforce","config":{"userName":"","password":"","server":"http://sfdc"}}}'
+          CONNECTION_CONFIG: '{"file":{"driver":"file","config":{},"name":"file"},"mssql":{"driver":"mssql","name":"mssql","config":{"server":"mssql","password":"YourV3ryStrong!Passw0rd","userName":"SA","options":{"port":1433, "requestTimeout":0}}},"mssql_o":{"driver":"mssql_o","name":"mssql_o","config":{"server":"mssql","password":"YourV3ryStrong!Passw0rd","userName":"SA","options":{"port":1433, "requestTimeout":0}}},"mysql":{"name":"mysql","driver":"mysql","config":{"host":"mysql","user":"root","password":"mysql_root_password"}},"mysql_bulk":{"name":"mysql_bulk", "type":"bulk","driver":"mysql","config":{"host":"mysql","user":"root","password":"mysql_root_password"}},"render":{"driver":"render","config":{},"name":"render"},"timesout":{"driver":"mssql","name":"timesout","config":{"server":"localhost","password":"vagrant","userName":"vagrant","options":{"port":1433, "requestTimeout":1}}},"no_server":{"driver":"mssql","name":"no_server","config":{"server":"no_server.pants.monkey.underware","password":"vagrant","userName":"vagrant","options":{"port":1433}}},"sfdc":{"name":"sfdc","driver":"salesforce","config":{"userName":"","password":"","server":"http://sfdc"}},"snowflake":{"driver":"snowflake","name":"snowflake","config":{"account":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_ACCOUNT_ID }}", "warehouse":"EPIQUERY_PRODUCTION", "username":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_USERNAME }}", "password":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_PASSWORD }}"}}}'
           DEBUG: true
           DIFFTEST_QUIET: false
           ENABLE_TEMPLATE_ACLS: DISABLED
@@ -44,7 +44,6 @@ jobs:
           NODE_ENV: development
           PORT: 8080
           TEMPLATE_DIRECTORY: ${{ github.workspace }}/difftest/templates/
-          URL_BASED_API_KEY: true
         run: |
           TZ=UTC make start &
           ./bin/wait-for-epi

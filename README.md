@@ -1,9 +1,11 @@
 ## Websockets suck. I use 'normal' HTTP
+Ok, so websockets can kind of suck.  And lots of people are more comfortable with the request/response behavior of 'standard' HTTP as opposed to the async event based nature of websockets. To that end, we offer multiple transport formats for HTTP. The simplest purpose of epiquery2 is to turn a request and a template into a string to send somewhere else.
 
 ### Table of Contents
-
-* [Development](#development)
-  * [Environment Setup](#environment-setup)
+* [Overview](#overview)
+* [Local Development](#local-development)
+  * [Prerequisites](#prerequisites)
+  * [Get epiquery2 running!](#get-epiquery2-running!)
   * [Running Tests](#running-tests)
   * [Adding Tests](#adding-tests)
 * [HTTP Response Format Examples](#http-response-format-examples)
@@ -12,65 +14,76 @@
   * [epiquery1](#epiquery1)
   * [CSV](#csv)
   * [Gotchas](#gotchas)
-* [How do I use it?](#websockets-i-dont-care-how-do-i-use-it)
+* [Websockets: How do I use it?](#websockets-i-dont-care-how-do-i-use-it)
 * [Definitions](#definitions)
-* [Supported Data sources](#supported-data-sources)
-* [Configuration](#configuration)
 * [Interface](#interface)
+* [Supported Data sources](#supported-data-sources)
+* [Provided Drivers](#provided-drivers)
+  * [Snowflake](#snowflake)
 
-Ok, so websockets can kind of suck.  And lots of people are more comfortable
-with the request/response behavior of 'standard' HTTP as opposed to the async
-event based nature of websockets. To that end, we offer multiple transport
-formats for HTTP.
-
-First a little about HTTP requests to epiquery.
+## Overview
+First a little about HTTP requests to epiquery2.
 
 The general format is as follows:
-
-        http://epiquery.server.com/[optional format]/<required connection name>/template_path
+```
+https://epiquery.server.com/[optional format]/<required connection name>/template_path
+```
 
 Epiquery 2 supports multiple named connections, so the _connection name_ portion of
 the url is required, as is the template path.  As an option you may provide a
-format specifier, currently epiquery 2 supports two optional formats `simple` or `epiquery1`.
+format specifier - currently epiquery2 supports two optional formats; `simple` or `epiquery1`.
 
 So the following would execute the template */test/servername* against the connection named *pants*:
+```
+https://epiquery.server.com/pants/test/servername
+```
 
-        http://epiquery.server.com/pants/test/servername
+## Local Development
+Configuration of epiquery2 is done entirely through environment variables. This is done to simplify the deployment specifically within [Starphleet](https://github.com/wballard/starphleet).  The configuration can be done solely through environment variables, or epiquery will source a file `~/.epiquery2/config` in which the variables can be specified.
 
+* `TEMPLATE_DIRECTORY` - (optional) Where the templates will be found. If not specified
+the templates will be put into a directory named 'templates' within epiquery's working directory.
+* `CONNECTIONS` - A space delimited list of names of environment variables which contain
+the JSON encoded information needed to configure the various drivers.  Ya, gnarly.  We'll do this one through examples.
+* `ENABLE_TEMPLATE_ACLS` - (optional) ACLs are enabled by default, however it's possible to disable them by setting
+this to the string 'DISABLED'
+* `HTTP_REQUEST_TIMEOUT_IN_SECONDS` - Number of seconds after which node will timeout connections, specifically this is used
+to set [server.setTimeout(x)](https://nodejs.org/docs/latest-v5.x/api/http.html#http_request_settimeout_timeout_callback) which
+defaults to 2 minutes both in node and here in epiquery2.
 
-## Development
-
-You need to run the server in the background or another terminal window before running the tests.
-
-### Environment Setup
-
-All of these need to be completed before you can run the tests reliably.
-
-* The server needs the time zone (`TZ`) set. This can be accomplished with the following:
-
-      TZ=UTC make start
-
-* If the `DEBUG` variable is set when the tests run, it will break the tests. To remedy
-  this, use the following:
-
-      DEBUG= make test
-
-* You need to add the following to your `/etc/hosts` file:
-
-      127.0.0.1  mssql mysql sfdc
-
-* Create a symlink for the test configuration to the `~/.epiquery2` directory by running
-  the following at the root of the project:
+### Prerequisites
+* Have your environment variables configured in your `~/.epiquery2/config` file, OR create a symlink for the test configuration to the `~/.epiquery2` directory by running the following at the root of the project:
 
     ```shell
     mkdir -p ~/.epiquery2
     ln -s $(pwd)/difftest/etc/epi_test_config ~/.epiquery2/config
     ```
 
+* Modify your `/etc/hosts` file to connect to local docker run databases:
+
+    ```
+    127.0.0.1  mssql mysql sfdc
+    ```
+
+* Confirm you are running at least GNU Make 4.3. A Mac OS X running version 3.81 won't work. This is required for the `make test` command in the [Makefile](./Makefile). More info on the issue [here](https://stackoverflow.com/questions/8941110/how-i-could-add-dir-to-path-in-makefile).
+
+* You will need [secrets](https://services.glgresearch.com/secrets-docs) and [jq](https://stedolan.github.io/jq/) for the development environment, and aws credentials that grant you access to the `developmentglobal` namespace, which you can get [here.](https://services.glgresearch.com/aws-dev-creds). If you use NVM, you will need to make sure `secrets` is installed in your active node version.
+
+### Get epiquery2 running!
+1. The server needs the time zone (`TZ`) set. This can be accomplished with the following:
+    ```shell
+    TZ=UTC make start
+    ```
+2. Now in a second terminal, query some data!
+    ```
+    curl http://localhost:8080/pants/test/servername
+    ```
+
 ### Running Tests
+You need to have an epiquery instance running in the background or another terminal window before running the tests. If the `DEBUG` variable is set when the tests run, it will break the tests, so we run like so:
 
 ```shell
-make test
+EPI_TEST_SERVER=localhost DEBUG= make test
 ```
 
 ### Adding Tests
@@ -80,6 +93,8 @@ generally makes network calls to epiquery via `curl`.
 
 The `difftest/expected` directory contains the hypothesis for your tests. They will be used to
 verify against the live result at runtime.
+
+The `difftest/templates/test` directory is where the test templates are stored. These will be called by the bash executables in `difftest/tests`.
 
 ## HTTP Response Format Examples
 
@@ -311,43 +326,6 @@ results to epiquery.
 
 * epiquery - the application described within the repository hosting this README
 
-
-## Supported data sources
-* Microsoft SQL Server
-* MySQL
-* Microsoft SQL Server Analysis Services (MDX)
-* File system
-
-## Configuration
-
-Configuration of epiquery is done entirely through environment variables, this
-is done to simplify the deployment specifically within
-[Starphleet](https://github.com/wballard/starphleet).  The configuration can
-be done solely through environment variables or, as a convenience, epiquery
-will source a file `~/.epiquery2/config` in which the variables can be specified.
-
-
-* `TEMPLATE_REPO_URL` - (required) specifies the git repository from which the templates will be loaded
-* `TEMPLATE_DIRECTORY` - (optional) Where the templates will be found, if not specified
-the templates will be put into a directory named 'templates' within epiquery's working directory.
-* `CONNECTIONS` - A space delimited list of names of environment variables which contain
-the JSON encoded information needed to configure the various drivers.  Ya, gnarly.  We'll do this one through examples.
-* `ENABLE_TEMPLATE_ACLS` - (optional) ACLs are enabled by default, however it's possible to disable them by setting
-this to the string 'DISABLED'
-* `HTTP_REQUEST_TIMEOUT_IN_SECONDS` - Number of seconds after which node will timeout connections, specifically this is used
-to set [server.setTimeout(x)](https://nodejs.org/docs/latest-v5.x/api/http.html#http_request_settimeout_timeout_callback) which
-defaults to 2 minutes both in node and here in epiquery2.
-
-#### Sample Configuration (~/.epiquery2/config)
-        export TEMPLATE_REPO_URL=https://github.com/intimonkey/epiquery-templates.git
-        export TEMPLATE_DIRECTORY=~/Development/epiquery2/difftest/templates
-        export CONNECTIONS="EPI_C_MSSQL EPI_C_FILE EPI_C_MYSQL EPI_C_RENDER EPI_C_MSSQL_RO"
-        export EPI_C_FILE='{"driver":"file","config":{},"name":"file"}'
-        export EPI_C_RENDER='{"driver":"render","config":{},"name":"render"}'
-        export EPI_C_MSSQL='{"driver":"mssql","name":"mssql","config":{"server":"10.211.55.5","password":"PASSWORD","userName":"USER","options":{"port":1433}}}'
-        export EPI_C_MYSQL='{"name":"mysql","driver":"mysql","config":{"host":"localhost","user":"root","password":""}}'
-        export EPI_C_MSSQL_RO="{\"driver\":\"mssql\",\"name\":\"db250\",\"config\":{\"server\":\"${DATABASE_READONLY_SERVER}\",\"password\":\"${DATABASE_READONLY_PASSWORD}\",\"userName\":\"${DATABASE_READONLY_USER}\",\"options\":{\"port\":1433}}}"
-
 ## Interface
 
   The systems to which epiquery provides access are generally streaming data
@@ -420,8 +398,15 @@ around tracking a single request to execute a query as it is handled by the
 system.  Specifically this is to help debugging as the concept of epiquery is
 very concise and simple, it should support a robust handling of that functionality
 
+## Supported data sources
+* Microsoft SQL Server
+* MySQL
+* Microsoft SQL Server Analysis Services (MDX)
+* File system
+* SFDC (Salesforce.com)
+* Snowflake
 
-##### Provided Drivers
+## Provided Drivers
 * mssql - based on tedious, used to query an MS SQL Server instance
 * mssql_o - based on tedious, used to query an MS SQL Server instance, this
   driver returns the results as an object instead of an array of key/value pairs
@@ -434,3 +419,34 @@ very concise and simple, it should support a robust handling of that functionali
   comes through as a 'row' event.
 * msmdx - allows for MDX querying of a Microsoft Analysis Server interface
 * render - simply renders the template requested and returns the result
+* SFDC - connect to salesforce.com using the jsforce npm package
+* Snowflake - based on the [snowflake-sdk](https://docs.snowflake.com/en/user-guide/nodejs-driver-use.html#using-the-node-js-driver) npm package, used to query https://www.snowflake.com/ data platform
+
+### Snowflake
+[snowflake Node.js Driver](https://docs.snowflake.com/en/user-guide/nodejs-driver-use.html#using-the-node-js-driver)
+
+#### Notes to be removed
+We should probably put these in the epiquery templates repo to keep it separated.
+
+"Multiple SQL statements in a single API call are not supported; use one API call per statement instead."
+``` 
+set (min, max)=(40, 70);
+select $min;
+```
+
+I used the below from the [web console](https://kma51753.us-east-1.snowflakecomputing.com/console#/internal/worksheet) to insert some test data into the dedicated epiquery snowflake database for integration testing.
+```
+//Get the layout of the table so I know what to insert
+desc table EPIQUERY.PUBLIC.TEST;
+
+//View current values
+select * from EPIQUERY.PUBLIC.TEST limit 10;
+
+//Plug in some additional test values
+//insert into EPIQUERY.PUBLIC.TEST
+//  values
+//  (4,'FOURTH_VAL'),
+//  (5,'FIFTH_VAL');
+```
+
+Binding values: https://docs.snowflake.com/en/sql-reference/stored-procedures-usage.html#binding-variables
