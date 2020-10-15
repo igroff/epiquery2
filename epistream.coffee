@@ -6,7 +6,7 @@ http      = require 'http'
 log       = require 'simplog'
 sockjs    = require 'sockjs'
 
-app       = require './epistream.coffee'
+app       = require './app.coffee'
 config    = require './src/config.js'
 Context   = require('./src/context').Context
 queryRequestHandler = require('./src/request.coffee').queryRequestHandler
