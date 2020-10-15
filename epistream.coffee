@@ -7,7 +7,7 @@ path      = require 'path'
 log       = require 'simplog'
 Context   = require('./src/context').Context
 core      = require './src/core.coffee'
-config    = require './src/config.coffee'
+config    = require './src/config.js'
 httpClient          = require './src/transport/http.coffee'
 queryRequestHandler = require('./src/request.coffee').queryRequestHandler
 

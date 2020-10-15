@@ -1,5 +1,5 @@
 fs     = require 'fs'
-config = require './config.coffee'
+config = require './config.js'
 log    = require 'simplog'
 path   = require 'path'
 vm     = require 'vm'
@@ -7,7 +7,7 @@ coffee = require 'coffee-script'
 
 loadedTransforms = {}
 
-# given the name of a response transformation (file name), load it from the 
+# given the name of a response transformation (file name), load it from the
 # proper location
 getRequestedTransform = (transformName, cb) ->
   if not transformName
@@ -16,7 +16,7 @@ getRequestedTransform = (transformName, cb) ->
     return false
   log.debug "loading requested response transform: #{transformName}"
   try
-    # calculate the path for the transform location, so that we can 
+    # calculate the path for the transform location, so that we can
     # clear the cache, templates are loaded on each execution so the expectation
     # will be the same for the transforms
     transformPath = path.join(config.responseTransformDirectory, transformName)

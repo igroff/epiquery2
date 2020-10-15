@@ -7,7 +7,7 @@ log       = require 'simplog'
 sockjs    = require 'sockjs'
 
 app       = require './epistream.coffee'
-config    = require './src/config.coffee'
+config    = require './src/config.js'
 Context   = require('./src/context').Context
 queryRequestHandler = require('./src/request.coffee').queryRequestHandler
 sockjsClient        = require './src/transport/sockjs.coffee'

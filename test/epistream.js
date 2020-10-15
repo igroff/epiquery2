@@ -4,21 +4,22 @@ const supertest = require('supertest');
 const MOCK_ENV = {
   DISABLE_LOGGING: true,
   TEMPLATE_DIRECTORY: `${process.cwd()}/difftest/templates/`,
-  CONNECTIONS: 'catpants foo meh',
-  catpants: JSON.stringify({
-    driver: 'file',
-    config: {},
-    name: 'catpants',
-  }),
-  foo: JSON.stringify({
-    driver: 'file',
-    config: {},
-    name: 'foo',
-  }),
-  meh: JSON.stringify({
-    driver: 'file',
-    config: {},
-    name: 'meh',
+  CONNECTION_CONFIG: JSON.stringify({
+    catpants: {
+      driver: 'file',
+      config: {},
+      name: 'catpants',
+    },
+    foo: {
+      driver: 'file',
+      config: {},
+      name: 'foo',
+    },
+    meh: {
+      driver: 'file',
+      config: {},
+      name: 'meh',
+    },
   }),
 };
 
@@ -52,7 +53,7 @@ describe('express', () => {
         underscore: {},
         './src/context.coffee': {},
         './src/core.coffee': { init: sinon.fake() },
-        './src/config.coffee': { isDevelopmentMode: () => false },
+        './src/config.js': { isDevelopmentMode: () => false },
         './src/transport/http.coffee': {},
         './src/request.coffee': {},
       });
