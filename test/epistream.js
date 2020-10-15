@@ -46,7 +46,16 @@ describe('express', () => {
 
       stub = sinon.stub(process, 'env').value(MOCK_ENV);
 
-      proxyquire('../epistream.coffee', { express: mockExpress });
+      proxyquire('../epistream.coffee', {
+        express: mockExpress,
+        // mock out everything not being tested for performance reasons
+        underscore: {},
+        './src/context.coffee': {},
+        './src/core.coffee': { init: sinon.fake() },
+        './src/config.coffee': { isDevelopmentMode: () => false },
+        './src/transport/http.coffee': {},
+        './src/request.coffee': {},
+      });
     });
 
     afterEach(() => {
