@@ -12,8 +12,6 @@ Context   = require('./src/context').Context
 queryRequestHandler = require('./src/request.coffee').queryRequestHandler
 sockjsClient        = require './src/transport/sockjs.coffee'
 
-apiKey = config.epistreamApiKey
-
 socketServer = sockjs.createServer(app, options: disconnect_delay: 900000)
 
 socketServer.on 'connection', (conn) ->
