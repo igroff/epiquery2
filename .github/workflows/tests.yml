@@ -15,7 +15,7 @@ jobs:
           npm ci
           npm run lint --if-present
           npm test
-  test:
+  integration-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
