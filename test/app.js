@@ -51,7 +51,7 @@ describe('express', () => {
         express: mockExpress,
         // mock out everything not being tested for performance reasons
         underscore: {},
-        './src/context.coffee': {},
+        './src/context': {},
         './src/core.coffee': { init: sinon.fake() },
         './src/config.js': { isDevelopmentMode: () => false },
         './src/transport/http.coffee': {},

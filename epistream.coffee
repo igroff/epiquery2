@@ -51,7 +51,6 @@ log.debug "server worker process starting with configuration"
 log.debug "%j", config
 log.debug "node version", process.version
 
-
 if config.isDevelopmentMode()
   log.warn "********************************************************************************"
   log.warn "epiquery is running in development mode, this will result in templates not being cached and thus"

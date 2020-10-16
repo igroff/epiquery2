@@ -45,7 +45,7 @@ jobs:
             "snowflake":{"driver":"snowflake","name":"snowflake","config":{"account":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_ACCOUNT_ID }}","warehouse":"EPIQUERY_PRODUCTION","username":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_USERNAME }}","password":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_PASSWORD }}"}},
             "timesout":{"driver":"mssql","name":"timesout","config":{"server":"localhost","password":"vagrant","userName":"vagrant","options":{"port":1433,"requestTimeout":1}}}
             }
-          DEBUG: true
+          DEBUG: false
           DIFFTEST_QUIET: false
           ENABLE_TEMPLATE_ACLS: DISABLED
           EPI_SCREAMER_URL: https://services.glgresearch.com/epi-screamer/epiquery
