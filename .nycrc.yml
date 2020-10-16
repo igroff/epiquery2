@@ -3,5 +3,7 @@ extension:
   - .js
 
 include:
-  - 'bin/**'
-  - 'src/**'
+  - app.coffee
+  - epistream.coffee
+  - bin/**
+  - src/**
