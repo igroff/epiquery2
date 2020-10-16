@@ -33,7 +33,7 @@ jobs:
         run: docker-compose up --detach
       - name: make test
         env:
-          CONNECTION_CONFIG: {
+          CONNECTION_CONFIG: '{
             "file":{"driver":"file","config":{},"name":"file"},
             "mssql":{"driver":"mssql","name":"mssql","config":{"server":"mssql","password":"YourV3ryStrong!Passw0rd","userName":"SA","options":{"port":1433,"requestTimeout":0}}},
             "mssql_o":{"driver":"mssql_o","name":"mssql_o","config":{"server":"mssql","password":"YourV3ryStrong!Passw0rd","userName":"SA","options":{"port":1433,"requestTimeout":0}}},
@@ -44,7 +44,7 @@ jobs:
             "sfdc":{"name":"sfdc","driver":"salesforce","config":{"userName":"","password":"","server":"http://sfdc"}},
             "snowflake":{"driver":"snowflake","name":"snowflake","config":{"account":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_ACCOUNT_ID }}","warehouse":"EPIQUERY_PRODUCTION","username":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_USERNAME }}","password":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_PASSWORD }}"}},
             "timesout":{"driver":"mssql","name":"timesout","config":{"server":"localhost","password":"vagrant","userName":"vagrant","options":{"port":1433,"requestTimeout":1}}}
-            }
+            }'
           DEBUG: false
           DIFFTEST_QUIET: false
           ENABLE_TEMPLATE_ACLS: DISABLED
