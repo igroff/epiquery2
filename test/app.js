@@ -23,14 +23,17 @@ const MOCK_ENV = {
   }),
 };
 
-describe('express', () => {
-  describe('internals', () => {
+describe('express', function() {
+  describe('internals', function() {
     let mockApp;
     let mockExpress;
     let now;
     let stub;
 
-    beforeEach(() => {
+    beforeEach(function() {
+      // NOTE (phd): node 12.3.1 executes this very slowly. This can be removed after we upgrade
+      this.timeout(3000);
+
       now = Date.now();
       mockApp = {
         all: sinon.fake(),
