@@ -1,6 +1,6 @@
 {
   "name": "epiquery2",
-  "version": "0.0.14",
+  "version": "1.0.0",
   "description": "run templated queries from the http's using learnings from 1",
   "devDependencies": {
     "chai": "^4.2.0",

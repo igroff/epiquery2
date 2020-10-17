@@ -33,6 +33,7 @@ jobs:
         run: docker-compose up --detach
       - name: make test
         env:
+          # yamllint disable-line rule:indentation
           CONNECTION_CONFIG: '{
             "file":{"driver":"file","config":{},"name":"file"},
             "mssql":{"driver":"mssql","name":"mssql","config":{"server":"mssql","password":"YourV3ryStrong!Passw0rd","userName":"SA","options":{"port":1433,"requestTimeout":0}}},
