@@ -1,0 +1,13 @@
+extension:
+  - .coffee
+  - .js
+
+include:
+  - app.coffee
+  - epistream.coffee
+  - bin/**
+  - src/**
+
+reporter:
+  - lcov
+  - text
