@@ -79,6 +79,12 @@ defaults to 2 minutes both in node and here in epiquery2.
     curl http://localhost:8080/pants/test/servername
     ```
 
+### Get epiquery2 running via Docker
+Something like this:
+```
+docker run --env-file ./docker.env --volume $PWD/difftest/templates:/tmp/difftest/templates -p 127.0.0.1:8080:8080/tcp -it 9c883cee1d3e
+```
+
 ### Running Tests
 You need to have an epiquery instance running in the background or another terminal window before running the tests. If the `DEBUG` variable is set when the tests run, it will break the tests, so we run like so:
 
@@ -429,7 +435,7 @@ very concise and simple, it should support a robust handling of that functionali
 We should probably put these in the epiquery templates repo to keep it separated.
 
 "Multiple SQL statements in a single API call are not supported; use one API call per statement instead."
-``` 
+```
 set (min, max)=(40, 70);
 select $min;
 ```
