@@ -2,9 +2,9 @@ const EventEmitter = require('events');
 const snowflake    = require('snowflake-sdk');
 const log          = require('simplog');
 
-// So this driver to work with snowflake, and there's nothing particularly 
+// So this driver to work with snowflake, and there's nothing particularly
 // outstanding about it with the exception of the parameter binding.
-// 
+//
 // Due to the way in which param binding works in the snowflake-sdk it is possible
 // to write a parameterized template using numbered parameter placeholders and
 // pass in the parameters for that template as an array of values orderd appropriately
@@ -13,7 +13,7 @@ const log          = require('simplog');
 // A sample of a parameterized template would be
 //
 //   select * from WARS.BI.D_CLIENT limit :1
-// 
+//
 // To get that parameter passed in via the request the caller would have to provide
 // a JSON object with a 'binds' property as an array in the request, like:
 //
@@ -30,15 +30,26 @@ class SnowflakeDriver extends EventEmitter {
   }
 
   execute(query, context) {
+    let rowSetStarted = false;
     log.debug(`executing Snowflake query ${query}`);
     const stream = this.conn.execute({sqlText: query, binds: context.templateContext.binds}).streamRows();
     stream.on('data', record => {
+      if (!rowSetStarted) {
+        rowSetStarted = true;
+        this.emit('beginrowset');
+      }
       this.emit('row', record);
     });
     stream.on('end', query => {
+      if (rowSetStarted) {
+        this.emit('endrowset');
+      }
       this.emit('endquery', query);
     });
     stream.on('error', error => {
+      if (rowSetStarted) {
+        this.emit('endrowset');
+      }
       this.valid = false;
       this.emit('error', error);
     });
@@ -67,7 +78,7 @@ class SnowflakeDriver extends EventEmitter {
       }
     });
   }
-      
+
   validate() {
     return this.valid;
   }
