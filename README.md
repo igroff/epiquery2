@@ -51,6 +51,8 @@ this to the string 'DISABLED'
 to set [server.setTimeout(x)](https://nodejs.org/docs/latest-v5.x/api/http.html#http_request_settimeout_timeout_callback) which
 defaults to 2 minutes both in node and here in epiquery2.
 
+## Running Tests
+
 ### Prerequisites
 * Have your environment variables configured in your `~/.epiquery2/config` file, OR create a symlink for the test configuration to the `~/.epiquery2` directory by running the following at the root of the project:
 
@@ -67,6 +69,8 @@ defaults to 2 minutes both in node and here in epiquery2.
 
 * Confirm you are running at least GNU Make 4.3. A Mac OS X running version 3.81 won't work. This is required for the `make test` command in the [Makefile](./Makefile). More info on the issue [here](https://stackoverflow.com/questions/8941110/how-i-could-add-dir-to-path-in-makefile).
 
+For MAC users, you can simply `brew install make` and then add the path to `gmake` to your bashrc shell boot script as defined in this document: https://formulae.brew.sh/formula/make
+
 ### Get epiquery2 running!
 1. The server needs the time zone (`TZ`) set. This can be accomplished with the following:
     ```shell
@@ -76,9 +80,10 @@ defaults to 2 minutes both in node and here in epiquery2.
     ```
     curl http://localhost:8080/pants/test/servername
     ```
+### Run Tests
+You need to have an epiquery instance using test configuration running in the background or another terminal window before running the tests. See the above Prerequisties section for details.
 
-### Running Tests
-You need to have an epiquery instance running in the background or another terminal window before running the tests. If the `DEBUG` variable is set when the tests run, it will break the tests, so we run like so:
+If the `DEBUG` variable is set when the tests run, it will break the tests, so we run like so:
 
 ```shell
 DEBUG= make test
@@ -427,7 +432,7 @@ very concise and simple, it should support a robust handling of that functionali
 We should probably put these in the epiquery templates repo to keep it separated.
 
 "Multiple SQL statements in a single API call are not supported; use one API call per statement instead."
-``` 
+```
 set (min, max)=(40, 70);
 select $min;
 ```
