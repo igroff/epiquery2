@@ -71,6 +71,8 @@ defaults to 2 minutes both in node and here in epiquery2.
 
 For MAC users, you can simply `brew install make` and then add the path to `gmake` to your bashrc shell boot script as defined in this document: https://formulae.brew.sh/formula/make
 
+* You will need [secrets](https://services.glgresearch.com/secrets-docs) and [jq](https://stedolan.github.io/jq/) for the development environment, and aws credentials that grant you access to the `developmentglobal` namespace, which you can get [here.](https://services.glgresearch.com/aws-dev-creds). If you use NVM, you will need to make sure `secrets` is installed in your active node version.
+
 ### Get epiquery2 running!
 1. The server needs the time zone (`TZ`) set. This can be accomplished with the following:
     ```shell
@@ -86,7 +88,7 @@ You need to have an epiquery instance using test configuration running in the ba
 If the `DEBUG` variable is set when the tests run, it will break the tests, so we run like so:
 
 ```shell
-DEBUG= make test
+EPI_TEST_SERVER=localhost DEBUG= make test
 ```
 
 ### Adding Tests

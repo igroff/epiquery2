@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: actions/setup-node@v2.1.1
+      - uses: actions/setup-node@v2.1.2
         with:
           node-version: '12.3.1'
       - name: Update hosts file
@@ -32,7 +32,7 @@ jobs:
           EPI_C_MYSQL: '{"driver":"mysql","name":"mysql","config":{"host":"mysql","user":"root","password":"mysql_root_password"}}'
           EPI_C_RENDER: '{"driver":"render","name":"render","config":{}}'
           EPI_C_SFDC: '{"driver":"salesforce","name":"sfdc","config":{"userName":"","password":"","server":"http://sfdc"}}'
-          EPI_C_SNOWFLAKE: '{"driver":"snowflake","name":"snowflake","config":{"account":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_ACCOUNT_ID }}", "username":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_USERNAME }}", "password":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_PASSWORD }}"}}'
+          EPI_C_SNOWFLAKE: '{"driver":"snowflake","name":"snowflake","config":{"account":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_ACCOUNT_ID }}", "warehouse":"EPIQUERY_PRODUCTION", "username":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_USERNAME }}", "password":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_PASSWORD }}"}}'
           EPI_C_TIMESOUT: '{"driver":"mssql","name":"timesout","config":{"server":"localhost","password":"vagrant","userName":"vagrant","options":{"port":1433, "requestTimeout":1}}}'
           EPI_SCREAMER_URL: https://services.glgresearch.com/epi-screamer/epiquery
           EPI_TEST_SERVER: localhost
@@ -42,7 +42,6 @@ jobs:
           NON_EXISTENT_SERVER: '{"driver":"mssql","name":"no_server","config":{"server":"no_server.pants.monkey.underware","password":"vagrant","userName":"vagrant","options":{"port":1433}}}'
           PORT: 8080
           TEMPLATE_DIRECTORY: ${{ github.workspace }}/difftest/templates/
-          URL_BASED_API_KEY: true
         run: |
           TZ=UTC make start &
           ./bin/wait-for-epi
