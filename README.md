@@ -20,6 +20,7 @@ Ok, so websockets can kind of suck.  And lots of people are more comfortable wit
 * [Supported Data sources](#supported-data-sources)
 * [Provided Drivers](#provided-drivers)
   * [Snowflake](#snowflake)
+* [Deploying Epiquery2](https://github.com/glg/devops/wiki/Deploying-Epiquery2-Changes)
 
 ## Overview
 First a little about HTTP requests to epiquery2.
