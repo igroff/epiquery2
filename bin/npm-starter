@@ -1,4 +1,4 @@
-#! /usr/bin/env bash
+#! /usr/bin/env sh
 # vim: ft=sh
 make build
 [ -r ~/.epiquery2/config ] && . ~/.epiquery2/config ; exec ./epistream.coffee
