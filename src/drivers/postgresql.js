@@ -15,7 +15,7 @@ class PostgresqlDriver  extends events.EventEmitter {
 
   execute(query, context) {
     log.debug(query, context.templateContext)
-    const stream = this.conn.query(new QueryStream(query));
+    const stream = this.conn.query(new QueryStream(query, context.templateContext.binds));
     stream.pipe(JSONStream.stringify())
 
     let rowSetStarted = false;
