@@ -80,9 +80,13 @@ defaults to 2 minutes both in node and here in epiquery2.
     ```
 
 ### Get epiquery2 running via Docker
-Something like this:
+#### Build first
 ```
-docker run --env-file ./docker.env --volume $PWD/difftest/templates:/tmp/difftest/templates -p 127.0.0.1:8080:8080/tcp -it --init 8c883cee1d3e
+docker build -t epiquery2 .
+```
+#### Run second
+```
+docker run --env-file ./docker.env -p 127.0.0.1:8080:8080/tcp -it --init epiquery2
 ```
 
 ### Running Tests
