@@ -18,3 +18,4 @@ jobs:
         secret_access_key: ${{secrets.ECR_AWS_SECRET_ACCESS_KEY}}
         env_file: docker.env
         healthcheck: /diagnostic
+        port: 8080
