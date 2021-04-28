@@ -16,3 +16,5 @@ jobs:
         ecr_uri: ${{secrets.ECR_URI}}
         access_key_id: ${{secrets.ECR_AWS_ACCESS_KEY_ID}}
         secret_access_key: ${{secrets.ECR_AWS_SECRET_ACCESS_KEY}}
+        env_file: docker.env
+        healthcheck: /diagnostic
