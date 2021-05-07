@@ -8,13 +8,21 @@ class SalesforceDriver extends events.EventEmitter
       @valid = false
 
   execute: (query, context) ->
+      rowSetStarted = false
       log.debug "executing SOQL query #{query}"
       @conn.query(query)
         .on 'record', (record) =>
+          if !rowSetStarted
+            rowSetStarted = true
+            @emit 'beginrowset'
           @emit 'row', record
         .on 'end', (query) =>
+          if rowSetStarted
+            @emit 'endrowset'
           @emit 'endquery', query
         .on 'error', (error) =>
+          if rowSetStarted
+            @emit 'endrowset'
           @valid = false
           @emit 'error', error
         .run { autoFetch: true, maxFetch: @config.maxFetch || 5000 }
