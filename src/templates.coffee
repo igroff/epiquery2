@@ -4,7 +4,7 @@ log       = require 'simplog'
 fs        = require 'fs'
 path      = require 'path'
 _         = require 'lodash'
-config    = require './config.js'
+config    = require './config.coffee'
 util      = require 'util'
 yaml      = require 'js-yaml'
 

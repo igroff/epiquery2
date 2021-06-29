@@ -7,7 +7,7 @@ log       = require 'simplog'
 sockjs    = require 'sockjs'
 
 app       = require './app.coffee'
-config    = require './src/config.js'
+config    = require './src/config.coffee'
 Context   = require('./src/context').Context
 queryRequestHandler = require('./src/request.coffee').queryRequestHandler
 sockjsClient        = require './src/transport/sockjs.coffee'

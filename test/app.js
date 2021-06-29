@@ -56,7 +56,7 @@ describe('express', function() {
         underscore: {},
         './src/context': {},
         './src/core.coffee': { init: sinon.fake() },
-        './src/config.js': { isDevelopmentMode: () => false },
+        './src/config.coffee': { isDevelopmentMode: () => false },
         './src/transport/http.coffee': {},
         './src/request.coffee': {},
       });

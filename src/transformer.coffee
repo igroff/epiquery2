@@ -1,5 +1,5 @@
 fs     = require 'fs'
-config = require './config.js'
+config = require './config.coffee'
 log    = require 'simplog'
 path   = require 'path'
 vm     = require 'vm'

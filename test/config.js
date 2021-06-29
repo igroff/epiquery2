@@ -38,7 +38,7 @@ describe('config', () => {
 
     it('should throw an error', () => {
       assert.throws(() => {
-        proxyquire('../src/config.js', { simplog: log });
+        proxyquire('../src/config.coffee', { simplog: log });
       }, /Unexpected token .* in JSON/);
     });
   });
@@ -54,7 +54,7 @@ describe('config', () => {
 
     it('should throw an error', () => {
       assert.throws(() => {
-        proxyquire('../src/config.js', { simplog: log });
+        proxyquire('../src/config.coffee', { simplog: log });
       }, 'No connections specified');
     });
   });
@@ -70,7 +70,7 @@ describe('config', () => {
         CONNECTION_CONFIG: JSON.stringify({ meh: { name: 'meh' } }),
       });
 
-      config = proxyquire('../src/config.js', { simplog: log });
+      config = proxyquire('../src/config.coffee', { simplog: log });
     });
 
     afterEach(() => {
@@ -94,7 +94,7 @@ describe('config', () => {
     });
 
     beforeEach(() => {
-      config = proxyquire('../src/config.js', { 'simplog': log });
+      config = proxyquire('../src/config.coffee', { 'simplog': log });
     });
 
     Object
@@ -139,7 +139,7 @@ describe('config', () => {
     });
 
     beforeEach(() => {
-      config = proxyquire('../src/config.js', { 'simplog': log });
+      config = proxyquire('../src/config.coffee', { 'simplog': log });
     });
 
     it('should copy username and password', () => {
