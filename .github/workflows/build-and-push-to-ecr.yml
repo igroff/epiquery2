@@ -5,6 +5,7 @@ on:
   push:
     # You can set these branches to any that you want to build and push images from
     branches:
+      - gds
       - gds2
 jobs:
   build-and-deploy:
