@@ -20,37 +20,18 @@ const expected = {
 
 describe('config', () => {
   let config;
-  let envStub;
   let log;
 
   beforeEach(() => {
     log = { error: sinon.fake() };
   });
 
-  describe('without connection_config', () => {
+  describe('with no connections specified', () => {
     beforeEach(() => {
-      envStub = sinon.stub(process, 'env').value({});
+      sinon.stub(process, 'env').value({});
     });
 
-    afterEach(() => {
-      envStub.restore();
-    });
-
-    it('should throw an error', () => {
-      assert.throws(() => {
-        proxyquire('../src/config.coffee', { simplog: log });
-      }, /Unexpected token .* in JSON/);
-    });
-  });
-
-  describe('with no connections in connection_config', () => {
-    beforeEach(() => {
-      envStub = sinon.stub(process, 'env').value({ CONNECTION_CONFIG: '{}' });
-    });
-
-    afterEach(() => {
-      envStub.restore();
-    });
+    afterEach(sinon.restore);
 
     it('should throw an error', () => {
       assert.throws(() => {
@@ -65,17 +46,16 @@ describe('config', () => {
     let config;
 
     beforeEach(() => {
-      envStub = sinon.stub(process, 'env').value({
+      sinon.stub(process, 'env').value({
         ALLOWED_TEMPLATE_PATHS: JSON.stringify(expected),
-        CONNECTION_CONFIG: JSON.stringify({ meh: { name: 'meh' } }),
+        CONNECTIONS: 'meh',
+        meh: JSON.stringify({ meh: { name: 'meh' } }),
       });
 
       config = proxyquire('../src/config.coffee', { simplog: log });
     });
 
-    afterEach(() => {
-      envStub.restore();
-    });
+    afterEach(sinon.restore);
 
     it('should parse ALLOWED_TEMPLATE_PATHS', () => {
       assert.deepEqual(config.allowedTemplates, expected);
@@ -84,14 +64,13 @@ describe('config', () => {
 
   describe('default values', () => {
     before(() => {
-      envStub = sinon.stub(process, 'env').value({
-        CONNECTION_CONFIG: JSON.stringify({ name: 'catpants' }),
+      sinon.stub(process, 'env').value({
+        CONNECTIONS: 'catpants',
+        catpants: JSON.stringify({ name: 'catpants' }),
       });
     });
 
-    after(() => {
-      envStub.restore();
-    });
+    after(sinon.restore);
 
     beforeEach(() => {
       config = proxyquire('../src/config.coffee', { 'simplog': log });
@@ -109,69 +88,52 @@ describe('config', () => {
 
   describe('transform configs', () => {
     before(() => {
-      envStub = sinon.stub(process, 'env').value({
-        CONNECTION_CONFIG: JSON.stringify({
-          bar: {
-            name: 'bar',
-            config: {},
+      sinon.stub(process, 'env').value({
+        CONNECTIONS: 'bar bazinga catpants foo',
+        bar: JSON.stringify({
+          name: 'bar',
+          config: {},
+        }),
+        bazinga: JSON.stringify({ name: 'bazinga' }),
+        catpants: JSON.stringify({
+          name: 'catpants',
+          config: {
+            password: 'catpants-password',
+            userName: 'catpants-userName',
           },
-          bazinga: { name: 'bazinga' },
-          catpants: {
-            name: 'catpants',
-            config: {
-              password: 'catpants-password',
-              userName: 'catpants-userName',
-            },
-          },
-          foo: {
-            name: 'foo',
-            config: {
-              password: 'foo-password',
-              user: 'foo-user',
-            },
+        }),
+        foo: JSON.stringify({
+          name: 'foo',
+          config: {
+            password: 'foo-password',
+            user: 'foo-user',
           },
         }),
       });
     });
 
-    after(() => {
-      envStub.restore();
-    });
+    after(sinon.restore)
 
     beforeEach(() => {
       config = proxyquire('../src/config.coffee', { 'simplog': log });
     });
 
-    it('should copy username and password', () => {
+    it('should copy username and password: catpants', () => {
       assert.deepEqual(config.connections.catpants, {
         name: 'catpants',
         config: {
           password: 'catpants-password',
           userName: 'catpants-userName',
-          authentication: {
-            type: 'default',
-            options: {
-              password: 'catpants-password',
-              userName: 'catpants-userName',
-            },
-          },
         },
       });
     });
 
-    it('should copy user and password', () => {
+    it('should copy user and password: foo', () => {
       assert.deepEqual(config.connections.foo, {
         name: 'foo',
         config: {
           password: 'foo-password',
           user: 'foo-user',
-          authentication: {
-            type: 'default',
-            options: {
-              password: 'foo-password',
-              userName: 'foo-user',
-            },
-          },
         },
       });
     });
@@ -183,15 +145,7 @@ describe('config', () => {
     it('should not error when username and password are not in config', () => {
       assert.deepEqual(config.connections.bar, {
         name: 'bar',
-        config: {
-          authentication: {
-            type: 'default',
-            options: {
-              password: undefined,
-              userName: undefined,
-            },
-          },
-        },
+        config: {},
       });
     });
   });

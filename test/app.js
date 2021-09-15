@@ -4,22 +4,21 @@ const supertest = require('supertest');
 const MOCK_ENV = {
   DISABLE_LOGGING: true,
   TEMPLATE_DIRECTORY: `${process.cwd()}/difftest/templates/`,
-  CONNECTION_CONFIG: JSON.stringify({
-    catpants: {
-      driver: 'file',
-      config: {},
-      name: 'catpants',
-    },
-    foo: {
-      driver: 'file',
-      config: {},
-      name: 'foo',
-    },
-    meh: {
-      driver: 'file',
-      config: {},
-      name: 'meh',
-    },
+  CONNECTIONS: 'catpants foo meh',
+  catpants:JSON.stringify( {
+    driver: 'file',
+    config: {},
+    name: 'catpants',
+  }),
+  foo: JSON.stringify({
+    driver: 'file',
+    config: {},
+    name: 'foo',
+  }),
+  meh: JSON.stringify({
+    driver: 'file',
+    config: {},
+    name: 'meh',
   }),
 };
 
@@ -85,18 +84,15 @@ describe('express', function() {
 
   describe('requests', () => {
     let app;
-    let envStub;
 
     before(() => {
-      envStub = sinon.stub(process, 'env').value(MOCK_ENV);
+      sinon.stub(process, 'env').value(MOCK_ENV);
 
       // eslint-disable-next-line global-require
       app = require('../app.coffee');
     });
 
-    after(() => {
-      envStub.restore();
-    });
+    after(sinon.restore);
 
     describe('/diagnostic', () => {
       it('should return a 200', done => {
