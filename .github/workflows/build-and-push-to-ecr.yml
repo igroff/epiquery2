@@ -1,0 +1,26 @@
+# vi:syntax=yaml
+#TODO: this should only happen if tests.yml passes - merge them into one file?
+name: Build Image and Push to ECR
+on:
+  push:
+    # You can set these branches to any that you want to build and push images from
+    branches:
+      - gds
+      - gds2
+      - salesforce-connect
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-20.04
+    steps:
+      # Checks out the code from this repo
+      - uses: actions/checkout@main
+
+      # Builds a docker image from ./dockerfile, and pushes it to our ECR repository
+      - uses: glg-public/build-and-deploy-ecr@main
+        with:
+          ecr_uri: ${{secrets.GLGAPP_ECR_URI}}
+          access_key_id: ${{secrets.GLGAPP_ECR_AWS_ACCESS_KEY_ID}}
+          secret_access_key: ${{secrets.GLGAPP_ECR_AWS_SECRET_ACCESS_KEY}}
+          env_file: docker.env
+          healthcheck: /diagnostic
+          port: 8080
