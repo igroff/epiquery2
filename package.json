@@ -1,13 +1,20 @@
 {
   "name": "epiquery2",
-  "version": "0.0.14",
+  "version": "1.0.0",
   "description": "run templated queries from the http's using learnings from 1",
   "devDependencies": {
+    "chai": "^4.2.0",
     "coffeelint": "0.6.1",
-    "jshint": "2.3.0",
-    "supervisor": "igroff/node-supervisor",
-    "sockjs-client": "0.1.3",
     "difftest-runner": "igroff/difftest-runner",
+    "husky": "^4.2.5",
+    "jshint": "2.3.0",
+    "mocha": "^8.1.1",
+    "nyc": "^15.1.0",
+    "proxyquire": "^2.1.3",
+    "sinon": "^9.0.3",
+    "sockjs-client": "0.1.3",
+    "supertest": "^4.0.2",
+    "supervisor": "igroff/node-supervisor",
     "ws": "~0.4.31"
   },
   "dependencies": {
@@ -41,7 +48,9 @@
     "xmla4js": "git+https://github.com/glg/xmla4js.git"
   },
   "scripts": {
+    "quick-test": "mocha --reporter dot",
     "start": "make start",
+    "test": "nyc mocha",
     "watch": "make watch"
   },
   "engines": {
@@ -60,5 +69,10 @@
   },
   "os": [
     "!win32"
-  ]
+  ],
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run quick-test"
+    }
+  }
 }

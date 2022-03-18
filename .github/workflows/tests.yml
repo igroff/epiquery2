@@ -3,7 +3,7 @@ name: Build Verification
 on: [push]
 
 jobs:
-  test:
+  unit-test:
     runs-on: ubuntu-latest
     services:
       mssql:
@@ -27,7 +27,19 @@ jobs:
           - 80:80
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v2.1.2
+        with:
+          node-version: 12.3.1
+      - name: Install, lint, and test
+        run: |
+          npm ci --ignore-scripts
+          npm run lint --if-present
+          npm test
+  integration-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2.1.2
         with:
           node-version: 12.3.1
       - name: Update hosts file
@@ -35,7 +47,7 @@ jobs:
       - name: make test
         env:
           CONNECTIONS: 'EPI_C_FILE EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_MYSQL_BULK EPI_C_MYSQL EPI_C_RENDER EPI_C_SFDC EPI_C_SNOWFLAKE EPI_C_TIMESOUT NON_EXISTENT_SERVER'
-          DEBUG: true
+          DEBUG: true          # yamllint disable-line rule:indentation
           DIFFTEST_QUIET: false
           ENABLE_TEMPLATE_ACLS: DISABLED
           EPI_C_FILE: '{"driver":"file","name":"file","config":{}}'
