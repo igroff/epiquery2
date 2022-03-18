@@ -12,7 +12,11 @@ run-server: static/js/epiclient_v2.js static/js/epiclient_v3.js
 	exec ./bin/npm-starter
 
 test: node_modules/
+# skip in GitHub Actions
+ifndef CI
 	docker-compose up --detach
+endif
+
 	difftest run ${TEST_NAME}
 
 pass/%:
