@@ -124,7 +124,7 @@ attachEpiqueryResponder = (context, res) ->
     d = message: 'error', errorDetail: err
     d.error = err.message if err.message
     log.error err
-    status = 500
+    status = err.code || 500
     writeResultElement d
     #check if we hit beginrowset - if so add a closing ']' since we won't hit endrowset
     #and only if we hit beginroset because it is possible an error occurs prior to getting there.

@@ -22,6 +22,13 @@ app.use express.json({ limit: '26mb' })
 app.use express.urlencoded({ extended: true, limit: '26mb', parameterLimit: 5000 })
 app.use '/static', express.static(path.join(__dirname, 'static'))
 
+#add fucntion so we don't need the check to stop throwing favicon errors all over
+ignoreFavicon = (req, res, next) -> 
+  if req.originalUrl.includes('favicon.ico')
+    return res.status(204).end()
+  next()
+app.use(ignoreFavicon)
+
 socketServer = sockjs.createServer(app, options: disconnect_delay: 900000)
 
 # initialize the core including driver loading, etc.
@@ -75,9 +82,6 @@ httpRequestHandler = (req, res) ->
   c.queryId = req.params.queryId || req.body?.queryId || req.query.queryId
   _.extend c, httpClient.getQueryRequestInfo(req)
 
-  if c.connectionName and not config.connections[c.connectionName]
-    res.send error: "unable to find connection by name '#{c.connectionName}'"
-    return
   httpClient.attachResponder c, res
   c.requestedTemplatePath = req.path
   queryRequestHandler(c)

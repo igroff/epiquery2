@@ -70,8 +70,9 @@ selectConnection = (context, callback) ->
     context.connection = config.connections[context.connectionName]
     if not context.connection
       msg = "unable to find connection '#{context.connectionName}'"
-      context.emit 'error', msg
-      return callback msg
+      error = new Error(msg)
+      error.code = 400
+      return callback error, context
   else
     context.connection = connectionConfig
   context.driver = core.selectDriver context.connection
