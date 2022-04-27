@@ -7,12 +7,15 @@ class MySQLDriver extends events.EventEmitter
   constructor: (@query, @config, @context) ->
 
   execute: () =>
+    rowSetStarted = false
+
     @config = _.clone @config
     connect_deferred = Q.defer()
     @config.multipleStatements = true
     @isValid = false
     @hasErrored = false
 
+    console.log(@config)
     conn = mysql.createConnection @config
     conn.connect connect_deferred.makeNodeResolver()
     conn.on 'error', (error) => this.emit 'error', error
@@ -24,12 +27,16 @@ class MySQLDriver extends events.EventEmitter
       query.on 'error',  (error) =>
         @hasErrored = true
         this.emit 'error', error
-      query.on 'fields', (fields) => this.emit 'beginrowset', fields
+      query.on 'fields', (fields) => 
+        this.emit 'endrowset', fields if rowSetStarted
+        rowSetStarted = true if not rowSetStarted         
+        this.emit 'beginrowset', fields
       query.on 'end',    () =>
         # our driver structure really REALLY wants to get EITHER
         # an endquery or an error event and not both. However mysql raises both
         # error and end in the case of an error we avoid the raise of both here
         if not @hasErrored
+          this.emit 'endrowset'          
           this.emit 'endquery'
     ).fail( (error) => this.emit 'error', error
     ).finally( () -> conn.end() )
