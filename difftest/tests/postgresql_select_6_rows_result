@@ -1,0 +1,8 @@
+
+#! /usr/bin/env bash
+# vi: ft=sh
+# Above line tells VI that the filetype is a shell script
+
+# copies stderr onto stdout
+exec 2>&1
+curl -s "http://${EPI_TEST_SERVER}:8080/simple/postgres/test/postgres/select_6_rows.sql"

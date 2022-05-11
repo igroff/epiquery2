@@ -1,0 +1,2 @@
+
+./difftest/bin/wsBasic.coffee --connection postgres --template '/test/postgres/select_2_recordset.sql'

@@ -13,42 +13,37 @@ class PostgresqlDriver  extends events.EventEmitter {
     this.valid = false;
   }
 
-  execute(txt, context) {
-    // callback
-    this.conn.query(txt, context.templateContext.binds)
-    .then(res => {
-      console.log(res)
-      if (Array.isArray(res))
-      {
-        res.forEach( rs =>
-        {
-          this.emit('beginrowset');  
-            rs.rows.forEach(r => this.emit('row', r));    
-          this.emit('endrowset');
-        })
+  execute(query, context) {
+    log.debug(query, context.templateContext)
+    const stream = this.conn.query(new QueryStream(query, context.templateContext.binds));
+    stream.pipe(JSONStream.stringify())
+
+    let rowSetStarted = false;
+    stream.on('data', record => {
+      if (!rowSetStarted) {
+        rowSetStarted = true;
+        this.emit('beginrowset');
       }
-      else
-      { 
-        this.emit('beginrowset');  
-            res.rows.forEach(r => this.emit('row', r));    
-        this.emit('endrowset');      
+      this.emit('row', record);
+    });
+    stream.on('end', query => {
+      if (rowSetStarted) {
+        this.emit('endrowset');
       }
-      this.emit('endquery', res);
-      
-    })
-    .catch(e => console.error(e.stack))
-    
+      this.emit('endquery', query);
+    });
+    stream.on('error', error => {
+      if (rowSetStarted) {
+        this.emit('endrowset');
+      }
+      this.valid = false;
+      this.emit('error', error);
+    });
   }
 
   connect(cb) {
     log.debug('connect', this.config);
-    this.conn = new pg.Client({
-      user: this.config.user,
-      host: this.config.host,
-      password: this.config.password,
-      database: this.config.database,
-      port: this.config.port,
-    });
+    this.conn = new pg.Client(this.config);
     this.conn.connect(err => {
       if(err) {
         log.error(`Failed connecting to postgres \n${err}`)
