@@ -1,7 +1,7 @@
 export PORT=8080
 export TEMPLATE_DIRECTORY=$(pwd)/difftest/templates/
 SNOWFLAKE_CREDS=$(secrets -e developmentglobal SNOWFLAKE_EPIQUERY_INTEGRATION_ACCOUNT)
-export CONNECTIONS="EPI_C_FILE EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_MYSQL_BULK EPI_C_MYSQL EPI_C_RENDER EPI_C_SFDC EPI_C_SNOWFLAKE EPI_C_TIMESOUT NON_EXISTENT_SERVER"
+export CONNECTIONS="EPI_C_FILE EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_MYSQL_BULK EPI_C_MYSQL EPI_C_RENDER EPI_C_SFDC EPI_C_SFDC_V2 EPI_C_SNOWFLAKE EPI_C_TIMESOUT NON_EXISTENT_SERVER"
 export EPI_C_FILE='{"driver":"file","config":{},"name":"file"}'
 export EPI_C_MSSQL_O='{"driver":"mssql_o","name":"mssql_o","config":{"server":"mssql","password":"YourV3ryStrong!Passw0rd","userName":"SA","options":{"port":1433, "requestTimeout":0}}}'
 export EPI_C_MSSQL='{"driver":"mssql","name":"mssql","config":{"server":"mssql","password":"YourV3ryStrong!Passw0rd","userName":"SA","options":{"port":1433, "requestTimeout":0}}}'
@@ -9,6 +9,7 @@ export EPI_C_MYSQL_BULK='{"name":"mysql_bulk", "type":"bulk","driver":"mysql","c
 export EPI_C_MYSQL='{"name":"mysql","driver":"mysql","config":{"host":"mysql","user":"root","password":"mysql_root_password"}}'
 export EPI_C_RENDER='{"driver":"render","config":{},"name":"render"}'
 export EPI_C_SFDC='{"name":"sfdc","driver":"salesforce","config":{"userName":"","password":"","server":"http://sfdc"}}'
+export EPI_C_SFDC_V2='{"name":"sfdc_v2","driver":"salesforce_V2","config":{"userName":"","password":"","server":"http://sfdc"}}'
 export EPI_C_SNOWFLAKE='{"driver":"snowflake","config":{"account":"'$(echo $SNOWFLAKE_CREDS | jq -r .account)'", "warehouse":"EPIQUERY_PRODUCTION", "username":"'$(echo $SNOWFLAKE_CREDS | jq -r .username)'", "password":"'$(echo $SNOWFLAKE_CREDS | jq -r .password)'"},"name":"snowflake"}'
 export EPI_C_TIMESOUT='{"driver":"mssql","name":"timesout","config":{"server":"localhost","password":"vagrant","userName":"vagrant","options":{"port":1433, "requestTimeout":1}}}'
 export NON_EXISTENT_SERVER='{"driver":"mssql","name":"no_server","config":{"server":"no_server.pants.monkey.underware","password":"vagrant","userName":"vagrant","options":{"port":1433}}}'
