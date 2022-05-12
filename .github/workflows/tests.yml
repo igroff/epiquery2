@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: 12.3.1
       - name: Update hosts file
-        run: echo '127.0.0.1 mssql mysql sfdc' | sudo tee --append /etc/hosts
+        run: echo '127.0.0.1 postgres mssql mysql sfdc' | sudo tee --append /etc/hosts
       - name: pull images
         run: |
           docker pull glgresearch/sfdc-with-drakov:e04eea15
@@ -33,7 +33,7 @@ jobs:
         run: docker-compose up --detach
       - name: make test
         env:
-          CONNECTIONS: 'EPI_C_FILE EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_MYSQL_BULK EPI_C_MYSQL EPI_C_RENDER EPI_C_SFDC EPI_C_SNOWFLAKE EPI_C_TIMESOUT NON_EXISTENT_SERVER'
+          CONNECTIONS: 'EPI_C_FILE EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_MYSQL_BULK EPI_C_MYSQL EPI_C_POST EPI_C_RENDER EPI_C_SFDC EPI_C_SNOWFLAKE EPI_C_TIMESOUT NON_EXISTENT_SERVER'
           DEBUG: true          # yamllint disable-line rule:indentation
           DIFFTEST_QUIET: false
           ENABLE_TEMPLATE_ACLS: DISABLED
@@ -42,6 +42,7 @@ jobs:
           EPI_C_MSSQL: '{"driver":"mssql","name":"mssql","config":{"server":"mssql","password":"YourV3ryStrong!Passw0rd","userName":"SA","options":{"port":1433, "requestTimeout":0}}}'
           EPI_C_MYSQL_BULK: '{"driver":"mysql","name":"mysql_bulk","type":"bulk","config":{"host":"mysql","user":"root","password":"mysql_root_password"}}'
           EPI_C_MYSQL: '{"driver":"mysql","name":"mysql","config":{"host":"mysql","user":"root","password":"mysql_root_password"}}'
+          EPI_C_POST: '{"name":"postgres","driver":"postgresql","config":{"host":"postgres","database":"postgres","user":"postgres","password":"postgres","port":5432}}'
           EPI_C_RENDER: '{"driver":"render","name":"render","config":{}}'
           EPI_C_SFDC: '{"driver":"salesforce","name":"sfdc","config":{"userName":"","password":"","server":"http://sfdc"}}'
           EPI_C_SNOWFLAKE: '{"driver":"snowflake","name":"snowflake","config":{"account":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_ACCOUNT_ID }}", "warehouse":"EPIQUERY_PRODUCTION", "username":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_USERNAME }}", "password":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_PASSWORD }}"}}'
