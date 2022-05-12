@@ -41,7 +41,7 @@ getDriverInstance = (driver, connectionConfig, driverAcquired) ->
         else
           return true
       # max used to be hard-coded to 50. If we don't specifiy a value, maintain the same default of 50
-      max: connectionConfig?.maxConnections || 50 
+      max: 50 # connectionConfig?.maxConnections || 50 
     })
     DRIVER_POOL[connectionConfig.name] = pool
   poolAcquireStart = new Date()
