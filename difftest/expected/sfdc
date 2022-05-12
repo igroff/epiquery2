@@ -6,10 +6,6 @@
     },
     {
       queryid,
-      "message": "beginrowset"
-    },
-    {
-      queryid,
       "columns": {
         "attributes": {
           "type": "Subscription__c",
@@ -23,10 +19,6 @@
         "Subscription_Type__c": "OSP"
       },
       "message": "row"
-    },
-    {
-      queryid,
-      "message": "endrowset"
     },
     {
       queryid,
