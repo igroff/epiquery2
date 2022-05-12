@@ -7,7 +7,7 @@ on:
     branches:
       - gds
       - gds2
-      - betaPostgres
+      - beta-postgres
 jobs:
   build-and-deploy:
     runs-on: ubuntu-20.04

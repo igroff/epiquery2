@@ -1,6 +1,7 @@
 export PORT=8080
 export TEMPLATE_DIRECTORY=$(pwd)/difftest/templates/
 SNOWFLAKE_CREDS=$(secrets -e developmentglobal SNOWFLAKE_EPIQUERY_INTEGRATION_ACCOUNT)
+#export SNOWFLAKE_CREDS
 export CONNECTIONS="EPI_C_FILE EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_MYSQL_BULK EPI_C_MYSQL EPI_C_RENDER EPI_C_SFDC EPI_C_POST EPI_C_SNOWFLAKE EPI_C_TIMESOUT NON_EXISTENT_SERVER"
 export EPI_C_FILE='{"driver":"file","config":{},"name":"file"}'
 export EPI_C_MSSQL_O='{"driver":"mssql_o","name":"mssql_o","config":{"server":"mssql","password":"YourV3ryStrong!Passw0rd","userName":"SA","options":{"port":1433, "requestTimeout":0}}}'
