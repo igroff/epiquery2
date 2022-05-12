@@ -40,8 +40,7 @@ getDriverInstance = (driver, connectionConfig, driverAcquired) ->
           return valid
         else
           return true
-      # max used to be hard-coded to 50. If we don't specifiy a value, maintain the same default of 50
-      max: 50 # connectionConfig?.maxConnections || 50 
+      max: 50
     })
     DRIVER_POOL[connectionConfig.name] = pool
   poolAcquireStart = new Date()
@@ -49,9 +48,6 @@ getDriverInstance = (driver, connectionConfig, driverAcquired) ->
     driverAcquired(err, poolItem, new Date().getTime() - poolAcquireStart.getTime(), connectionConfig.name)
 
 execute = (driver, context, cb) ->
-  console.log("==============")
-  console.log(context);
-  console.log("==============")
   query = context.renderedTemplate
   config = context.connection
   # if we have a driver that supports pooling we'll use pooling, which is defined by a driver
