@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@main
 
       # Builds a docker image from ./dockerfile, and pushes it to our ECR repository
-      - uses: glg-public/build-and-deploy-ecr@main
+      - uses: glg-public/build-and-deploy-ecr@f53f0c59580f300260bd28dbc29f3bbcc366455a
         with:
           ecr_uri: ${{secrets.GLGAPP_ECR_URI}}
           access_key_id: ${{secrets.GLGAPP_ECR_AWS_ACCESS_KEY_ID}}
