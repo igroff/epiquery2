@@ -1,7 +1,6 @@
 # epiquery2 driver: salesforce
 # version: 2.0
 # Change description: Adding proper json wrapper around full resultset
-#
 events      = require 'events'
 salesforce  = require 'jsforce'
 log         = require 'simplog'
