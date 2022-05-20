@@ -1,12 +1,7 @@
 {
-  "events": [
-    {
-      queryid,
-      "message": "beginquery"
-    },
-    {
-      queryid,
-      "columns": {
+  "results": [
+    [
+      {
         "attributes": {
           "type": "Subscription__c",
           "url": "/services/data/version/sobjects/Subscription__c/a0AU0000019hqdGMAQ"
@@ -17,12 +12,7 @@
         "IsUsageBased__c": false,
         "Subscription_Revenue_Type__c": "Non-Unit Based",
         "Subscription_Type__c": "OSP"
-      },
-      "message": "row"
-    },
-    {
-      queryid,
-      "message": "endquery"
-    }
+      }
+    ]
   ]
 }
