@@ -22,7 +22,7 @@
     "async": "0.2.9",
     "awesome-websocket": "0.0.25",
     "browserify": "6.2.0",
-    "circuit-breaker": "git+ssh://git@github.com/glg/circuit-breaker.git#v1.0.1",
+    "circuit-breaker": "glg/circuit-breaker.git#v1.0.1",
     "coffee-script": "1.9.1",
     "coffeeify": "0.6.0",
     "debug": "3.1.0",
@@ -31,7 +31,7 @@
     "generic-pool": "2.2.0",
     "hogan.js": "3.0.2",
     "js-yaml": "3.13.1",
-    "jsforce": "git+ssh://git@github.com/glg/jsforce#1.4.1-retry",
+    "jsforce": "glg/jsforce#1.4.1-retry",
     "line-by-line": "0.1.1",
     "lodash": "4.17.19",
     "lodash-contrib": "241.4.14",
@@ -45,7 +45,7 @@
     "tedious": "2.0.0",
     "tough-cookie": "<3.0.0",
     "underscore": "1.4.4",
-    "xmla4js": "git+ssh://git@github.com/glg/xmla4js.git"
+    "xmla4js": "glg/xmla4js.git"
   },
   "scripts": {
     "quick-test": "mocha --reporter dot",
@@ -54,8 +54,8 @@
     "watch": "make watch"
   },
   "engines": {
-    "node": "12.13.0",
-    "npm": "8.10.0"
+    "node": "12.3.1",
+    "npm": "7.24.2"
   },
   "browser": "src/clients/EpiClient.coffee",
   "browserify": {
