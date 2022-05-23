@@ -32,7 +32,7 @@ jobs:
           node-version: 12.3.1
       - name: Install, lint, and test
         run: |
-          npm ci --ignore-scripts
+          npm install
           npm run lint --if-present
           npm test
   integration-test:
