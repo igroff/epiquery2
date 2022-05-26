@@ -11,6 +11,10 @@ config    = require './src/config.coffee'
 httpClient          = require './src/transport/http.coffee'
 queryRequestHandler = require('./src/request.coffee').queryRequestHandler
 
+http = require 'http'
+request = require("request-promise");
+async = require('asyncawait/async');
+await = require('asyncawait/await');
 
 app = express()
 # based on https://stackoverflow.com/a/19965089/2733
@@ -41,6 +45,29 @@ app.get '/diagnostic', (req, res) ->
   if config.isDevelopmentMode()
     response.aclsEnabled = config.enableTemplateAcls
   res.send response
+
+app.get '/diagnosticall', (req, res) ->
+  response =
+    message: "ok"
+    connections: _.map(config.connections, (conn) -> { driver: conn.driver, name: conn.name, server: conn.config?.server, timeout: conn.config?.options?.requestTimeout, port: conn.config?.options?.port })
+  if config.isDevelopmentMode()
+    response.aclsEnabled = config.enableTemplateAcls
+  res.send response
+
+app.get '/diagnostictest', async (req, res) ->
+  connections = [];
+  epi_connections= _.pluck(_.where(config.connections, {driver: "mssql"}),'name');
+  for connection in epi_connections
+    try
+      results = await request 'http://localhost:'+process.env.PORT+'/epiquery1/'+connection+'/test/servername'
+      result = JSON.parse(results)
+      console.log "Name :" + connection
+      console.log Object.values(result[0])[0] 
+      console.log result
+      connections.push {"connectionname": connection, "server": result[0], "server": Object.values(result[0])[0]}
+    catch e
+      connections.push {"connectionname": connection, "error": JSON.parse(e.error.replace(/\\/g, ''))}
+  res.send connections
 
 app.get '/templates', (req, res) ->
   response =

@@ -11,7 +11,7 @@ config    = require './src/config.coffee'
 Context   = require('./src/context').Context
 queryRequestHandler = require('./src/request.coffee').queryRequestHandler
 #master code to clean
-http = require 'http'
+### http = require 'http'
 request = require("request-promise");
 async = require('asyncawait/async');
 await = require('asyncawait/await');
@@ -104,7 +104,7 @@ httpRequestHandler = (req, res) ->
     return
   httpClient.attachResponder c, res
   c.requestedTemplatePath = req.path
-  queryRequestHandler(c)
+  queryRequestHandler(c) ###
 #End master stuffs
 sockjsClient        = require './src/transport/sockjs.coffee'
 
