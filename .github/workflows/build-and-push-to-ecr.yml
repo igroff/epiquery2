@@ -8,6 +8,8 @@ on:
       - gds
       - gds2
       - new-diagnostic
+      - salesforce-connect
+      - salesforce-connect-v2
 jobs:
   build-and-deploy:
     runs-on: ubuntu-20.04

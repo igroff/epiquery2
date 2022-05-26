@@ -5,6 +5,26 @@ on: [push]
 jobs:
   unit-test:
     runs-on: ubuntu-latest
+    services:
+      mssql:
+        image: mcr.microsoft.com/mssql/server:2017-latest
+        ports:
+          - 1433:1433
+        env:
+          ACCEPT_EULA: Y
+          SA_PASSWORD: YourV3ryStrong!Passw0rd
+      mysql:
+        image: mysql:5.7.22
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: epiquery
+          MYSQL_ROOT_PASSWORD: mysql_root_password
+      sfdc:
+        image: glgresearch/sfdc-with-drakov:e04eea15
+        ports:
+          - 80:80
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2.1.2
@@ -12,7 +32,7 @@ jobs:
           node-version: 12.3.1
       - name: Install, lint, and test
         run: |
-          npm ci --ignore-scripts
+          npm install
           npm run lint --if-present
           npm test
   integration-test:
@@ -33,7 +53,7 @@ jobs:
         run: docker-compose up --detach
       - name: make test
         env:
-          CONNECTIONS: 'EPI_C_FILE EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_MYSQL_BULK EPI_C_MYSQL EPI_C_RENDER EPI_C_SFDC EPI_C_SNOWFLAKE EPI_C_TIMESOUT NON_EXISTENT_SERVER'
+          CONNECTIONS: 'EPI_C_FILE EPI_C_MSSQL_O EPI_C_MSSQL EPI_C_MYSQL_BULK EPI_C_MYSQL EPI_C_RENDER EPI_C_SFDC EPI_C_SFDC_V2 EPI_C_SNOWFLAKE EPI_C_TIMESOUT NON_EXISTENT_SERVER'
           DEBUG: true          # yamllint disable-line rule:indentation
           DIFFTEST_QUIET: false
           ENABLE_TEMPLATE_ACLS: DISABLED
@@ -44,6 +64,7 @@ jobs:
           EPI_C_MYSQL: '{"driver":"mysql","name":"mysql","config":{"host":"mysql","user":"root","password":"mysql_root_password"}}'
           EPI_C_RENDER: '{"driver":"render","name":"render","config":{}}'
           EPI_C_SFDC: '{"driver":"salesforce","name":"sfdc","config":{"userName":"","password":"","server":"http://sfdc"}}'
+          EPI_C_SFDC_V2: '{"driver":"salesforce_v2","name":"sfdc_v2","config":{"userName":"","password":"","server":"http://sfdc"}}'
           EPI_C_SNOWFLAKE: '{"driver":"snowflake","name":"snowflake","config":{"account":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_ACCOUNT_ID }}", "warehouse":"EPIQUERY_PRODUCTION", "username":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_USERNAME }}", "password":"${{ secrets.SNOWFLAKE_INTEGRATION_TEST_PASSWORD }}"}}'
           EPI_C_TIMESOUT: '{"driver":"mssql","name":"timesout","config":{"server":"localhost","password":"vagrant","userName":"vagrant","options":{"port":1433, "requestTimeout":1}}}'
           EPI_SCREAMER_URL: https://services.glgresearch.com/epi-screamer/epiquery
