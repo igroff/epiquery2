@@ -15,7 +15,6 @@ sockjsClient        = require './src/transport/sockjs.coffee'
 httpClient          = require './src/transport/http.coffee'
 queryRequestHandler = require('./src/request.coffee').queryRequestHandler
 http = require 'http'
-#request = require 'request'
 request = require("request-promise");
 async = require('asyncawait/async');
 await = require('asyncawait/await');
@@ -68,20 +67,11 @@ app.get '/diagnostictest', async (req, res) ->
       results = await request 'http://localhost:'+process.env.PORT+'/epiquery1/'+connection+'/test/servername'
       result = JSON.parse(results)
       console.log "Name :" + connection
-      console.log "**************"
       console.log Object.values(result[0])[0] 
       console.log result
-      console.log "**************"
       connections.push {"connectionname": connection, "server": result[0], "server": Object.values(result[0])[0]}
     catch e
-      console.log "exception/error occurred"
-      console.log "The STACKTRACE for the exception/error occurred is ::"
-      console.log e.stack
-      #console.log e.error
       connections.push {"connectionname": connection, "error": JSON.parse(e.error.replace(/\\/g, ''))}
-    finally
-      console.log "This is the statement of finally block"
-      #connections.push {"connectionname": connection, "server": result[0], "server": Object.values(result[0])[0]}
   res.send connections
       
 
