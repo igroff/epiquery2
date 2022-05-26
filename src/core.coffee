@@ -69,13 +69,13 @@ process.on 'SIGUSR1', () ->
   return unless config.isDevelopmentMode
   log.info 'handling SIGUSR1'
   config.enableTemplateAcls = 'DISABLED'
- 
+
 process.on 'SIGUSR2', () ->
   #enable ACLs only in development mode
   return unless config.isDevelopmentMode
   log.info 'handling SIGUSR2'
   config.enableTemplateAcls = true
-  
+
 module.exports.init = init
 module.exports.loadDrivers = loadDrivers
 module.exports.selectDriver = selectDriver

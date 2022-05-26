@@ -86,7 +86,22 @@ For MAC users, you can simply `brew install make` and then add the path to `gmak
 ### Run Tests
 You need to have an epiquery instance using test configuration running in the background or another terminal window before running the tests. See the above Prerequisties section for details.
 
+<<<<<<< HEAD
+### Get epiquery2 running via Docker
+#### Build first
+```
+docker build -t epiquery2 .
+```
+#### Run second
+```
+docker run --env-file ./docker.env -p 127.0.0.1:8080:8080/tcp -it --init epiquery2
+```
+
+### Running Tests
+You need to have an epiquery instance running in the background or another terminal window before running the tests. If the `DEBUG` variable is set when the tests run, it will break the tests, so we run like so:
+=======
 If the `DEBUG` variable is set when the tests run, it will break the tests, so we run like so:
+>>>>>>> 312d76bcf5807dac2423e36395d256050cbd59d0
 
 ```shell
 EPI_TEST_SERVER=localhost DEBUG= make test

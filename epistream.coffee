@@ -2,18 +2,15 @@
 # vim:ft=coffee
 
 cluster   = require 'cluster'
-express   = require 'express'
-_         = require 'underscore'
-path      = require 'path'
+http      = require 'http'
 log       = require 'simplog'
 sockjs    = require 'sockjs'
-http      = require 'http'
-Context   = require('./src/context').Context
-core      = require './src/core.coffee'
+
+app       = require './app.coffee'
 config    = require './src/config.coffee'
-sockjsClient        = require './src/transport/sockjs.coffee'
-httpClient          = require './src/transport/http.coffee'
+Context   = require('./src/context').Context
 queryRequestHandler = require('./src/request.coffee').queryRequestHandler
+#master code to clean
 http = require 'http'
 request = require("request-promise");
 async = require('asyncawait/async');
@@ -108,6 +105,10 @@ httpRequestHandler = (req, res) ->
   httpClient.attachResponder c, res
   c.requestedTemplatePath = req.path
   queryRequestHandler(c)
+#End master stuffs
+sockjsClient        = require './src/transport/sockjs.coffee'
+
+socketServer = sockjs.createServer(app, options: disconnect_delay: 900000)
 
 socketServer.on 'connection', (conn) ->
   conn.on 'data', (message) ->
@@ -136,16 +137,15 @@ socketServer.on 'connection', (conn) ->
 socketServer.on 'error', (e) ->
   log.error "error on socketServer", e
 
-app.get /\/(.+)$/, httpRequestHandler
-app.post /\/(.+)$/, httpRequestHandler
+server = http.createServer(app)
+
+prefix = {prefix: '/sockjs'}
+
+socketServer.installHandlers(server, prefix)
 
 log.debug "server worker process starting with configuration"
 log.debug "%j", config
 log.debug "node version", process.version
-server = http.createServer(app)
-
-prefix = {prefix: '/sockjs'}
-socketServer.installHandlers(server, prefix)
 
 if config.isDevelopmentMode()
   log.warn "********************************************************************************"
