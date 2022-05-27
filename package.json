@@ -1,13 +1,20 @@
 {
   "name": "epiquery2",
-  "version": "0.0.14",
+  "version": "1.0.0",
   "description": "run templated queries from the http's using learnings from 1",
   "devDependencies": {
+    "chai": "^4.2.0",
     "coffeelint": "0.6.1",
+    "difftest-runner": "git+https://github.com/igroff/difftest-runner",
+    "husky": "^4.2.5",
     "jshint": "2.3.0",
-    "supervisor": "igroff/node-supervisor",
+    "mocha": "^8.1.1",
+    "nyc": "^15.1.0",
+    "proxyquire": "^2.1.3",
+    "sinon": "^9.0.3",
     "sockjs-client": "0.1.3",
-    "difftest-runner": "igroff/difftest-runner",
+    "supertest": "^4.0.2",
+    "supervisor": "git+https://github.com/igroff/node-supervisor",
     "ws": "~0.4.31"
   },
   "dependencies": {
@@ -15,7 +22,7 @@
     "async": "0.2.9",
     "awesome-websocket": "0.0.25",
     "browserify": "6.2.0",
-    "circuit-breaker": "glg/circuit-breaker.git#v1.0.1",
+    "circuit-breaker": "git+https://github.com/glg/circuit-breaker.git#v1.0.1",
     "coffee-script": "1.9.1",
     "coffeeify": "0.6.0",
     "debug": "3.1.0",
@@ -24,7 +31,7 @@
     "generic-pool": "2.2.0",
     "hogan.js": "3.0.2",
     "js-yaml": "3.13.1",
-    "jsforce": "glg/jsforce#1.4.1-retry",
+    "jsforce": "git+https://github.com/glg/jsforce#1.4.1-retry",
     "line-by-line": "0.1.1",
     "lodash": "4.17.19",
     "lodash-contrib": "241.4.14",
@@ -34,19 +41,21 @@
     "q": "0.9.2",
     "simplog": "0.2.2",
     "snowflake-sdk": "1.5.3",
-    "sockjs": "github:igroff/sockjs-node#pass-headers",
+    "sockjs": "git+https://github.com/igroff/sockjs-node#pass-headers",
     "tedious": "2.0.0",
     "tough-cookie": "<3.0.0",
     "underscore": "1.4.4",
     "xmla4js": "git+https://github.com/glg/xmla4js.git"
   },
   "scripts": {
+    "quick-test": "mocha --reporter dot",
     "start": "make start",
+    "test": "nyc mocha",
     "watch": "make watch"
   },
   "engines": {
     "node": "12.3.1",
-    "npm": "6.14.8"
+    "npm": "7.24.2"
   },
   "browser": "src/clients/EpiClient.coffee",
   "browserify": {
@@ -60,5 +69,10 @@
   },
   "os": [
     "!win32"
-  ]
+  ],
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run quick-test"
+    }
+  }
 }

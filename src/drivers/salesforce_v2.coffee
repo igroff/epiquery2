@@ -1,23 +1,31 @@
 # epiquery2 driver: salesforce
-# version: 1.0
-# 
+# version: 2.0
+# Change description: Adding proper json wrapper around full resultset
 events      = require 'events'
 salesforce  = require 'jsforce'
 log         = require 'simplog'
 
-class SalesforceDriver extends events.EventEmitter
+class SalesforceDriverV2 extends events.EventEmitter
 
   constructor: (@config) ->
       @valid = false
 
   execute: (query, context) ->
+      rowSetStarted = false
       log.debug "executing SOQL query #{query}"
       @conn.query(query)
         .on 'record', (record) =>
+          if !rowSetStarted
+            rowSetStarted = true
+            @emit 'beginrowset'
           @emit 'row', record
         .on 'end', (query) =>
+          if rowSetStarted
+            @emit 'endrowset'
           @emit 'endquery', query
         .on 'error', (error) =>
+          if rowSetStarted
+            @emit 'endrowset'
           @valid = false
           @emit 'error', error
         .run { autoFetch: true, maxFetch: @config.maxFetch || 5000 }
@@ -37,4 +45,4 @@ class SalesforceDriver extends events.EventEmitter
   validate: ->
     @valid
 
-module.exports.DriverClass = SalesforceDriver
+module.exports.DriverClass = SalesforceDriverV2
