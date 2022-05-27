@@ -8,7 +8,6 @@ on:
       - gds
       - gds2
       - salesforce-connect
-      - salesforce-connect-v2
 jobs:
   unit-test:
     runs-on: ubuntu-latest
