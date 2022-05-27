@@ -9,6 +9,7 @@ on:
       - gds2
       - salesforce-connect
       - salesforce-connect-v2
+      - epi-mysql
 jobs:
   unit-test:
     runs-on: ubuntu-latest
