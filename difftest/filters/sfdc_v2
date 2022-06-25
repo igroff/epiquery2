@@ -1,0 +1,2 @@
+#! /usr/bin/env bash
+cat | sed -e 's/"queryId": "[0-9]*_[0-9]*"/queryid/g' -e 's|/v[0-9]*.[0-9]*/|/version/|g'
