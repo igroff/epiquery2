@@ -11,8 +11,6 @@ config    = require './src/config.coffee'
 httpClient          = require './src/transport/http.coffee'
 queryRequestHandler = require('./src/request.coffee').queryRequestHandler
 
-http = require 'http';
-fibers = require('fibers');
 request = require('request-promise');
 async = require('asyncawait/async');
 await = require('asyncawait/await');
