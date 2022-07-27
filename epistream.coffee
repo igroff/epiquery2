@@ -10,10 +10,6 @@ app       = require './app.coffee'
 config    = require './src/config.coffee'
 Context   = require('./src/context').Context
 queryRequestHandler = require('./src/request.coffee').queryRequestHandler
-#master code to clean
-request = require("request-promise");
-async = require('asyncawait/async');
-await = require('asyncawait/await');
 
 sockjsClient        = require './src/transport/sockjs.coffee'
 
