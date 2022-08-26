@@ -53,16 +53,23 @@ app.get '/diagnosticall', (req, res) ->
     response.aclsEnabled = config.enableTemplateAcls
   res.send response
 
-app.get '/diagnostictest', async (req, res) ->
+app.get '/connection_health', async (req, res) ->
+  # connection_health endpoint
+  # used as a true healthcheck for the epiquery instance. 
+  # it grabs each of the mssql connections defined in the service's connection list
+  # and attempts to call a trivial template through it. Results are returned, along
+  # with any errors. The caller can inspect the resulting array and determine if the
+  # service is healthy or not and which connections may be failing if any.
   connections = [];
   epi_connections= _.pluck(_.where(config.connections, {driver: "mssql"}),'name');
   for connection in epi_connections
     try
+      console.debug "Connection Health: Attempting to connect to " + connection
       results = await request 'http://localhost:'+process.env.PORT+'/epiquery1/'+connection+'/test/servername'
       result = JSON.parse(results)
-      console.log "Name :" + connection
-      console.log Object.values(result[0])[0] 
-      console.log result
+      console.debug "Name: " + connection
+      console.debug Object.values(result[0])[0] 
+      console.debug result
       connections.push {"connectionname": connection, "server": result[0], "server": Object.values(result[0])[0]}
     catch e
       connections.push {"connectionname": connection, "error": JSON.parse(e.error.replace(/\\/g, ''))}
