@@ -70,7 +70,7 @@ app.get '/connection_health', async (req, res) ->
       console.debug "Name: " + connection
       console.debug Object.values(result[0])[0] 
       console.debug result
-      connections.push {"connectionname": connection, "server": result[0], "server": Object.values(result[0])[0]}
+      connections.push {"connectionname": connection}
     catch e
       connections.push {"connectionname": connection, "error": JSON.parse(e.error.replace(/\\/g, ''))}
   res.send connections
