@@ -48,7 +48,7 @@ app.get '/diagnostic', (req, res) ->
 app.get '/connections', (req, res) ->
   response =
     message: "ok"
-    connections: _.map(config.connections, (conn) -> { driver: conn.driver, name: conn.name, timeout: conn.config?.options?.requestTimeout })
+    connections: _.map(config.connections, (conn) -> { driver: conn.driver, name: conn.name, server: conn.config?.server, timeout: conn.config?.options?.requestTimeout, port: conn.config?.options?.port })
   if config.isDevelopmentMode()
     response.aclsEnabled = config.enableTemplateAcls
   res.send response
@@ -70,7 +70,7 @@ app.get '/connection_health', async (req, res) ->
       console.debug "Name: " + connection
       console.debug Object.values(result[0])[0] 
       console.debug result
-      connections.push {"connectionname": connection}
+      connections.push {"connectionname": connection, "server": result[0], "server": Object.values(result[0])[0]}
     catch e
       connections.push {"connectionname": connection, "error": JSON.parse(e.error.replace(/\\/g, ''))}
   res.send connections
