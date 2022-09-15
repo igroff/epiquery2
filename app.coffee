@@ -45,7 +45,7 @@ app.get '/diagnostic', (req, res) ->
     response.aclsEnabled = config.enableTemplateAcls
   res.send response
 
-app.get '/diagnosticall', (req, res) ->
+app.get '/connections', (req, res) ->
   response =
     message: "ok"
     connections: _.map(config.connections, (conn) -> { driver: conn.driver, name: conn.name, timeout: conn.config?.options?.requestTimeout })
