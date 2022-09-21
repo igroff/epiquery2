@@ -7,7 +7,9 @@ on:
     branches:
       - gds
       - gds2
+      - new-diagnostic
       - salesforce-connect
+      - salesforce-connect-v2
 jobs:
   unit-test:
     runs-on: ubuntu-latest
