@@ -64,13 +64,11 @@ app.get '/connection_health', async (req, res) ->
   epi_connections= _.pluck(_.where(config.connections, {driver: "mssql"}),'name');
   for connection in epi_connections
     try
-      console.debug "Connection Health: Attempting to connect to " + connection
+      log.debug "Connection Health: Attempting to connect to " + connection
       results = await request 'http://localhost:'+process.env.PORT+'/epiquery1/'+connection+'/test/servername'
       result = JSON.parse(results)
-      console.debug "Name: " + connection
-      console.debug Object.values(result[0])[0] 
-      console.debug result
-      connections.push {"connectionname": connection, "server": result[0], "server": Object.values(result[0])[0]}
+      log.debug "Name: " + connection + result
+      connections.push {"connectionname": connection, "server": Object.values(result[0])[0]}
     catch e
       connections.push {"connectionname": connection, "error": JSON.parse(e.error.replace(/\\/g, ''))}
   res.send connections
