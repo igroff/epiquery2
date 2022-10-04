@@ -26,7 +26,7 @@ for conn_name in CONNECTION_VAR_NAMES.split(" ")
   try
     conn_o = JSON.parse(process.env[conn_name])    
   catch e
-    log.error "Unable to parse env var #{conn_name} as connection: #{process.env[conn_name]}"
+    log.error "Unable to parse env var #{conn_name} as connection"
     throw e
   CONNECTIONS[conn_o.name] = conn_o
 
