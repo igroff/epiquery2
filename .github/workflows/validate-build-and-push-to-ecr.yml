@@ -7,9 +7,7 @@ on:
     branches:
       - gds
       - gds2
-      - new-diagnostic
-      - salesforce-connect
-      - salesforce-connect-v2
+      - beta-postgres
 jobs:
   unit-test:
     runs-on: ubuntu-latest
