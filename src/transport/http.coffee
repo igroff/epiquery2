@@ -123,7 +123,9 @@ attachEpiqueryResponder = (context, res) ->
   context.on 'error', (err) ->
     d = message: 'error', errorDetail: err
     d.error = err.message if err.message
-    log.error err
+    # by the time we get here, the error has been logged elsewhere so
+    # this is really just for debugging
+    log.debug err
     status = 500
     writeResultElement d
     #check if we hit beginrowset - if so add a closing ']' since we won't hit endrowset
@@ -251,7 +253,9 @@ attachSimpleResponder = (context, res) ->
   context.on 'error', (err) ->
     d = message: 'error', errorDetail: err
     d.error = err.message if err.message
-    log.error err
+    # by the time we get here, the error has been logged elsewhere so
+    # this is really just for debugging
+    log.debug err
     status = 500
     writeResultElement d
     #check if we hit beginrowset - if so add a closing ']' since we won't hit endrowset
@@ -313,7 +317,9 @@ attachStandardResponder = (context, res) ->
   c.on 'error', (err) ->
     d = message: 'error', errorDetail: err
     d.error = err.message if err.message
-    log.error err
+    # by the time we get here, the error has been logged elsewhere so
+    # this is really just for debugging
+    log.debug err
     writeEvent d
 
   c.once 'completequeryexecution', completeResponse
