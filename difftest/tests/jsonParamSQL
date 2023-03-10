@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# vi: ft=sh
+curl -s "http://${EPI_TEST_SERVER}:8080/simple/mssql/test/jsonParam.sql" \
+  --header 'Content-Type: application/json' \
+  --data '{"someJ": { "a":"a", "b":"b", "c":{ "a": "ca", "b":"cb"}}}' | jq .

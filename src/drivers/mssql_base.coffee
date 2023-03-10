@@ -167,9 +167,17 @@ class MSSQLDriver extends events.EventEmitter
       try
         parameters.forEach (param) =>
           lowerCaseTypeName = param.type.toLowerCase()
-          tediousType = lowerCaseTediousTypeMap[lowerCaseTypeName]
-          throw new TypeError("Unknown parameter type (#{param.type}) for #{param.varName}") if not tediousType
-          transformedValue = tediousType.transformValue(param.value)
+
+          # handling for costume json parameter that would pass in stringify JSON into nvarchar variable
+          if lowerCaseTypeName != "json"
+            tediousType = lowerCaseTediousTypeMap[lowerCaseTypeName]          
+            throw new TypeError("Unknown parameter type (#{param.type}) for #{param.varName}") if not tediousType
+            transformedValue = tediousType.transformValue(param.value)
+          else
+            tediousType = lowerCaseTediousTypeMap["nvarchar"]          
+            transformedValue = JSON.stringify(param.value)
+            lowerCaseTypeName = "nvarchar"
+
           log.debug "adding parameter #{param.varName}, length (#{transformedValue?.length}), value (#{param.value}) as type #{tediousType.name} with lowerCaseTypeName #{lowerCaseTypeName}, transformed value: #{transformedValue}"
           paramOptions = {}
           # we entered into this with the ability to not specify length, precision or scale in our
