@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# vi: ft=sh
+# testing to be sure deeply nested json doesn't have any issues
+curl -s "http://${EPI_TEST_SERVER}:8080/simple/mssql/test/param_json_deep_nest.sql" \
+  --header 'Content-Type: application/json' \
+  --data '{"myJson": {"a": {"b": {"c": {"d": {"e": {"f": {"g": {"h": {"i": {"j": {"k": "how low can you go"}}}}}}}}}}}}' | jq .
