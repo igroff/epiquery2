@@ -65,7 +65,7 @@ defaults to 2 minutes both in node and here in epiquery2.
 * Modify your `/etc/hosts` file to connect to local docker run databases:
 
     ```
-    127.0.0.1  mssql mysql sfdc
+    127.0.0.1  postgres mssql mysql sfdc
     ```
 
 * Confirm you are running at least GNU Make 4.3. A Mac OS X running version 3.81 won't work. This is required for the `make test` command in the [Makefile](./Makefile). More info on the issue [here](https://stackoverflow.com/questions/8941110/how-i-could-add-dir-to-path-in-makefile).
