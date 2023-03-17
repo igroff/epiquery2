@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# vi: ft=sh
+curl -s "http://${EPI_TEST_SERVER}:8080/simple/mssql/test/param_json_large_json_data.sql" \
+  --header 'Content-Type: application/json' \
+  --data @./difftest/test-data/26mb-of-json | jq .
+  #--data '{"message":"catpants","array":[1,2,3,4,5,6,7]}' | jq . 
+  
