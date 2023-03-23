@@ -1,0 +1,4 @@
+--parameters:
+--@myJson json myJson
+
+SELECT apple FROM OpenJson(@myJson) WITH (apple VARCHAR(32) '$.apple');
