@@ -1,0 +1,33 @@
+{
+  "results": [
+    [
+      {
+        "v": "honeycrisp",
+        "datetimes": "2023-04-04T04:10:57.000Z",
+        "thresold": 25.609,
+        "cmdids": "1,2,3",
+        "amount": 55,
+        "autoInvoice": true,
+        "cmids": 25
+      },
+      {
+        "v": "red delicious",
+        "datetimes": "2023-04-04T04:10:57.000Z",
+        "thresold": 25.609,
+        "cmdids": "1,2,3",
+        "amount": 55,
+        "autoInvoice": true,
+        "cmids": 25
+      },
+      {
+        "v": "blahblah",
+        "datetimes": "2023-04-04T04:10:57.000Z",
+        "thresold": 25.609,
+        "cmdids": "1,2,3",
+        "amount": 55,
+        "autoInvoice": true,
+        "cmids": 25
+      }
+    ]
+  ]
+}
