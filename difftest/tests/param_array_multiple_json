@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# vi: ft=sh
+# pass an array to a json object type and verify its still parsed as json
+curl -s "http://${EPI_TEST_SERVER}:8080/simple/mssql/test/param_array_multiple_json.sql" \
+  --header 'Content-Type: application/json' \
+  --data '{"myJson1": ["honeycrisp", "red delicious"],"myJson2": ["apple", "red"]}' | jq .
