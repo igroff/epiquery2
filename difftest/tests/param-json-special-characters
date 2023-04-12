@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# vi: ft=sh
+# pass an array to a json object type and verify its still parsed as json
+curl -s "http://${EPI_TEST_SERVER}:8080/simple/mssql/test/param-json-special-characters.mustache" \
+  --header 'Content-Type: application/json' \
+  --data '{"param1": {"description": "special chars “ ” ‘ ’ – — ½ ¼ ¾ © ® …"},"jsonParam2": {"description": "special chars “ ” ‘ ’ – — ½ ¼ ¾ © ® …"}}' | jq .

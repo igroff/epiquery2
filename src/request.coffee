@@ -204,13 +204,21 @@ collectStats = (context, callback) ->
   callback null, context
 
 sanitizeInput = (context, callback) ->
+  parentKey=""
   _.walk.preorder context.templateContext, (value, key, parent) ->
+    # only the top level parents have a "host" key
+    # using this as a hack to identify the top level parent because
+    # "walk.preorder doesn't expose any type of depth attribute
+    # if we find a top level parent, store the parent key for comparison below
+    if parent and parent.host  
+      parentKey=key
     if _.isString value
       _.each Object.keys(special_characters), (keyCode) ->
         # do not escape our JSON data since it's JSON and does it's own thing
         # oh, and don't try to lower case things that don't have the toLowerCase
         # method, such as numbers which are the 'keys' of arrays
         return if key.toLowerCase and key.toLowerCase().startsWith 'json'
+        return if parentKey and parentKey.toLowerCase and parentKey.toLowerCase().startsWith 'json'
         def = special_characters[keyCode]
         value = value.replace def.regex, def.replace
       parent[key] = value
