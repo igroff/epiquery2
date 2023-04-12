@@ -58,7 +58,7 @@ for propertyName in Object.getOwnPropertyNames(tedious.TYPES)
     # when this happens we'll convert the array to a string
     else if key is 'varchar' or key is 'nvarchar'
       transformValue = (providedValue) ->
-        if _.isArray(providedValue)
+        if Array.isArray(providedValue)
           # return the string version of provided array
           providedValue.toString()
         else
