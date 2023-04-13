@@ -1,0 +1,2 @@
+#! /usr/bin/env bash
+curl -s http://${EPI_TEST_SERVER}:8080/simple/mssql/test/param-subobject.sql -H 'Content-Type: application/json' --data '{"user": {"userId": 30, "name": "jim"}}' | jq .
