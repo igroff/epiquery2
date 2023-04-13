@@ -219,7 +219,6 @@ sanitizeInput = (context, callback) ->
         def = special_characters[keyCode]
         value = value.replace def.regex, def.replace
       parent[key] = value
-  context.unEscapedTemplateContext = _.cloneDeep context.templateContext
   if context.driver.class.prototype.escapeTemplateContext
     context.driver.class.prototype.escapeTemplateContext(context.templateContext)
   callback null, context
