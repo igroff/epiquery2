@@ -99,7 +99,7 @@ class MSSQLDriver extends events.EventEmitter
       # and would have to rely on the parameter name and hokey tree traversal depth monitoring
       contextToUse = context.templateContext
       if type == "json"
-        contextToUse = context.originalTemplateContext
+        contextToUse = context.unEscapedTemplateContext
 
       # reduce used here to account for multi-level json keys (ie. user.userId)
       value = _.reduce value.split('.'), (doc,prop) ->
