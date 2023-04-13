@@ -205,22 +205,16 @@ collectStats = (context, callback) ->
 
 sanitizeInput = (context, callback) ->
   headerKeys=["host", "accept", "user-agent", "content-type", "content-length"]
-  parentKey=""
+  # store the original template context without escaping anything
+  context.originalTemplateContext = _.cloneDeep context.templateContext
   _.walk.preorder context.templateContext, (value, key, parent) ->
     # get out if we're looking at headers. no need to escape them
     return if headerKeys.includes(key)
-    # only the top level parents have a "host" key
-    # using this as a hack to identify the top level parent because
-    # "walk.preorder doesn't expose any type of depth attribute
-    # if we find a top level parent, store the parent key for comparison below
-    if parent and parent.host
-      parentKey=key
-    if _.isString value
+    if typeof value == "string"
       # do not escape our JSON data since it's JSON and does it's own thing
       # oh, and don't try to lower case things that don't have the toLowerCase
       # method, such as numbers which are the 'keys' of arrays
-      return if key.toLowerCase and key.toLowerCase().startsWith 'json'
-      return if parentKey and parentKey.toLowerCase and parentKey.toLowerCase().startsWith 'json'
+      return if key.toLowerCase and key.toLowerCase().startsWith 'json'  
       _.each Object.keys(special_characters), (keyCode) ->
         def = special_characters[keyCode]
         value = value.replace def.regex, def.replace

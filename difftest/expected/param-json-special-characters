@@ -2,7 +2,7 @@
   "results": [
     [
       {
-        "param1": "{\"description\":\"special chars \\\" \\\" ' ' - -- 1/2 1/4 3/4 (C) (R) ...\"}"
+        "param1": "{\"description\":\"special chars “ ” ‘ ’ – — ½ ¼ ¾ © ® …\"}"
       }
     ],
     [

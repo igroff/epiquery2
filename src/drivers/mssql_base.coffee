@@ -76,9 +76,12 @@ class MSSQLDriver extends events.EventEmitter
         parent[key] = value.replace(/'/g, "''") if _.isString(value)
 
   parseQueryParameters: (query, context) ->
-
+    # parameters in an epi template must use the convention
+    # "--@sql_param data_type [json_input_name]"
+    # extract all lines that look like params
     lines = query.match ///^--@.*$///mg
 
+    # loop through possible params and extract details
     _.map lines, (line) =>
       line = line.replace '--', ''
       line = line.replace '=', ''
@@ -87,18 +90,21 @@ class MSSQLDriver extends events.EventEmitter
       varName = varName.replace('@','')
       type = type.replace /\(.*\)/
 
-      # as a convenience, we'll let you omit the value declaration in which case we'll use the name of the parametr
+      # as a convenience, we'll let you omit the value declaration in which case we'll use the name of the parameter
       # as the name of the value
       value = varName unless value
 
-      # here we can use the unescaped context because
-      # parameter values are not subject to the sql injection problems that
-      # raw sql is, and our escaping would render parmeter values incorrect e.g.
-      # duplicating 's
+      # If the variable type is json, use the unescapted context
+      # this is done here because the sanitize input step isn't aware of types
+      # and would have to rely on the parameter name and hokey tree traversal depth monitoring
+      contextToUse = context.templateContext
+      if type == "json"
+        contextToUse = context.originalTemplateContext
+
+      # reduce used here to account for multi-level json keys (ie. user.userId)
       value = _.reduce value.split('.'), (doc,prop) ->
         doc[prop]
-      , context.unEscapedTemplateContext
-
+      , contextToUse
       { varName, type, value }
 
   connect: (cb) ->
@@ -168,7 +174,7 @@ class MSSQLDriver extends events.EventEmitter
         parameters.forEach (param) =>
           lowerCaseTypeName = param.type.toLowerCase()
 
-          # handling for costume json parameter that would pass in stringify JSON into nvarchar variable
+          # handling for custom json parameter that would pass in stringify JSON into nvarchar variable
           if lowerCaseTypeName != "json"
             tediousType = lowerCaseTediousTypeMap[lowerCaseTypeName]          
             throw new TypeError("Unknown parameter type (#{param.type}) for #{param.varName}") if not tediousType
