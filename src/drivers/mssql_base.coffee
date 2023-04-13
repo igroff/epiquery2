@@ -103,7 +103,9 @@ class MSSQLDriver extends events.EventEmitter
 
       # reduce used here to account for multi-level json keys (ie. user.userId)
       value = _.reduce value.split('.'), (doc,prop) ->
-        doc[prop]
+        if doc 
+          return doc[prop]
+        return
       , contextToUse
       { varName, type, value }
 
