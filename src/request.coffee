@@ -206,7 +206,7 @@ collectStats = (context, callback) ->
 sanitizeInput = (context, callback) ->
   headerKeys=["host", "accept", "user-agent", "content-type", "content-length"]
   # store the original template context without escaping anything
-  context.unEscapedTemplateContext = _.cloneDeep context.templateContext
+  context.orignalTemplateContext = _.cloneDeep context.templateContext
   _.walk.preorder context.templateContext, (value, key, parent) ->
     # get out if we're looking at headers. no need to escape them
     return if headerKeys.includes(key)
@@ -219,6 +219,7 @@ sanitizeInput = (context, callback) ->
         def = special_characters[keyCode]
         value = value.replace def.regex, def.replace
       parent[key] = value
+  context.unEscapedTemplateContext = _.cloneDeep context.templateContext
   if context.driver.class.prototype.escapeTemplateContext
     context.driver.class.prototype.escapeTemplateContext(context.templateContext)
   callback null, context

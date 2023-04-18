@@ -1,0 +1,14 @@
+{
+  "results": [
+    [
+      {
+        "myJson1": "some o'test"
+      }
+    ],
+    [
+      {
+        "jsonParam": "some o'test"
+      }
+    ]
+  ]
+}

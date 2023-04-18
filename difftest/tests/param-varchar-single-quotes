@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# vi: ft=sh
+# pass an array to a json object type and verify its still parsed as json
+curl -s "http://${EPI_TEST_SERVER}:8080/simple/mssql/test/param-varchar-single-quotes.sql" \
+  --header 'Content-Type: application/json' \
+  --data "{\"myJson1\": \"some o'test\", \"jsonParam\": \"some o'test\"}" | jq .
+# note: escaping single quotes in bash is not easy. above line departs from the convention
+# used in the other difftests because the outer wrapper here is a double and not single
+# however, in order to do an outer single wrapper, the line would look something like
+# the below, which is just really hard to understand. #bewareSingleQuotesInBash
+# --data '{"myJson1": "some o'"'"'test", "jsonParam": "some o'"'"'test"}' | jq .

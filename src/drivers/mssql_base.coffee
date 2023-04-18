@@ -97,9 +97,9 @@ class MSSQLDriver extends events.EventEmitter
       # If the variable type is json, use the unescapted context
       # this is done here because the sanitize input step isn't aware of types
       # and would have to rely on the parameter name and hokey tree traversal depth monitoring
-      contextToUse = context.templateContext
+      contextToUse = context.unEscapedTemplateContext
       if type == "json"
-        contextToUse = context.unEscapedTemplateContext
+        contextToUse = context.orignalTemplateContext
 
       # reduce used here to account for multi-level json keys (ie. user.userId)
       value = _.reduce value.split('.'), (doc,prop) ->
