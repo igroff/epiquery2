@@ -1,0 +1,2 @@
+#! /usr/bin/env bash
+curl -s http://${EPI_TEST_SERVER}:8080/simple/mssql/test/invalid-param-missing-subobject.sql -H 'Content-Type: application/json' --data '{"something":1,"somethingElse":2}' | jq .
