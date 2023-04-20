@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # vi: ft=sh
 # if I pass a object to a template expecting a json parameter, sql will detect it as json
-curl -s "http://${EPI_TEST_SERVER}:8080/simple/mssql/test/param_json_is_json.sql" \
+curl -s "http://${EPI_TEST_SERVER}:8080/simple/mssql/test/param-json-is-json.sql" \
   --header 'Content-Type: application/json' \
   --data '{"myJson": {"apples": ["honeycrisp", "red delicious"]}}' | jq .

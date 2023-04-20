@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # vi: ft=sh
 # if I pass a string to a template expecting a json parameter, sql will detect it as not json
-curl -s "http://${EPI_TEST_SERVER}:8080/simple/mssql/test/param_json_non_json.sql" \
+curl -s "http://${EPI_TEST_SERVER}:8080/simple/mssql/test/param-json-non-json.sql" \
   --header 'Content-Type: application/json' \
   --data '{"myJson": "not json. just a string"}' | jq .
